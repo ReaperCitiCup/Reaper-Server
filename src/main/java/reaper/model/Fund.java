@@ -10,16 +10,12 @@ public class Fund {
     @GeneratedValue
     private Integer id;
 
-    @Column(length = 6)
     private String fundId;
 
-    @Column(length = 128)
     private String name;
 
-    @Column(length = 32)
     private String shortname;
 
-    @Column(length = 32)
     private String type;
 
     private Date establishmentDate;
@@ -30,6 +26,7 @@ public class Fund {
 
     }
 
+    @Column(length = 6)
     public String getFundId() {
         return fundId;
     }
@@ -38,6 +35,7 @@ public class Fund {
         this.fundId = fundId;
     }
 
+    @Column(length = 128)
     public String getName() {
         return name;
     }
@@ -46,6 +44,7 @@ public class Fund {
         this.name = name;
     }
 
+    @Column(length = 32)
     public String getShortname() {
         return shortname;
     }
@@ -54,6 +53,7 @@ public class Fund {
         this.shortname = shortname;
     }
 
+    @Column(length = 32)
     public String getType() {
         return type;
     }

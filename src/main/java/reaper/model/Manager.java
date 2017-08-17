@@ -10,21 +10,16 @@ public class Manager {
     @GeneratedValue
     private Integer id;
 
-    @Column(length = 8)
     private String managerId;
 
-    @Column(length = 32)
     private String name;
 
-    @Column(length = 1)
     private String gender;
 
-    @Column(length = 32)
     private String university;
 
     private Date appointedDate;
 
-    @Column(length = 65535)
     private String introduction;
 
     private Double totalScope;
@@ -35,6 +30,7 @@ public class Manager {
 
     }
 
+    @Column(length = 8)
     public String getManagerId() {
         return managerId;
     }
@@ -43,6 +39,7 @@ public class Manager {
         this.managerId = managerId;
     }
 
+    @Column(length = 32)
     public String getName() {
         return name;
     }
@@ -51,6 +48,7 @@ public class Manager {
         this.name = name;
     }
 
+    @Column(length = 1)
     public String getGender() {
         return gender;
     }
@@ -59,6 +57,7 @@ public class Manager {
         this.gender = gender;
     }
 
+    @Column(length = 32)
     public String getUniversity() {
         return university;
     }
@@ -75,6 +74,7 @@ public class Manager {
         this.appointedDate = appointedDate;
     }
 
+    @Column(length = 65535)
     public String getIntroduction() {
         return introduction;
     }
