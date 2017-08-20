@@ -30,7 +30,7 @@ public class UserRepositoryTest {
     @Test
     public void save() throws Exception {
         User user = new User();
-        user.setId(1);
+//        user.setId(1);
         user.setUsername("111");
         user.setPassword("123");
         userRepository.save(user);
@@ -38,7 +38,7 @@ public class UserRepositoryTest {
     
     @Test
     public void findById() throws Exception {
-        assertNotNull(userRepository.findUserById(1));
+        assertNotNull(userRepository.findUserById(0));
     }
 
     @After

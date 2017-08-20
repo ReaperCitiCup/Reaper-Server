@@ -8,4 +8,6 @@ import reaper.model.User;
 public interface UserService {
 
     public User findUserByUsername(String username);
+
+    public String addUser(String name,String password);
 }
