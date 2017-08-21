@@ -26,7 +26,7 @@ public class TestController {
         return "Hello World";
     }
 
-    @RequestMapping("/users")
+    @RequestMapping("/user")
     @ResponseBody
     public User getUsers() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -34,9 +34,9 @@ public class TestController {
 
     }
 
-    @RequestMapping("/add")
-    @ResponseBody
-    public String addUser(String name,String password){
-        return userService.addUser(name,password);
-    }
+//    @RequestMapping("/add")
+//    @ResponseBody
+//    public String addUser(String name,String password){
+//        return userService.addUser(name,password);
+//    }
 }
