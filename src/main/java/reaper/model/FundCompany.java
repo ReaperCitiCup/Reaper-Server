@@ -11,7 +11,7 @@ public class FundCompany {
 
     private String fundId;
 
-    private String managerId;
+    private String companyId;
 
     public FundCompany(){
 
@@ -27,11 +27,11 @@ public class FundCompany {
     }
 
     @Column(length = 8)
-    public String getManagerId() {
-        return managerId;
+    public String getcompanyId() {
+        return companyId;
     }
 
-    public void setManagerId(String managerId) {
-        this.managerId = managerId;
+    public void setcompanyId(String companyId) {
+        this.companyId = companyId;
     }
 }

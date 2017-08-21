@@ -13,6 +13,7 @@ public class CrawlTest {
     @Autowired
     FundHoldStockRepository fundHoldStockRepository;
 
+
     @Test
     public void fundHoldStockCrawl(){
         Code code = new Code();
