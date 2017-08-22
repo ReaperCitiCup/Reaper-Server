@@ -14,7 +14,7 @@ public class Fund {
 
     private String name;
 
-    private String shortname;
+
 
     private String type;
 
@@ -44,14 +44,6 @@ public class Fund {
         this.name = name;
     }
 
-    @Column(length = 32)
-    public String getShortname() {
-        return shortname;
-    }
-
-    public void setShortname(String shortname) {
-        this.shortname = shortname;
-    }
 
     @Column(length = 32)
     public String getType() {
