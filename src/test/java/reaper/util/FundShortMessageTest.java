@@ -19,7 +19,7 @@ import java.io.*;
 public class FundShortMessageTest {
 
     @Autowired
-    FundHoldStockRepository fundHoldStockRepository;
+    FundShortMessageRepository fundShortMessageRepository;
 
 
     @Test
@@ -44,7 +44,7 @@ public class FundShortMessageTest {
                 FundShortMessage fundShortMessage=new FundShortMessage();
                 fundShortMessage.setCode(code);
                 fundShortMessage.setName(name);
-                fundHoldStockRepository.save(fundShortMessage);
+                fundShortMessageRepository.save(fundShortMessage);
 
 
 
