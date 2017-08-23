@@ -1,9 +1,8 @@
 package reaper.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import reaper.Application;
+import reaper.model.FundHoldBond;
 import reaper.model.FundHoldStock;
+import reaper.repository.FundHoldBondRepository;
 import reaper.repository.FundHoldStockRepository;
 
 import java.io.BufferedReader;
@@ -18,14 +17,15 @@ import java.util.regex.Pattern;
  */
 public class Crawler {
     public static void main(String[] args) {
-//        Code code = new Code();
-//        Crawler crawler = new Crawler();
+        Code code = new Code();
+        Crawler crawler = new Crawler();
 //        for (String c:code.getStockCode()){
 //            for(int i=2009;i<2018;i++){
-//                crawler.crawlByYearAndFundCode(c,String.valueOf(i));
+//                crawler.crawlFondHoldStock(c,String.valueOf(i));
 //            }
 //        }
-//        crawlByYearAndFundCode("000066",String.valueOf(2013));
+//        new Crawler().crawlFondHoldStock("001829",String.valueOf(2017),null);
+        crawler.crawlFundHoldBond("410001","2015",null);
     }
 
     /**
@@ -33,9 +33,72 @@ public class Crawler {
      * @param fundCode 基金代码
      * @param year 年份
      */
-    public void crawlByYearAndFundCode(String fundCode, String year, FundHoldStockRepository fundHoldStockRepository) {
-        // 定义即将访问的链接
-        String url = "http://fund.eastmoney.com/f10/FundArchivesDatas.aspx?type=jjcc&code=" + fundCode + "&topline=100&year=" + year;
+    public void crawlFondHoldStock(String fundCode, String year, FundHoldStockRepository fundHoldStockRepository) {
+        String result = getHtml("http://fund.eastmoney.com/f10/FundArchivesDatas.aspx?type=jjcc&code=" + fundCode + "&topline=100&year=" + year);
+
+//        result = "<td><a href='http://quote.eastmoney.com/sz300335.html'>300335</a></td>";
+//        System.out.println(result);
+        //分割季度的pattern
+        Pattern seasonPattern = Pattern.compile("&nbsp;&nbsp;(\\d{4})年(\\d){1}季度股票投资明细");
+        Matcher seasonMatcher = seasonPattern.matcher(result);
+        String[] seasonNumbers = new String[4];
+        int count = 0;
+        while (seasonMatcher.find()) {
+            seasonNumbers[count] = seasonMatcher.group(2);
+            count++;
+        }
+
+        String[] seasons = seasonPattern.split(result);
+
+        Pattern codePattern = Pattern.compile("<td><a href='[^']*'>(\\d{5,6})</a></td>");
+        Pattern ratePattern = Pattern.compile("<a href='(.)*?'>档案</a></td><td class='tor'>((((\\d|\\.)+)%)|---)?</td>");
+        //分割后，0为抬头，后面对应各个季度
+        for (int i = 0; i < count; i++) {
+            Matcher codeMatcher = codePattern.matcher(seasons[i + 1]);
+            Matcher rateMatcher = ratePattern.matcher(seasons[i + 1]);
+            while (codeMatcher.find()) {
+                rateMatcher.find();
+                FundHoldStock fundHoldStock = new FundHoldStock(fundCode,Integer.valueOf(year),Integer.valueOf(seasonNumbers[i]),codeMatcher.group(1),rateMatcher.group(4)==null?null:Double.valueOf(rateMatcher.group(4)));
+                fundHoldStockRepository.save(fundHoldStock);
+
+//                System.out.println(fundHoldStock);
+//                System.out.println(fundCode + " " + year + " " + seasonNumbers[i] + " " + codeMatcher.group(1) + " " + rateMatcher.group(4));
+            }
+        }
+    }
+
+    public void crawlFundHoldBond(String fundCode, String year, FundHoldBondRepository fundHoldBondRepository){
+        System.out.println(fundCode+" "+year);
+        String result = getHtml("http://fund.eastmoney.com/f10/FundArchivesDatas.aspx?type=zqcc&code=" + fundCode + "&topline=100&year=" + year);
+
+//        System.out.println(result);
+        //分割季度的pattern
+        Pattern seasonPattern = Pattern.compile("&nbsp;&nbsp;(\\d{4})年(\\d){1}季度债券投资明细");
+        Matcher seasonMatcher = seasonPattern.matcher(result);
+        String[] seasonNumbers = new String[4];
+        int count = 0;
+        while (seasonMatcher.find()) {
+            seasonNumbers[count] = seasonMatcher.group(2);
+            count++;
+        }
+
+        String[] seasons = seasonPattern.split(result);
+
+        Pattern pattern = Pattern.compile("<td>(\\d{6,7})</td><td class='tol'>(.*?)</td><td class='tor'>((((\\d|\\.)+)%)|---)?</td>");
+        //分割后，0为抬头，后面对应各个季度
+        for (int i = 0; i < count; i++) {
+            Matcher matcher = pattern.matcher(seasons[i + 1]);
+            while (matcher.find()) {
+                FundHoldBond fundHoldBond = new FundHoldBond(fundCode,Integer.valueOf(year),Integer.valueOf(seasonNumbers[i]),matcher.group(1),matcher.group(2),matcher.group(5)==null?null:Double.valueOf(matcher.group(5)));
+                fundHoldBondRepository.save(fundHoldBond);
+
+//                System.out.println(fundHoldBond);
+//                System.out.println(fundCode + " " + year + " " + seasonNumbers[i] + " " + codeMatcher.group(1) + " " + rateMatcher.group(4));
+            }
+        }
+    }
+
+    private String getHtml(String url){
         // 定义一个字符串用来存储网页内容
         String result = "";
         // 定义一个缓冲字符输入流
@@ -56,6 +119,7 @@ public class Crawler {
                 result += line + "\n";
             }
         } catch (Exception e) {
+            System.out.println(url);
             System.out.println("发送GET请求出现异常！" + e);
             e.printStackTrace();
         } // 使用finally来关闭输入流
@@ -68,34 +132,6 @@ public class Crawler {
                 e2.printStackTrace();
             }
         }
-//        result = "<td><a href='http://quote.eastmoney.com/sz300335.html'>300335</a></td>";
-//        System.out.println(result);
-        //分割季度的pattern
-        Pattern seasonPattern = Pattern.compile("&nbsp;&nbsp;(\\d){4}年(\\d){1}季度股票投资明细");
-        Matcher seasonMatcher = seasonPattern.matcher(result);
-        String[] seasonNumbers = new String[4];
-        int count = 0;
-        while (seasonMatcher.find()) {
-            seasonNumbers[count] = seasonMatcher.group(2);
-            count++;
-        }
-
-        String[] seasons = seasonPattern.split(result);
-
-        Pattern codePattern = Pattern.compile("<td><a href='[^']*'>(\\d+)</a></td>");
-        Pattern ratePattern = Pattern.compile("<a href='(.)*?'>档案</a></td><td class='tor'>((((\\d|\\.)+)%)|---)</td>");
-        //分割后，0为抬头，后面对应各个季度
-        for (int i = 0; i < count; i++) {
-            Matcher codeMatcher = codePattern.matcher(seasons[i + 1]);
-            Matcher rateMatcher = ratePattern.matcher(seasons[i + 1]);
-            while (codeMatcher.find()) {
-                rateMatcher.find();
-                FundHoldStock fundHoldStock = new FundHoldStock(fundCode,Integer.valueOf(year),Integer.valueOf(seasonNumbers[i]),codeMatcher.group(1),rateMatcher.group(4)==null?null:Double.valueOf(rateMatcher.group(4)));
-                fundHoldStockRepository.save(fundHoldStock);
-
-//                System.out.println(fundHoldStock);
-//                System.out.println(fundCode + " " + year + " " + seasonNumbers[i] + " " + codeMatcher.group(1) + " " + rateMatcher.group(4));
-            }
-        }
+        return result;
     }
 }
