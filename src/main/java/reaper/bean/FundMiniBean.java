@@ -6,17 +6,17 @@ package reaper.bean;
 public class FundMiniBean {
 
     /**
-     * 代码 id
+     * 代码 code
      */
-    public int id;
+    public String code;
 
     /**
      * 名称
      */
     public String name;
 
-    public FundMiniBean(int id, String name) {
-        this.id = id;
+    public FundMiniBean(String code, String name) {
+        this.code = code;
         this.name = name;
     }
 }

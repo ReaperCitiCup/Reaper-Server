@@ -14,8 +14,6 @@ public class Fund {
 
     private String name;
 
-
-
     private String type;
 
     private Date establishmentDate;

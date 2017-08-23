@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reaper.model.FundShortMessage;
-import reaper.repository.FundHoldStockRepository;
 import reaper.repository.FundShortMessageRepository;
 
 import java.io.*;
@@ -26,7 +25,7 @@ public class FundShortMessageTest {
     public  void getFundShortMessageTest() {
 
 
-        File file = new File("code.txt");
+        File file = new File("src/main/code.txt");
 
 
         try {
