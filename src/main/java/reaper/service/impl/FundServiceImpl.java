@@ -5,12 +5,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reaper.bean.FundMiniBean;
+import reaper.bean.HistoryManagerBean;
 import reaper.bean.NetValueDateBean;
+import reaper.model.FundHistory;
 import reaper.model.FundNetValue;
 import reaper.model.FundShortMessage;
-import reaper.repository.FundNetValueRepository;
-import reaper.repository.FundRepository;
-import reaper.repository.FundShortMessageRepository;
+import reaper.repository.*;
 import reaper.service.FundService;
 
 import java.text.SimpleDateFormat;
@@ -33,6 +33,12 @@ public class FundServiceImpl implements FundService {
 
     @Autowired
     FundNetValueRepository fundNetValueRepository;
+
+    @Autowired
+    FundHistoryRepository fundHistoryRepository;
+
+    @Autowired
+    ManagerInfoRepository managerInfoRepository;
 
     //TODO 日期格式
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -96,6 +102,19 @@ public class FundServiceImpl implements FundService {
         for (FundNetValue fundNetValue:fundNetValues){
             cumulativeValue += fundNetValue.getDailyRate();
             res.add(new NetValueDateBean(sdf.format(fundNetValue.getDate()),cumulativeValue));
+        }
+        return res;
+    }
+
+    //TODO 没数据，还未测试
+    @Override
+    public List<HistoryManagerBean> findHistoryManagersByCode(String code) {
+        List<HistoryManagerBean> res = new ArrayList<>();
+
+        for(FundHistory fundHistory:fundHistoryRepository.findAllByFundCodeOrderByStartDateAsc(code)){
+            //计算相差的天数
+            int difDays = (int)((fundHistory.getEndDate().getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24));
+            res.add(new HistoryManagerBean(fundHistory.getManagerId(),managerInfoRepository.findByCode(fundHistory.getManagerId()).getName(),sdf.format(fundHistory.getStartDate()),sdf.format(fundHistory.getEndDate()),difDays,fundHistory.getPayback()));
         }
         return res;
     }

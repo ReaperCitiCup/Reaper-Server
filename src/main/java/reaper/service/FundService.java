@@ -1,6 +1,7 @@
 package reaper.service;
 
 import reaper.bean.FundMiniBean;
+import reaper.bean.HistoryManagerBean;
 import reaper.bean.NetValueDateBean;
 import reaper.util.Page;
 
@@ -40,4 +41,11 @@ public interface FundService {
      * @return 对应代码基金在该时间段的积累收益率
      */
     public List<NetValueDateBean> findCumulativeRateTrendByCode(String code,String month);
+
+    /**
+     * 基金历史经理数据
+     * @param code 基金代码
+     * @return 历史经理情况
+     */
+    public List<HistoryManagerBean> findHistoryManagersByCode(String code);
 }
