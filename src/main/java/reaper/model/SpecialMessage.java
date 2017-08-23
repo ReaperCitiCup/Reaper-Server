@@ -14,6 +14,17 @@ public class SpecialMessage {
     @Id
     @GeneratedValue
     private Integer id;
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    private String code;
+
     private Double standardDeviation1;
 
     public SpecialMessage() {

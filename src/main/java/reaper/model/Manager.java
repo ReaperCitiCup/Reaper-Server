@@ -14,9 +14,9 @@ public class Manager {
 
     private String name;
 
-    private String gender;
 
-    private String university;
+
+
 
     private Date appointedDate;
 
@@ -48,23 +48,6 @@ public class Manager {
         this.name = name;
     }
 
-    @Column(length = 1)
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    @Column(length = 32)
-    public String getUniversity() {
-        return university;
-    }
-
-    public void setUniversity(String university) {
-        this.university = university;
-    }
 
     public Date getAppointedDate() {
         return appointedDate;

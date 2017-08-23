@@ -18,7 +18,8 @@ public class FundShortMessage {
     public FundShortMessage() {
     }
 
-    @Column(length = 6)
+    @Column(length = 6,unique = true)
+
     public String getCode() {
         return code;
     }
