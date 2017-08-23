@@ -14,9 +14,7 @@ public class Manager {
 
     private String name;
 
-
-
-
+    private String gender;
 
     private Date appointedDate;
 
@@ -48,6 +46,13 @@ public class Manager {
         this.name = name;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
 
     public Date getAppointedDate() {
         return appointedDate;
