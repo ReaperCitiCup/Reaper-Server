@@ -14,7 +14,9 @@ public class Fund {
 
     private String name;
 
-    private String type;
+    private String type1;
+
+    private String type2;
 
     private Date establishmentDate;
 
@@ -44,12 +46,21 @@ public class Fund {
 
 
     @Column(length = 32)
-    public String getType() {
-        return type;
+    public String getType1() {
+        return type1;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setType1(String type1) {
+        this.type1 = type1;
+    }
+
+    @Column(length = 20)
+    public String getType2() {
+        return type2;
+    }
+
+    public void setType2(String type2) {
+        this.type2 = type2;
     }
 
     public Date getEstablishmentDate() {

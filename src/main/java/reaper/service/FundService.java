@@ -1,6 +1,7 @@
 package reaper.service;
 
-import reaper.bean.FundMiniBean;
+import reaper.bean.FundInfoBean;
+import reaper.bean.MiniBean;
 import reaper.bean.HistoryManagerBean;
 import reaper.bean.NetValueDateBean;
 import reaper.util.Page;
@@ -18,7 +19,13 @@ public interface FundService {
      * @param page     第几页
      * @return Movie 分页列表
      */
-    public Page<FundMiniBean> findFundByKeyword(String keyword, String order, int size, int page);
+    public Page<MiniBean> findFundByKeyword(String keyword, String order, int size, int page);
+
+    /**
+     * @param code 基金代码
+     * @return 基金详细信息
+     */
+    public FundInfoBean findFundByCode(String code);
 
     /**
      * 根据基金代码获得基金单位净值走势

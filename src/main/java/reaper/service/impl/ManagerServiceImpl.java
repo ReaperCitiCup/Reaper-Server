@@ -46,10 +46,10 @@ public class ManagerServiceImpl implements ManagerService {
             Manager manager=managers.get(0);
             List<ManagerCompany> managerCompanys=managerCompanyRespository.findByManagerId(manager.getManagerId());
             if(managerCompanys!=null){
-                List<Company> companys=companyRepository.findByCompanyId(managerCompanys.get(0).getCompanyId());
+                Company companys=companyRepository.findByCompanyId(managerCompanys.get(0).getCompanyId());
                 if(companys!=null){
                     return  new ManagerBean(manager.getManagerId(), manager.getName(), manager.getGender(), sdf.format(manager.getAppointedDate()),
-                            new CompanyMiniBean(companys.get(0).getCompanyId(), companys.get(0).getName()), manager.getTotalScope(), manager.getBestReturns(), manager.getIntroduction());
+                            new CompanyMiniBean(companys.getCompanyId(), companys.getName()), manager.getTotalScope(), manager.getBestReturns(), manager.getIntroduction());
                 }
             }
         }
@@ -63,7 +63,7 @@ public class ManagerServiceImpl implements ManagerService {
         if(fundHistories!=null){
             for(FundHistory fundHistory:fundHistories){
                 res.add(new FundHistoryBean(fundHistory.getFundCode(),fundHistory.getFundName(),fundHistory.getFundType(),
-                        fundRepository.findByFundCode(fundHistory.getFundCode()).get(0).getScope(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()),
+                        fundRepository.findByFundCode(fundHistory.getFundCode()).getScope(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()),
                         (int)((fundHistory.getEndDate().getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24)),
                         fundHistory.getPayback()));
             }

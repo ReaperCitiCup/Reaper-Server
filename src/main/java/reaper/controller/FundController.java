@@ -3,12 +3,12 @@ package reaper.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import reaper.bean.FundMiniBean;
+import reaper.bean.FundInfoBean;
+import reaper.bean.MiniBean;
 import reaper.bean.NetValueDateBean;
 import reaper.service.FundService;
 import reaper.util.Page;
 
-import java.sql.Time;
 import java.util.List;
 
 /**
@@ -36,11 +36,25 @@ public class FundController {
             params = {"keyword", "order", "size", "page"},
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"})
-    public Page<FundMiniBean> findFundByKeyword(@RequestParam(value = "keyword") String keyword,
-                                                @RequestParam(value = "order") String order,
-                                                @RequestParam(value = "size") int size,
-                                                @RequestParam(value = "page") int page) {
+    public Page<MiniBean> findFundByKeyword(@RequestParam(value = "keyword") String keyword,
+                                            @RequestParam(value = "order") String order,
+                                            @RequestParam(value = "size") int size,
+                                            @RequestParam(value = "page") int page) {
         return fundService.findFundByKeyword(keyword, order, size, page);
+    }
+
+    /**
+     * @param code 基金代码
+     * @return 基金详细信息
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"}
+    )
+    public FundInfoBean findFundByCode(@PathVariable String code){
+        return fundService.findFundByCode(code);
     }
 
     /**

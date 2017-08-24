@@ -6,5 +6,5 @@ import reaper.model.Company;
 import java.util.List;
 
 public interface CompanyRepository extends JpaRepository<Company, Integer> {
-    public List<Company> findByCompanyId(String companyId);
+    public Company findByCompanyId(String companyId);
 }

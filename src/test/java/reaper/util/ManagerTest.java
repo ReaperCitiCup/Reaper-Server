@@ -138,10 +138,10 @@ public class ManagerTest {
             Manager manager=managers.get(0);
             List<ManagerCompany> managerCompanys=managerCompanyRespository.findByManagerId(manager.getManagerId());
             if(managerCompanys!=null){
-                List<Company> companys=companyRepository.findByCompanyId(managerCompanys.get(0).getCompanyId());
+                Company companys=companyRepository.findByCompanyId(managerCompanys.get(0).getCompanyId());
                 if(companys!=null){
                     ManagerBean managerBean=new ManagerBean(manager.getManagerId(), manager.getName(), manager.getGender(), sdf.format(manager.getAppointedDate()),
-                            new CompanyMiniBean(companys.get(0).getCompanyId(), companys.get(0).getName()), manager.getTotalScope(), manager.getBestReturns(), manager.getIntroduction());
+                            new CompanyMiniBean(companys.getCompanyId(), companys.getName()), manager.getTotalScope(), manager.getBestReturns(), manager.getIntroduction());
                     System.out.println();
                     System.out.println();
                     System.out.println();
