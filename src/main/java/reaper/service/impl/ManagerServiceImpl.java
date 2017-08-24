@@ -41,15 +41,14 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ManagerBean findManagerById(String id) {
-        List<Manager> managers=managerRepository.findByManagerId(id);
-        if(managers!=null){
-            Manager manager=managers.get(0);
-            List<ManagerCompany> managerCompanys=managerCompanyRespository.findByManagerId(manager.getManagerId());
-            if(managerCompanys!=null){
-                Company companys=companyRepository.findByCompanyId(managerCompanys.get(0).getCompanyId());
-                if(companys!=null){
+        Manager manager=managerRepository.findByManagerId(id);
+        if(manager!=null){
+            ManagerCompany managerCompany=managerCompanyRespository.findByManagerId(manager.getManagerId());
+            if(managerCompany!=null){
+                Company company=companyRepository.findByCompanyId(managerCompany.getCompanyId());
+                if(company!=null){
                     return  new ManagerBean(manager.getManagerId(), manager.getName(), manager.getGender(), sdf.format(manager.getAppointedDate()),
-                            new CompanyMiniBean(companys.getCompanyId(), companys.getName()), manager.getTotalScope(), manager.getBestReturns(), manager.getIntroduction());
+                            new CompanyMiniBean(company.getCompanyId(), company.getName()), manager.getTotalScope(), manager.getBestReturns(), manager.getIntroduction());
                 }
             }
         }
@@ -62,7 +61,10 @@ public class ManagerServiceImpl implements ManagerService {
         List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId(id);
         if(fundHistories!=null){
             for(FundHistory fundHistory:fundHistories){
-                res.add(new FundHistoryBean(fundHistory.getFundCode(),fundHistory.getFundName(),fundHistory.getFundType(),
+                List<String> type=new ArrayList<>();
+                type.add(fundHistory.getFundType1());
+                type.add(fundHistory.getFundType2());
+                res.add(new FundHistoryBean(fundHistory.getFundCode(),fundHistory.getFundName(),type,
                         fundRepository.findByFundCode(fundHistory.getFundCode()).getScope(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()),
                         (int)((fundHistory.getEndDate().getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24)),
                         fundHistory.getPayback()));

@@ -40,12 +40,20 @@ public class FundHistory {
         this.fundName = fundName;
     }
 
-    public String getFundType() {
-        return fundType;
+    public String getFundType1() {
+        return fundType1;
     }
 
-    public void setFundType(String fundType) {
-        this.fundType = fundType;
+    public void setFundType1(String fundType1) {
+        this.fundType1 = fundType1;
+    }
+
+    public String getFundType2() {
+        return fundType2;
+    }
+
+    public void setFundType2(String fundType2) {
+        this.fundType2 = fundType2;
     }
 
     public Double getSize() {
@@ -91,7 +99,8 @@ public class FundHistory {
     private String managerId;
     private String fundCode;
     private String fundName;
-    private String fundType;
+    private String fundType1;
+    private String fundType2;
     private Double size;
     private Date startDate;
     private Date endDate;

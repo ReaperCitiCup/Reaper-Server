@@ -11,14 +11,14 @@ public class FundHistoryBean {
      */
     public String id;
     public String name;
-    public String type;
+    public List<String> type;
     public Double scope;
     public String startDate;
     public String endDate;
     public Integer days;
     public Double returns;
 
-    public FundHistoryBean(String id, String name, String type, Double scope, String startDate, String endDate, Integer days, Double returns) {
+    public FundHistoryBean(String id, String name, List<String> type, Double scope, String startDate, String endDate, Integer days, Double returns) {
         this.id = id;
         this.name = name;
         this.type = type;

@@ -6,5 +6,5 @@ import reaper.model.Manager;
 import java.util.List;
 
 public interface ManagerRepository extends JpaRepository<Manager,Integer>{
-    public List<Manager> findByManagerId(String managerId);
+    public Manager findByManagerId(String managerId);
 }

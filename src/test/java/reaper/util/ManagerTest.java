@@ -59,7 +59,8 @@ public class ManagerTest {
     //fund
     String[] fundCodes={"f1","f2","f3","f4"};
     String[] fundNames={"fname1","fname2","fname3","fname4"};
-    String[] fundTypes={"t1","t2","t3","t4"};
+    String[] fundTypes1={"t1","t2","t3","t4"};
+    String[] fundTypes2={"t11","t22","t33","t44"};
     Date[] esDates={new Date(), new Date(), new Date(),new Date()};
     Double[] scopes={1.0, 2.0, 3.0, 4.0};
 
@@ -107,7 +108,8 @@ public class ManagerTest {
             Fund fund=new Fund();
             fund.setFundCode(fundCodes[i]);
             fund.setName(fundNames[i]);
-            fund.setType(fundTypes[i]);
+            fund.setType1(fundTypes1[i]);
+            fund.setType2(fundTypes2[i]);
             fund.setEstablishmentDate(esDates[i]);
             fund.setScope(scopes[i]);
             fundRepository.save(fund);
@@ -131,21 +133,14 @@ public class ManagerTest {
 
     @Test
     public void findManagerByIdTest(){
-//        ManagerService managerService=new ManagerServiceImpl();
-//        ManagerBean managerBean =managerService.findManagerById("m1");
-        List<Manager> managers=managerRepository.findByManagerId("m1");
-        if(managers!=null){
-            Manager manager=managers.get(0);
-            List<ManagerCompany> managerCompanys=managerCompanyRespository.findByManagerId(manager.getManagerId());
-            if(managerCompanys!=null){
-                Company companys=companyRepository.findByCompanyId(managerCompanys.get(0).getCompanyId());
-                if(companys!=null){
-                    ManagerBean managerBean=new ManagerBean(manager.getManagerId(), manager.getName(), manager.getGender(), sdf.format(manager.getAppointedDate()),
-                            new CompanyMiniBean(companys.getCompanyId(), companys.getName()), manager.getTotalScope(), manager.getBestReturns(), manager.getIntroduction());
-                    System.out.println();
-                    System.out.println();
-                    System.out.println();
-
+        Manager manager=managerRepository.findByManagerId("m1");
+        if(manager!=null){
+            ManagerCompany managerCompany=managerCompanyRespository.findByManagerId(manager.getManagerId());
+            if(managerCompany!=null){
+                Company company=companyRepository.findByCompanyId(managerCompany.getCompanyId());
+                if(company!=null){
+                    ManagerBean managerBean=  new ManagerBean(manager.getManagerId(), manager.getName(), manager.getGender(), sdf.format(manager.getAppointedDate()),
+                            new CompanyMiniBean(company.getCompanyId(), company.getName()), manager.getTotalScope(), manager.getBestReturns(), manager.getIntroduction());
                 }
             }
         }
@@ -158,16 +153,19 @@ public class ManagerTest {
     @Test
     public void findFundHistoryByIdTest(){
         List<FundHistoryBean> res=new ArrayList<>();
-//        List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId("m1");
-//        if(fundHistories!=null){
-//            for(FundHistory fundHistory:fundHistories){
-//                res.add(new FundHistoryBean(fundHistory.getFundCode(),fundHistory.getFundName(),fundHistory.getFundType(),
-//                        fundRepository.findByFundCode(fundHistory.getFundCode()).get(0).getScope(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()),
-//                        (int)((fundHistory.getEndDate().getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24)),
-//                        fundHistory.getPayback()));
-//            }
-//        }
-        System.out.println();
+        List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId("h2");
+        if(fundHistories!=null){
+            for(FundHistory fundHistory:fundHistories){
+                List<String> type=new ArrayList<>();
+                type.add(fundHistory.getFundType1());
+                type.add(fundHistory.getFundType2());
+                res.add(new FundHistoryBean(fundHistory.getFundCode(),fundHistory.getFundName(),type,
+                        fundRepository.findByFundCode(fundHistory.getFundCode()).getScope(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()),
+                        (int)((fundHistory.getEndDate().getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24)),
+                        fundHistory.getPayback()));
+            }
+        }
+        System.out.println(res.size());
         System.out.println();
     }
 
