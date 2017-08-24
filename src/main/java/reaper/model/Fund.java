@@ -10,7 +10,7 @@ public class Fund {
     @GeneratedValue
     private Integer id;
 
-    private String fundId;
+    private String fundCode;
 
     private String name;
 
@@ -25,12 +25,12 @@ public class Fund {
     }
 
     @Column(length = 6)
-    public String getFundId() {
-        return fundId;
+    public String getFundCode() {
+        return fundCode;
     }
 
-    public void setFundId(String fundId) {
-        this.fundId = fundId;
+    public void setFundCode(String fundCode) {
+        this.fundCode = fundCode;
     }
 
     @Column(length = 128)

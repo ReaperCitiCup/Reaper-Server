@@ -2,13 +2,14 @@ package reaper.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import reaper.bean.FundMiniBean;
+import reaper.bean.NetValueDateBean;
 import reaper.service.FundService;
 import reaper.util.Page;
+
+import java.sql.Time;
+import java.util.List;
 
 /**
  * Created by Sorumi on 17/8/21.
@@ -35,10 +36,57 @@ public class FundController {
             params = {"keyword", "order", "size", "page"},
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"})
-    public Page<FundMiniBean> findMoviesByKeyword(@RequestParam(value = "keyword") String keyword,
-                                                  @RequestParam(value = "order") String order,
-                                                  @RequestParam(value = "size") int size,
-                                                  @RequestParam(value = "page") int page) {
+    public Page<FundMiniBean> findFundByKeyword(@RequestParam(value = "keyword") String keyword,
+                                                @RequestParam(value = "order") String order,
+                                                @RequestParam(value = "size") int size,
+                                                @RequestParam(value = "page") int page) {
         return fundService.findFundByKeyword(keyword, order, size, page);
+    }
+
+    /**
+     * 根据基金代码获得基金单位净值走势
+     * @param code 代码
+     * @return 对应基金所有时间的单位净值
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/unit-net-value",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"}
+    )
+    public List<NetValueDateBean> findUnitNetValueDateByCode(@PathVariable String code){
+        return fundService.findUnitNetValueTrendByCode(code);
+    }
+
+    /**
+     * 根据基金代码获得基金积累净值走势
+     * @param code 代码
+     * @return 对应基金所有时间的积累净值
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/cumulative-net-value",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"}
+    )
+    public List<NetValueDateBean> findCumulativeNetValueDateByCode(@PathVariable String code){
+        return fundService.findCumulativeNetValueTrendByCode(code);
+    }
+
+    /**
+     * 根据基金代码和时间段获得基金累计收益率走势
+     * @param code 代码
+     * @param month 时间段（时间分为:1月、3月、6月、1年(12月)、3年(36月)、成立来(所有)，即输入为1/3/6/12/36/all）
+     * @return 对应代码基金在该时间段的积累收益率
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/rate",
+            params = {"month"},
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"}
+    )
+    public List<NetValueDateBean> findCumulativeRateByCode(@PathVariable String code,@RequestParam(value = "month") String month){
+        return fundService.findCumulativeRateTrendByCode(code, month);
     }
 }

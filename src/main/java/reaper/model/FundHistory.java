@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
 
 /**
  * Created by max on 2017/8/22.
@@ -23,12 +24,12 @@ public class FundHistory {
         this.managerId = managerId;
     }
 
-    public String getFundId() {
-        return fundId;
+    public String getFundCode() {
+        return fundCode;
     }
 
-    public void setFundId(String fundId) {
-        this.fundId = fundId;
+    public void setFundCode(String fundCode) {
+        this.fundCode = fundCode;
     }
 
     public String getFundName() {
@@ -55,20 +56,28 @@ public class FundHistory {
         this.size = size;
     }
 
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
     public String getTime() {
         return time;
     }
 
     public void setTime(String time) {
         this.time = time;
-    }
-
-    public String getDays() {
-        return days;
-    }
-
-    public void setDays(String days) {
-        this.days = days;
     }
 
     public Double getPayback() {
@@ -80,12 +89,13 @@ public class FundHistory {
     }
 
     private String managerId;
-    private String fundId;
+    private String fundCode;
     private String fundName;
     private String fundType;
     private Double size;
+    private Date startDate;
+    private Date endDate;
     private String time;
-    private String days;
     private Double payback;
 
 
