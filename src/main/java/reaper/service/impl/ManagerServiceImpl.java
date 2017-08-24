@@ -62,9 +62,7 @@ public class ManagerServiceImpl implements ManagerService {
         List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId(id);
         if(fundHistories!=null){
             for(FundHistory fundHistory:fundHistories){
-                List<String> type=null;
-                type.add(fundHistory.getFundType());
-                res.add(new FundHistoryBean(fundHistory.getFundCode(),fundHistory.getFundName(),type,
+                res.add(new FundHistoryBean(fundHistory.getFundCode(),fundHistory.getFundName(),fundHistory.getFundType(),
                         fundRepository.findByFundCode(fundHistory.getFundCode()).get(0).getScope(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()),
                         (int)((fundHistory.getEndDate().getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24)),
                         fundHistory.getPayback()));

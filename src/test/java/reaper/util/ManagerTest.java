@@ -157,13 +157,11 @@ public class ManagerTest {
 
     @Test
     public void findFundHistoryByIdTest(){
-//        List<FundHistoryBean> res=new ArrayList<>();
+        List<FundHistoryBean> res=new ArrayList<>();
 //        List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId("m1");
 //        if(fundHistories!=null){
 //            for(FundHistory fundHistory:fundHistories){
-//                List<String> type=null;
-//                type.add(fundHistory.getFundType());
-//                res.add(new FundHistoryBean(fundHistory.getFundCode(),fundHistory.getFundName(),type,
+//                res.add(new FundHistoryBean(fundHistory.getFundCode(),fundHistory.getFundName(),fundHistory.getFundType(),
 //                        fundRepository.findByFundCode(fundHistory.getFundCode()).get(0).getScope(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()),
 //                        (int)((fundHistory.getEndDate().getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24)),
 //                        fundHistory.getPayback()));
