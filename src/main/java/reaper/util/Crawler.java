@@ -1,14 +1,18 @@
 package reaper.util;
 
+import reaper.model.Fund;
 import reaper.model.FundHoldBond;
 import reaper.model.FundHoldStock;
 import reaper.repository.FundHoldBondRepository;
 import reaper.repository.FundHoldStockRepository;
+import reaper.repository.FundRepository;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,19 +23,16 @@ public class Crawler {
     public static void main(String[] args) {
         Code code = new Code();
         Crawler crawler = new Crawler();
-//        for (String c:code.getStockCode()){
-//            for(int i=2009;i<2018;i++){
-//                crawler.crawlFondHoldStock(c,String.valueOf(i));
-//            }
-//        }
-//        new Crawler().crawlFondHoldStock("001829",String.valueOf(2017),null);
-        crawler.crawlFundHoldBond("410001","2015",null);
+        for (String c : code.getStockCode()) {
+            crawler.crawlFundDetail(c, null);
+        }
     }
 
     /**
      * 根据年份和基金代码爬取持有股份的信息
+     *
      * @param fundCode 基金代码
-     * @param year 年份
+     * @param year     年份
      */
     public void crawlFondHoldStock(String fundCode, String year, FundHoldStockRepository fundHoldStockRepository) {
         String result = getHtml("http://fund.eastmoney.com/f10/FundArchivesDatas.aspx?type=jjcc&code=" + fundCode + "&topline=100&year=" + year);
@@ -58,7 +59,7 @@ public class Crawler {
             Matcher rateMatcher = ratePattern.matcher(seasons[i + 1]);
             while (codeMatcher.find()) {
                 rateMatcher.find();
-                FundHoldStock fundHoldStock = new FundHoldStock(fundCode,Integer.valueOf(year),Integer.valueOf(seasonNumbers[i]),codeMatcher.group(1),rateMatcher.group(4)==null?null:Double.valueOf(rateMatcher.group(4)));
+                FundHoldStock fundHoldStock = new FundHoldStock(fundCode, Integer.valueOf(year), Integer.valueOf(seasonNumbers[i]), codeMatcher.group(1), rateMatcher.group(4) == null ? null : Double.valueOf(rateMatcher.group(4)));
                 fundHoldStockRepository.save(fundHoldStock);
 
 //                System.out.println(fundHoldStock);
@@ -67,8 +68,8 @@ public class Crawler {
         }
     }
 
-    public void crawlFundHoldBond(String fundCode, String year, FundHoldBondRepository fundHoldBondRepository){
-        System.out.println(fundCode+" "+year);
+    public void crawlFundHoldBond(String fundCode, String year, FundHoldBondRepository fundHoldBondRepository) {
+        System.out.println(fundCode + " " + year);
         String result = getHtml("http://fund.eastmoney.com/f10/FundArchivesDatas.aspx?type=zqcc&code=" + fundCode + "&topline=100&year=" + year);
 
 //        System.out.println(result);
@@ -89,7 +90,7 @@ public class Crawler {
         for (int i = 0; i < count; i++) {
             Matcher matcher = pattern.matcher(seasons[i + 1]);
             while (matcher.find()) {
-                FundHoldBond fundHoldBond = new FundHoldBond(fundCode,Integer.valueOf(year),Integer.valueOf(seasonNumbers[i]),matcher.group(1),matcher.group(2),matcher.group(5)==null?null:Double.valueOf(matcher.group(5)));
+                FundHoldBond fundHoldBond = new FundHoldBond(fundCode, Integer.valueOf(year), Integer.valueOf(seasonNumbers[i]), matcher.group(1), matcher.group(2), matcher.group(5) == null ? null : Double.valueOf(matcher.group(5)));
                 fundHoldBondRepository.save(fundHoldBond);
 
 //                System.out.println(fundHoldBond);
@@ -98,7 +99,48 @@ public class Crawler {
         }
     }
 
-    private String getHtml(String url){
+    public void crawlFundDetail(String fundCode, FundRepository fundRepository) {
+        System.out.println(fundCode);
+        Fund fund = new Fund();
+        fund.setFundCode(fundCode);
+
+        String res = getHtml("http://fund.eastmoney.com/" + fundCode + ".html");
+
+        //name
+        Pattern pattern = Pattern.compile("<div style=\"float: left\">(.+?)<span>");
+        Matcher matcher = pattern.matcher(res);
+        matcher.find();
+        fund.setName(matcher.group(1));
+
+        //type
+        pattern = Pattern.compile("<td>基金类型：(<a href=\"(.*?)\">)?(.*?)(</a>)?(&nbsp;&nbsp;)?(\\|&nbsp;&nbsp;(.*?))?</td>");
+        matcher = pattern.matcher(res);
+        matcher.find();
+        fund.setType1(matcher.group(3));
+        fund.setType2(matcher.group(7));
+
+        //date
+        pattern = Pattern.compile("<td><span class=\"letterSpace01\">成 立 日</span>：(.*?)</td>");
+        matcher = pattern.matcher(res);
+        matcher.find();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            fund.setEstablishmentDate(sdf.parse(matcher.group(1)));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //scope
+        pattern = Pattern.compile("基金规模</a>：(.*?)亿元");
+        matcher = pattern.matcher(res);
+        matcher.find();
+        fund.setScope(matcher.group(1).equals("--")?null:Double.valueOf(matcher.group(1)));
+
+//        System.out.println(fund);
+        fundRepository.save(fund);
+    }
+
+    private String getHtml(String url) {
         // 定义一个字符串用来存储网页内容
         String result = "";
         // 定义一个缓冲字符输入流
@@ -122,6 +164,7 @@ public class Crawler {
             System.out.println(url);
             System.out.println("发送GET请求出现异常！" + e);
             e.printStackTrace();
+            return getHtml(url);
         } // 使用finally来关闭输入流
         finally {
             try {

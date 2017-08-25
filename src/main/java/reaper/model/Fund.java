@@ -78,4 +78,16 @@ public class Fund {
     public void setScope(Double scope) {
         this.scope = scope;
     }
+
+    @Override
+    public String toString() {
+        return "Fund{" +
+                "fundCode='" + fundCode + '\'' +
+                ", name='" + name + '\'' +
+                ", type1='" + type1 + '\'' +
+                ", type2='" + type2 + '\'' +
+                ", establishmentDate=" + establishmentDate +
+                ", scope=" + scope +
+                '}';
+    }
 }
