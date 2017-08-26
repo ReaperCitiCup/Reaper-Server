@@ -9,15 +9,16 @@ public class ManagerCompany {
     @GeneratedValue
     private Integer id;
 
+    @Column(length = 8)
     private String managerId;
 
+    @Column(length = 8)
     private String companyId;
 
     public ManagerCompany(){
 
     }
 
-    @Column(length = 8)
     public String getManagerId() {
         return managerId;
     }
@@ -26,7 +27,6 @@ public class ManagerCompany {
         this.managerId = managerId;
     }
 
-    @Column(length = 8)
     public String getCompanyId() {
         return companyId;
     }

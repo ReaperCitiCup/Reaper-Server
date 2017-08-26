@@ -1,9 +1,6 @@
 package reaper.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -96,14 +93,20 @@ public class FundHistory {
         this.payback = payback;
     }
 
+    @Column(length = 8)
     private String managerId;
+    @Column(length = 6)
     private String fundCode;
+    @Column(length = 128)
     private String fundName;
+    @Column(length = 32)
     private String fundType1;
+    @Column(length = 32)
     private String fundType2;
     private Double size;
     private Date startDate;
     private Date endDate;
+    @Column(length = 64)
     private String time;
     private Double payback;
 

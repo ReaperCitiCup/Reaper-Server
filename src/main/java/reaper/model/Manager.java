@@ -10,14 +10,15 @@ public class Manager {
     @GeneratedValue
     private Integer id;
 
+    @Column(length = 8)
     private String managerId;
 
+    @Column(length = 32)
     private String name;
-
-    private String gender;
 
     private Date appointedDate;
 
+    @Column(length = 3000)
     private String introduction;
 
     private Double totalScope;
@@ -28,7 +29,6 @@ public class Manager {
 
     }
 
-    @Column(length = 8)
     public String getManagerId() {
         return managerId;
     }
@@ -37,21 +37,12 @@ public class Manager {
         this.managerId = managerId;
     }
 
-    @Column(length = 32)
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
     }
 
     public Date getAppointedDate() {
@@ -62,7 +53,6 @@ public class Manager {
         this.appointedDate = appointedDate;
     }
 
-    @Column(length = 65535)
     public String getIntroduction() {
         return introduction;
     }
@@ -85,5 +75,17 @@ public class Manager {
 
     public void setBestReturns(Double bestReturns) {
         this.bestReturns = bestReturns;
+    }
+
+    @Override
+    public String toString() {
+        return "Manager{" +
+                "managerId='" + managerId + '\'' +
+                ", name='" + name + '\'' +
+                ", appointedDate=" + appointedDate +
+                ", introduction='" + introduction + '\'' +
+                ", totalScope=" + totalScope +
+                ", bestReturns=" + bestReturns +
+                '}';
     }
 }

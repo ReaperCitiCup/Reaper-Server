@@ -3,7 +3,7 @@ package reaper.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import reaper.bean.FundInfoBean;
+import reaper.bean.FundBean;
 import reaper.bean.MiniBean;
 import reaper.bean.NetValueDateBean;
 import reaper.service.FundService;
@@ -53,7 +53,7 @@ public class FundController {
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"}
     )
-    public FundInfoBean findFundByCode(@PathVariable String code){
+    public FundBean findFundByCode(@PathVariable String code){
         return fundService.findFundByCode(code);
     }
 

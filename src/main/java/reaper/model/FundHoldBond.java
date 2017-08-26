@@ -12,14 +12,17 @@ public class FundHoldBond {
     @GeneratedValue
     private Integer id;
 
+    @Column(length = 6)
     private String fundCode;
 
     private Integer year;
 
     private Integer season;
 
+    @Column(length = 7)
     private String bondCode;
 
+    @Column(length = 20)
     private String bondName;
 
     private Double proportion;
@@ -36,7 +39,6 @@ public class FundHoldBond {
         this.proportion = proportion;
     }
 
-    @Column(length = 6)
     public String getFundCode() {
         return fundCode;
     }
@@ -61,7 +63,6 @@ public class FundHoldBond {
         this.season = season;
     }
 
-    @Column(length = 6)
     public String getBondCode() {
         return bondCode;
     }
@@ -70,7 +71,6 @@ public class FundHoldBond {
         this.bondCode = bondCode;
     }
 
-    @Column(length = 20)
     public String getBondName() {
         return bondName;
     }

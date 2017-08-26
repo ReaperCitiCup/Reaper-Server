@@ -13,12 +13,13 @@ public class FundShortMessage {
     @Id
     @GeneratedValue
     private Integer id;
+    @Column(length = 6,unique = true)
     private String code;
 
     public FundShortMessage() {
     }
 
-    @Column(length = 6,unique = true)
+
 
     public String getCode() {
         return code;

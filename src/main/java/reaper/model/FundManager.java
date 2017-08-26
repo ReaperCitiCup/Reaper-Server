@@ -10,15 +10,16 @@ public class FundManager {
     @GeneratedValue
     private Integer id;
 
+    @Column(length = 6)
     private String fundCode;
 
+    @Column(length = 8)
     private String managerId;
 
     public FundManager(){
 
     }
 
-    @Column(length = 6)
     public String getFundCode() {
         return fundCode;
     }
@@ -27,7 +28,6 @@ public class FundManager {
         this.fundCode = fundCode;
     }
 
-    @Column(length = 8)
     public String getManagerId() {
         return managerId;
     }

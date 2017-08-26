@@ -1,6 +1,6 @@
 package reaper.service;
 
-import reaper.bean.FundInfoBean;
+import reaper.bean.FundBean;
 import reaper.bean.MiniBean;
 import reaper.bean.HistoryManagerBean;
 import reaper.bean.NetValueDateBean;
@@ -25,7 +25,7 @@ public interface FundService {
      * @param code 基金代码
      * @return 基金详细信息
      */
-    public FundInfoBean findFundByCode(String code);
+    public FundBean findFundByCode(String code);
 
     /**
      * 根据基金代码获得基金单位净值走势

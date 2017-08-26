@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * 基金详细信息
  */
-public class FundInfoBean {
+public class FundBean {
     /**
      * 基金代码
      */

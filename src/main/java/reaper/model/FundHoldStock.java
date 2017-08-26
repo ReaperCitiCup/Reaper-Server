@@ -9,12 +9,14 @@ public class FundHoldStock {
     @GeneratedValue
     private Integer id;
 
+    @Column(length = 6)
     private String fundCode;
 
     private Integer year;
 
     private Integer season;
 
+    @Column(length = 7)
     private String stockCode;
 
     private Double proportion;
@@ -54,7 +56,6 @@ public class FundHoldStock {
         this.season = season;
     }
 
-    @Column(length = 6)
     public String getStockCode() {
         return stockCode;
     }
@@ -63,7 +64,6 @@ public class FundHoldStock {
         this.stockCode = stockCode;
     }
 
-    @Column(length = 6)
     public String getFundCode() {
         return fundCode;
     }

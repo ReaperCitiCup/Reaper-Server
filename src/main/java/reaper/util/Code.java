@@ -34,6 +34,26 @@ public class Code {
 
     }
 
+    public ArrayList<String> getManagerCode(){
+        File file = new File("src/main/manager.csv");
+        ArrayList<String> res = new ArrayList<>();
 
+        try {
+            FileReader fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String s;
+            while ((s = bufferedReader.readLine()) != null) {
+                res.add(s);
+                //System.out.println(name);
+
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
 
 }

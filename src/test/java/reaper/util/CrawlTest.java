@@ -9,6 +9,7 @@ import reaper.model.FundHoldBond;
 import reaper.repository.FundHoldBondRepository;
 import reaper.repository.FundHoldStockRepository;
 import reaper.repository.FundRepository;
+import reaper.repository.ManagerRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest()
@@ -21,6 +22,9 @@ public class CrawlTest {
 
     @Autowired
     FundRepository fundRepository;
+
+    @Autowired
+    ManagerRepository managerRepository;
 
     @Test
     public void fundHoldStockCrawl(){
@@ -53,5 +57,14 @@ public class CrawlTest {
             crawler.crawlFundDetail(c,fundRepository);
         }
 
+    }
+
+    @Test
+    public void ManagerCrawl(){
+        Code code = new Code();
+        Crawler crawler = new Crawler();
+        for(String id:code.getManagerCode()){
+            crawler.crawlManager(id,managerRepository);
+        }
     }
 }

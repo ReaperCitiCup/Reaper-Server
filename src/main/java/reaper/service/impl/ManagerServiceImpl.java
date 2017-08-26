@@ -47,7 +47,7 @@ public class ManagerServiceImpl implements ManagerService {
             if(managerCompany!=null){
                 Company company=companyRepository.findByCompanyId(managerCompany.getCompanyId());
                 if(company!=null){
-                    return  new ManagerBean(manager.getManagerId(), manager.getName(), manager.getGender(), sdf.format(manager.getAppointedDate()),
+                    return  new ManagerBean(manager.getManagerId(), manager.getName(), sdf.format(manager.getAppointedDate()),
                             new CompanyMiniBean(company.getCompanyId(), company.getName()), manager.getTotalScope(), manager.getBestReturns(), manager.getIntroduction());
                 }
             }

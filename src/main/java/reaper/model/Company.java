@@ -9,8 +9,10 @@ public class Company {
     @GeneratedValue
     private Integer id;
 
+    @Column(length = 8)
     private String companyId;
 
+    @Column(length = 64)
     private String name;
 
     //TODO 其他字段待补充
@@ -19,7 +21,7 @@ public class Company {
 
     }
 
-    @Column(length = 8)
+
     public String getCompanyId() {
         return companyId;
     }
@@ -28,7 +30,6 @@ public class Company {
         this.companyId = companyId;
     }
 
-    @Column(length = 64)
     public String getName() {
         return name;
     }

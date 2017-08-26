@@ -84,7 +84,6 @@ public class ManagerTest {
             Manager manager=new Manager();
             manager.setManagerId(managerIds[i]);
             manager.setName(managerNames[i]);
-            manager.setGender(genders[i]);
             manager.setAppointedDate(dates[i]);
             manager.setIntroduction(introductions[i]);
             manager.setTotalScope(totalScopes[i]);
@@ -139,7 +138,7 @@ public class ManagerTest {
             if(managerCompany!=null){
                 Company company=companyRepository.findByCompanyId(managerCompany.getCompanyId());
                 if(company!=null){
-                    ManagerBean managerBean=  new ManagerBean(manager.getManagerId(), manager.getName(), manager.getGender(), sdf.format(manager.getAppointedDate()),
+                    ManagerBean managerBean=  new ManagerBean(manager.getManagerId(), manager.getName(), sdf.format(manager.getAppointedDate()),
                             new CompanyMiniBean(company.getCompanyId(), company.getName()), manager.getTotalScope(), manager.getBestReturns(), manager.getIntroduction());
                 }
             }

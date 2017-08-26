@@ -38,7 +38,7 @@ public class FundServiceImpl implements FundService {
     FundHistoryRepository fundHistoryRepository;
 
     @Autowired
-    ManagerInfoRepository managerInfoRepository;
+    ManagerRepository managerRepository;
 
     @Autowired
     CompanyRepository companyRepository;
@@ -70,14 +70,14 @@ public class FundServiceImpl implements FundService {
     }
 
     @Override
-    public FundInfoBean findFundByCode(String code) {
+    public FundBean findFundByCode(String code) {
         FundModelToBean fundModelToBean = new FundModelToBean();
         Fund fund = fundRepository.findByFundCode(code);
         FundNetValue fundNetValue = fundNetValueRepository.findFirstByCodeOrderByDateDesc(code);
         RateBean rateBean = getFundRate(code);
         //暂存经理和公司id的变量
         String id = fundManagerRepository.findByFundCode(code).getManagerId();
-        MiniBean manager = new MiniBean(id,managerInfoRepository.findByCode(id).getName());
+        MiniBean manager = new MiniBean(id,managerRepository.findByManagerId(id).getName());
         id = fundCompanyRepository.findByFundId(code).getcompanyId();
         MiniBean company = new MiniBean(id,companyRepository.findByCompanyId(id).getName());
         return fundModelToBean.modelToBean(fund,fundNetValue,rateBean,manager,company);
@@ -138,7 +138,7 @@ public class FundServiceImpl implements FundService {
         for(FundHistory fundHistory:fundHistoryRepository.findAllByFundCodeOrderByStartDateAsc(code)){
             //计算相差的天数
             int difDays = (int)((fundHistory.getEndDate().getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24));
-            res.add(new HistoryManagerBean(fundHistory.getManagerId(),managerInfoRepository.findByCode(fundHistory.getManagerId()).getName(),sdf.format(fundHistory.getStartDate()),sdf.format(fundHistory.getEndDate()),difDays,fundHistory.getPayback()));
+            res.add(new HistoryManagerBean(fundHistory.getManagerId(),managerRepository.findByManagerId(fundHistory.getManagerId()).getName(),sdf.format(fundHistory.getStartDate()),sdf.format(fundHistory.getEndDate()),difDays,fundHistory.getPayback()));
         }
         return res;
     }

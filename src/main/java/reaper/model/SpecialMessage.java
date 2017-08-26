@@ -1,9 +1,6 @@
 package reaper.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Created by max on 2017/8/21.
@@ -23,6 +20,7 @@ public class SpecialMessage {
         this.code = code;
     }
 
+    @Column(length = 6)
     private String code;
 
     private Double standardDeviation1;

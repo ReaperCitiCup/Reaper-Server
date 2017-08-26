@@ -3,9 +3,11 @@ package reaper.util;
 import reaper.model.Fund;
 import reaper.model.FundHoldBond;
 import reaper.model.FundHoldStock;
+import reaper.model.Manager;
 import reaper.repository.FundHoldBondRepository;
 import reaper.repository.FundHoldStockRepository;
 import reaper.repository.FundRepository;
+import reaper.repository.ManagerRepository;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -23,8 +25,8 @@ public class Crawler {
     public static void main(String[] args) {
         Code code = new Code();
         Crawler crawler = new Crawler();
-        for (String c : code.getStockCode()) {
-            crawler.crawlFundDetail(c, null);
+        for(String id:code.getManagerCode()) {
+            crawler.crawlManager(id, null);
         }
     }
 
@@ -104,7 +106,7 @@ public class Crawler {
         Fund fund = new Fund();
         fund.setFundCode(fundCode);
 
-        String res = getHtml("http://fund.eastmoney.com/" + fundCode + ".html");
+        String res = getHtml("http://fund.eastmoney.com/" + fundCode + ".html?spm=search");
 
         //name
         Pattern pattern = Pattern.compile("<div style=\"float: left\">(.+?)<span>");
@@ -138,6 +140,58 @@ public class Crawler {
 
 //        System.out.println(fund);
         fundRepository.save(fund);
+    }
+
+    public void crawlManager(String managerId, ManagerRepository managerRepository){
+        Manager manager = new Manager();
+        manager.setManagerId(managerId);
+
+        String res = getHtml("http://fund.eastmoney.com/manager/"+managerId+".html");
+        System.out.println(managerId);
+//        System.out.println(res);
+
+        //name
+        Pattern pattern = Pattern.compile("<h3 id=\"name_1\" title=\"(.*?)\">");
+        Matcher matcher = pattern.matcher(res);
+        matcher.find();
+        manager.setName(matcher.group(1));
+//        System.out.println(manager.getName());
+
+        //date
+        pattern = Pattern.compile("<span>任职起始日期：</span>(\\d{4}-\\d{2}-\\d{2})");
+        matcher = pattern.matcher(res);
+        matcher.find();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            manager.setAppointedDate(sdf.parse(matcher.group(1)));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+//        System.out.println(manager.getAppointedDate());
+
+        //introduction
+        pattern = Pattern.compile("<span class=\"strong\">基金经理简介：</span>(.*?)\n");
+        matcher = pattern.matcher(res);
+        matcher.find();
+        manager.setIntroduction(matcher.group(1));
+//        System.out.println(manager.getIntroduction());
+
+        //totalScope
+        pattern = Pattern.compile("<span class='redText'>(\\d+\\.\\d+)</span>");
+        matcher = pattern.matcher(res);
+        matcher.find();
+        manager.setTotalScope(Double.valueOf(matcher.group(1)));
+//        System.out.println(manager.getTotalScope());
+
+        //bestReturn
+        pattern = Pattern.compile("<span class='(red|green)Text'>(-?\\d+\\.\\d+)%</span>");
+        matcher = pattern.matcher(res);
+        matcher.find();
+        manager.setBestReturns(Double.valueOf(matcher.group(2)));
+//        System.out.println(manager.getBestReturns());
+
+//        System.out.println(manager);
+        managerRepository.save(manager);
     }
 
     private String getHtml(String url) {

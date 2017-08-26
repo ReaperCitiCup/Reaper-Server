@@ -10,7 +10,7 @@ public class FundNetValue {
     @GeneratedValue
     private Integer id;
 
-    @Column(length = 6)
+
     public String getCode() {
         return code;
     }
@@ -19,6 +19,7 @@ public class FundNetValue {
         this.code = code;
     }
 
+    @Column(length = 6)
     private String code;
 
 
