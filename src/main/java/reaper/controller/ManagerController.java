@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import reaper.bean.FundHistoryBean;
+import reaper.bean.ManagerAbilityBean;
 import reaper.bean.ManagerBean;
 import reaper.model.Manager;
 import reaper.service.ManagerService;
@@ -39,5 +40,9 @@ public class ManagerController {
             produces = {"application/json; charset=UTF-8"})
     public List<FundHistoryBean> findFundHistoryById(@PathVariable String id){
         return managerService.findFundHistoryById(id);
+    }
+
+    public ManagerAbilityBean findManagerAbilityByManagerId(){
+        return null;
     }
 }

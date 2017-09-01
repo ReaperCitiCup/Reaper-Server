@@ -97,7 +97,7 @@ public class Crawler {
     public void crawlFundDetail(String fundCode, FundRepository fundRepository) {
         System.out.println(fundCode);
         Fund fund = new Fund();
-        fund.setFundCode(fundCode);
+        fund.setCode(fundCode);
 
         String res = getHtml("http://fund.eastmoney.com/" + fundCode + ".html?spm=search");
 

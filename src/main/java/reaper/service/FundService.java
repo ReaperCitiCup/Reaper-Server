@@ -16,7 +16,7 @@ public interface FundService {
      * @param page     第几页
      * @return Movie 分页列表
      */
-    public Page<MiniBean> findFundByKeyword(String keyword, String order, int size, int page);
+    public Page<FundMiniBean> findFundByKeyword(String keyword, String order, int size, int page);
 
     /**
      * @param code 基金代码

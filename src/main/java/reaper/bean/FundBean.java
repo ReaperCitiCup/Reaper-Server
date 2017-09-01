@@ -56,7 +56,7 @@ public class FundBean {
     /**
      * 经理信息
      */
-    public MiniBean manager;
+    public List<MiniBean> manager;
 
     /**
      * 公司信息

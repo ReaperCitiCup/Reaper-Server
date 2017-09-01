@@ -10,8 +10,6 @@ import reaper.bean.FundHistoryBean;
 import reaper.bean.ManagerBean;
 import reaper.model.*;
 import reaper.repository.*;
-import reaper.service.ManagerService;
-import reaper.service.impl.ManagerServiceImpl;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -105,7 +103,7 @@ public class ManagerTest {
 
         for (int i = 0; i < fundCodes.length; i++) {
             Fund fund=new Fund();
-            fund.setFundCode(fundCodes[i]);
+            fund.setCode(fundCodes[i]);
             fund.setName(fundNames[i]);
             fund.setType1(fundTypes1[i]);
             fund.setType2(fundTypes2[i]);
@@ -117,7 +115,7 @@ public class ManagerTest {
 //        for (int i = 0; i < hManagerIds.length; i++) {
 //            FundHistory fundHistory=new FundHistory();
 //            fundHistory.setManagerId(hManagerIds[i]);
-//            fundHistory.setFundCode(hFundCodes[i]);
+//            fundHistory.setCode(hFundCodes[i]);
 //            fundHistory.setFundName(hFundNames[i]);
 //            fundHistory.setFundType(hFundTypes[i]);
 //            fundHistory.setSize(hSizes[i]);
@@ -158,8 +156,8 @@ public class ManagerTest {
 //                List<String> type=new ArrayList<>();
 //                type.add(fundHistory.getFundType1());
 //                type.add(fundHistory.getFundType2());
-//                res.add(new FundHistoryBean(fundHistory.getFundCode(),fundHistory.getFundName(),type,
-//                        fundRepository.findByFundCode(fundHistory.getFundCode()).getScope(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()),
+//                res.add(new FundHistoryBean(fundHistory.getCode(),fundHistory.getFundName(),type,
+//                        fundRepository.findByFundCode(fundHistory.getCode()).getScope(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()),
 //                        (int)((fundHistory.getEndDate().getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24)),
 //                        fundHistory.getPayback()));
 //            }

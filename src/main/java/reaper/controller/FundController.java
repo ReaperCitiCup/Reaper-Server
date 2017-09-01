@@ -3,10 +3,7 @@ package reaper.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import reaper.bean.CurrentAssetBean;
-import reaper.bean.FundBean;
-import reaper.bean.MiniBean;
-import reaper.bean.NetValueDateBean;
+import reaper.bean.*;
 import reaper.service.FundService;
 import reaper.util.Page;
 
@@ -37,10 +34,10 @@ public class FundController {
             params = {"keyword", "order", "size", "page"},
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"})
-    public Page<MiniBean> findFundByKeyword(@RequestParam(value = "keyword") String keyword,
-                                            @RequestParam(value = "order") String order,
-                                            @RequestParam(value = "size") int size,
-                                            @RequestParam(value = "page") int page) {
+    public Page<FundMiniBean> findFundByKeyword(@RequestParam(value = "keyword") String keyword,
+                                                     @RequestParam(value = "order") String order,
+                                                     @RequestParam(value = "size") int size,
+                                                     @RequestParam(value = "page") int page) {
         return fundService.findFundByKeyword(keyword, order, size, page);
     }
 
