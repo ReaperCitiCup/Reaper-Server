@@ -29,38 +29,6 @@ public class FundHistory {
         this.fundCode = fundCode;
     }
 
-    public String getFundName() {
-        return fundName;
-    }
-
-    public void setFundName(String fundName) {
-        this.fundName = fundName;
-    }
-
-    public String getFundType1() {
-        return fundType1;
-    }
-
-    public void setFundType1(String fundType1) {
-        this.fundType1 = fundType1;
-    }
-
-    public String getFundType2() {
-        return fundType2;
-    }
-
-    public void setFundType2(String fundType2) {
-        this.fundType2 = fundType2;
-    }
-
-    public Double getSize() {
-        return size;
-    }
-
-    public void setSize(Double size) {
-        this.size = size;
-    }
-
     public Date getStartDate() {
         return startDate;
     }
@@ -97,13 +65,6 @@ public class FundHistory {
     private String managerId;
     @Column(length = 6)
     private String fundCode;
-    @Column(length = 128)
-    private String fundName;
-    @Column(length = 32)
-    private String fundType1;
-    @Column(length = 32)
-    private String fundType2;
-    private Double size;
     private Date startDate;
     private Date endDate;
     @Column(length = 64)

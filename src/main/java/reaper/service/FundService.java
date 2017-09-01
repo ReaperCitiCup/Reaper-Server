@@ -1,9 +1,6 @@
 package reaper.service;
 
-import reaper.bean.FundBean;
-import reaper.bean.MiniBean;
-import reaper.bean.HistoryManagerBean;
-import reaper.bean.NetValueDateBean;
+import reaper.bean.*;
 import reaper.util.Page;
 
 import java.util.List;
@@ -55,4 +52,11 @@ public interface FundService {
      * @return 历史经理情况
      */
     public List<HistoryManagerBean> findHistoryManagersByCode(String code);
+
+    /**
+     * 根据基金代码获得当前资产配置
+     * @param code 代码
+     * @return 当前资产配置
+     */
+    public CurrentAssetBean findCurrentAssetByCode(String code);
 }
