@@ -1,13 +1,7 @@
 package reaper.util;
 
-import reaper.model.Fund;
-import reaper.model.FundHoldBond;
-import reaper.model.FundHoldStock;
-import reaper.model.Manager;
-import reaper.repository.FundHoldBondRepository;
-import reaper.repository.FundHoldStockRepository;
-import reaper.repository.FundRepository;
-import reaper.repository.ManagerRepository;
+import reaper.model.*;
+import reaper.repository.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -25,9 +19,7 @@ public class Crawler {
     public static void main(String[] args) {
         Code code = new Code();
         Crawler crawler = new Crawler();
-        for(String id:code.getManagerCode()) {
-            crawler.crawlManager(id, null);
-        }
+        crawler.crawlFondHoldStock("000979","2016",null);
     }
 
     /**
@@ -37,6 +29,7 @@ public class Crawler {
      * @param year     年份
      */
     public void crawlFondHoldStock(String fundCode, String year, FundHoldStockRepository fundHoldStockRepository) {
+        System.out.println(fundCode + " " + year);
         String result = getHtml("http://fund.eastmoney.com/f10/FundArchivesDatas.aspx?type=jjcc&code=" + fundCode + "&topline=100&year=" + year);
 
 //        result = "<td><a href='http://quote.eastmoney.com/sz300335.html'>300335</a></td>";
@@ -54,14 +47,14 @@ public class Crawler {
         String[] seasons = seasonPattern.split(result);
 
         Pattern codePattern = Pattern.compile("<td><a href='[^']*'>(\\d{5,6})</a></td>");
-        Pattern ratePattern = Pattern.compile("<a href='(.)*?'>档案</a></td><td class='tor'>((((\\d|\\.)+)%)|---)?</td>");
+        Pattern ratePattern = Pattern.compile("<td class='tor'>((((\\d|\\.)+)%)|---)?</td>");
         //分割后，0为抬头，后面对应各个季度
         for (int i = 0; i < count; i++) {
             Matcher codeMatcher = codePattern.matcher(seasons[i + 1]);
             Matcher rateMatcher = ratePattern.matcher(seasons[i + 1]);
             while (codeMatcher.find()) {
                 rateMatcher.find();
-                FundHoldStock fundHoldStock = new FundHoldStock(fundCode, Integer.valueOf(year), Integer.valueOf(seasonNumbers[i]), codeMatcher.group(1), rateMatcher.group(4) == null ? null : Double.valueOf(rateMatcher.group(4)));
+                FundHoldStock fundHoldStock = new FundHoldStock(fundCode, Integer.valueOf(year), Integer.valueOf(seasonNumbers[i]), codeMatcher.group(1), rateMatcher.group(3) == null ? null : Double.valueOf(rateMatcher.group(3)));
                 fundHoldStockRepository.save(fundHoldStock);
 
 //                System.out.println(fundHoldStock);
@@ -184,7 +177,7 @@ public class Crawler {
 //        System.out.println(manager.getTotalScope());
 
         //bestReturn
-        pattern = Pattern.compile("<span class='(red|green)Text'>(-?\\d+\\.\\d+)%</span>");
+        pattern = Pattern.compile("<span class='(red|green|ping)Text'>(-?\\d+\\.\\d+)%</span>");
         matcher = pattern.matcher(res);
         matcher.find();
         manager.setBestReturns(Double.valueOf(matcher.group(2)));
@@ -192,6 +185,37 @@ public class Crawler {
 
 //        System.out.println(manager);
         managerRepository.save(manager);
+    }
+
+    public void crawlAssetAllocation(String code, AssetAllocationRepository assetAllocationRepository){
+        AssetAllocation assetAllocation = new AssetAllocation();
+        assetAllocation.setCode(code);
+        System.out.println(code);
+
+        String res = getHtml("http://stock.finance.sina.com.cn/fundInfo/api/openapi.php/CaihuiFundInfoService.getFullAssetAL?symbol="+code+"&format=json&callback=var%20LatestAssetAL=");
+//        System.out.println(res);
+
+        Pattern pattern = Pattern.compile("\"gpjzb\":(.*?),\"yhckjzb\":(.*?),\"zqjzb\":(.*?)}");
+        Matcher matcher = pattern.matcher(res);
+
+        if(matcher.find()) {
+            assetAllocation.setStock(Double.valueOf(matcher.group(1)));
+            assetAllocation.setBank(Double.valueOf(matcher.group(2)));
+            assetAllocation.setBond(Double.valueOf(matcher.group(3)));
+        }
+        else {
+            pattern = Pattern.compile("\"zqjzb\":\"(.*?)\"");
+            matcher = pattern.matcher(res);
+            if(matcher.find()) {
+                assetAllocation.setBond(Double.valueOf(matcher.group(1)));
+                assetAllocation.setBank(0.0);
+                assetAllocation.setStock(0.0);
+            }else {
+                System.out.println(code+" 无数据！！！！");
+            }
+        }
+//        System.out.println(assetAllocation);
+        assetAllocationRepository.save(assetAllocation);
     }
 
     private String getHtml(String url) {

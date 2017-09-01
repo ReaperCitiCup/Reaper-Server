@@ -3,6 +3,7 @@ package reaper.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import reaper.bean.CurrentAssetBean;
 import reaper.bean.FundBean;
 import reaper.bean.MiniBean;
 import reaper.bean.NetValueDateBean;
@@ -102,5 +103,20 @@ public class FundController {
     )
     public List<NetValueDateBean> findCumulativeRateByCode(@PathVariable String code,@RequestParam(value = "month") String month){
         return fundService.findCumulativeRateTrendByCode(code, month);
+    }
+
+    /**
+     * 根据基金代码获得当前资产配置
+     * @param code 代码
+     * @return 当前资产配置
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/current-asset",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"}
+    )
+    public CurrentAssetBean findCurrentAssetByCode(@PathVariable String code){
+        return fundService.findCurrentAssetByCode(code);
     }
 }

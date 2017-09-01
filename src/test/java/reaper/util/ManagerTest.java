@@ -153,17 +153,17 @@ public class ManagerTest {
     public void findFundHistoryByIdTest(){
         List<FundHistoryBean> res=new ArrayList<>();
         List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId("h2");
-        if(fundHistories!=null){
-            for(FundHistory fundHistory:fundHistories){
-                List<String> type=new ArrayList<>();
-                type.add(fundHistory.getFundType1());
-                type.add(fundHistory.getFundType2());
-                res.add(new FundHistoryBean(fundHistory.getFundCode(),fundHistory.getFundName(),type,
-                        fundRepository.findByFundCode(fundHistory.getFundCode()).getScope(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()),
-                        (int)((fundHistory.getEndDate().getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24)),
-                        fundHistory.getPayback()));
-            }
-        }
+//        if(fundHistories!=null){
+//            for(FundHistory fundHistory:fundHistories){
+//                List<String> type=new ArrayList<>();
+//                type.add(fundHistory.getFundType1());
+//                type.add(fundHistory.getFundType2());
+//                res.add(new FundHistoryBean(fundHistory.getFundCode(),fundHistory.getFundName(),type,
+//                        fundRepository.findByFundCode(fundHistory.getFundCode()).getScope(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()),
+//                        (int)((fundHistory.getEndDate().getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24)),
+//                        fundHistory.getPayback()));
+//            }
+//        }
         System.out.println(res.size());
         System.out.println();
     }
