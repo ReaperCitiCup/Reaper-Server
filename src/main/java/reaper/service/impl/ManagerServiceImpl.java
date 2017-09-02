@@ -9,6 +9,7 @@ import reaper.service.ManagerService;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -61,9 +62,11 @@ public class ManagerServiceImpl implements ManagerService {
                     List<String> type=new ArrayList<>();
                     type.add(fund.getType1());
                     type.add(fund.getType2());
+                    //若fundHistory没有endDate, 则默认endDate是now
                     res.add(new FundHistoryBean(fundHistory.getFundCode(),fund.getName(),type,
-                            fund.getScope(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()),
-                            (int)((fundHistory.getEndDate().getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24)),
+                            fund.getScope(), sdf.format(fundHistory.getStartDate()),
+                            sdf.format((fundHistory.getEndDate()==null)?new Date():fundHistory.getEndDate()),
+                            (int)((((fundHistory.getEndDate()==null)?new Date():fundHistory.getEndDate()).getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24)),
                             fundHistory.getPayback()));
                 }
             }
@@ -73,6 +76,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public List<ReturnBean> findFundReturnsByManagerId(String managerId) {
+        
         return null;
     }
 
