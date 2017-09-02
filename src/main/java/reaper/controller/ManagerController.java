@@ -52,7 +52,17 @@ public class ManagerController {
         return managerService.findFundHistoryById(id);
     }
 
-    public ManagerAbilityBean findManagerAbilityByManagerId(){
-        return null;
+    /**
+     * @param id 经理Id
+     * @return 经理能力雷达图数据
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{id}/ability",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"}
+    )
+    public ManagerAbilityBean findManagerAbilityByManagerId(@PathVariable String id){
+        return managerService.findManagerAbilityById(id);
     }
 }

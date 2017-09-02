@@ -29,14 +29,14 @@ public interface FundService {
      * @param code 代码
      * @return 对应基金所有时间的单位净值
      */
-    public List<NetValueDateBean> findUnitNetValueTrendByCode(String code);
+    public List<ValueDateBean> findUnitNetValueTrendByCode(String code);
 
     /**
      * 根据基金代码获得基金积累净值走势
      * @param code 代码
      * @return 对应基金所有时间的积累净值
      */
-    public List<NetValueDateBean> findCumulativeNetValueTrendByCode(String code);
+    public List<ValueDateBean> findCumulativeNetValueTrendByCode(String code);
 
     /**
      * 根据基金代码和时间段获得基金累计收益率走势
@@ -44,7 +44,7 @@ public interface FundService {
      * @param month 时间段（时间分为:1月、3月、6月、1年(12月)、3年(36月)、成立来(所有)，即输入为1/3/6/12/36/all）
      * @return 对应代码基金在该时间段的积累收益率
      */
-    public List<NetValueDateBean> findCumulativeRateTrendByCode(String code,String month);
+    public List<ValueDateBean> findCumulativeRateTrendByCode(String code, String month);
 
     /**
      * 基金历史经理数据

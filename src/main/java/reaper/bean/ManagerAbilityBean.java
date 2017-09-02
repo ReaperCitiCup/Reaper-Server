@@ -29,10 +29,12 @@ public class ManagerAbilityBean {
     public Double antirisk;
 
     public ManagerAbilityBean(ManagerAbility managerAbility) {
-        experience = managerAbility.getExperience();
-        timing = managerAbility.getTiming();
-        returns = managerAbility.getReturns();
-        stability = managerAbility.getStability();
-        antirisk = managerAbility.getAntirisk();
+        if(managerAbility!=null) {
+            experience = managerAbility.getExperience();
+            timing = managerAbility.getTiming();
+            returns = managerAbility.getReturns();
+            stability = managerAbility.getStability();
+            antirisk = managerAbility.getAntirisk();
+        }
     }
 }

@@ -1,6 +1,7 @@
 package reaper.service;
 
 import reaper.bean.FundHistoryBean;
+import reaper.bean.ManagerAbilityBean;
 import reaper.bean.ManagerBean;
 
 import java.util.List;
@@ -22,4 +23,10 @@ public interface ManagerService {
      * @return 经理历史基金信息
      */
     public List<FundHistoryBean> findFundHistoryById(String id);
+
+    /**
+     * @param id 经理id
+     * @return 经理能力值
+     */
+    public ManagerAbilityBean findManagerAbilityById(String id);
 }
