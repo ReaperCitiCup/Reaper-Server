@@ -2,9 +2,7 @@ package reaper.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reaper.bean.CompanyMiniBean;
-import reaper.bean.FundHistoryBean;
-import reaper.bean.ManagerBean;
+import reaper.bean.*;
 import reaper.model.*;
 import reaper.repository.*;
 import reaper.service.ManagerService;
@@ -71,5 +69,40 @@ public class ManagerServiceImpl implements ManagerService {
             }
         }
         return res;
+    }
+
+    @Override
+    public List<ReturnBean> findFundReturnsByManagerId(String managerId) {
+        return null;
+    }
+
+    @Override
+    public List<RankBean> findFundRankByManagerId(String managerId) {
+        return null;
+    }
+
+    @Override
+    public List<RateTrendBean> findFundRateTrendByManagerId(String managerId) {
+        return null;
+    }
+
+    @Override
+    public List<RankTrendBean> findFundRankTrendByManagerId(String managerId) {
+        return null;
+    }
+
+    @Override
+    public List<FundPerformanceBean> findFundPerformanceByManagerId(String managerId) {
+        return null;
+    }
+
+    @Override
+    public List<ManagerPerformanceBean> findManagerPerformanceByManagerId(String managerId) {
+        return null;
+    }
+
+    @Override
+    public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
+        return null;
     }
 }
