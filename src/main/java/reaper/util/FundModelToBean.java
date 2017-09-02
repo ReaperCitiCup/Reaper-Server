@@ -7,13 +7,14 @@ import reaper.model.Fund;
 import reaper.model.FundNetValue;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 public class FundModelToBean {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-    public FundBean modelToBean(Fund fund, FundNetValue fundNetValue, RateBean rateBean, MiniBean manager, MiniBean company){
+    public FundBean modelToBean(Fund fund, FundNetValue fundNetValue, RateBean rateBean, List<MiniBean> manager, MiniBean company){
         FundBean res = new FundBean();
-        res.code = fund.getFundCode();
+        res.code = fund.getCode();
         res.name = fund.getName();
         String types[] = {fund.getType1(),fund.getType2()};
         res.type = types;

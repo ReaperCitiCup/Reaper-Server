@@ -11,7 +11,7 @@ public class Fund {
     private Integer id;
 
     @Column(length = 6)
-    private String fundCode;
+    private String code;
 
     @Column(length = 128)
     private String name;
@@ -26,16 +26,26 @@ public class Fund {
 
     private Double scope;
 
+    /**
+     * 年化率
+     */
+    private Double annualProfit;
+
+    /**
+     * 波动率
+     */
+    private Double volatility;
+
     public Fund(){
 
     }
 
-    public String getFundCode() {
-        return fundCode;
+    public String getCode() {
+        return code;
     }
 
-    public void setFundCode(String fundCode) {
-        this.fundCode = fundCode;
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getName() {
@@ -78,15 +88,19 @@ public class Fund {
         this.scope = scope;
     }
 
-    @Override
-    public String toString() {
-        return "Fund{" +
-                "fundCode='" + fundCode + '\'' +
-                ", name='" + name + '\'' +
-                ", type1='" + type1 + '\'' +
-                ", type2='" + type2 + '\'' +
-                ", establishmentDate=" + establishmentDate +
-                ", scope=" + scope +
-                '}';
+    public Double getAnnualProfit() {
+        return annualProfit;
+    }
+
+    public void setAnnualProfit(Double annualProfit) {
+        this.annualProfit = annualProfit;
+    }
+
+    public Double getVolatility() {
+        return volatility;
+    }
+
+    public void setVolatility(Double volatility) {
+        this.volatility = volatility;
     }
 }

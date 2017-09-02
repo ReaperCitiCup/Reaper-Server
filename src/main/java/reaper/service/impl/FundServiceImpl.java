@@ -8,6 +8,7 @@ import reaper.bean.*;
 import reaper.model.*;
 import reaper.repository.*;
 import reaper.service.FundService;
+import reaper.util.DaysBetween;
 import reaper.util.FundModelToBean;
 
 import java.text.SimpleDateFormat;
@@ -49,20 +50,26 @@ public class FundServiceImpl implements FundService {
     @Autowired
     AssetAllocationRepository assetAllocationRepository;
 
-    //TODO 日期格式
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
-    public reaper.util.Page<MiniBean> findFundByKeyword(String keyword, String order, int size, int page) {
-        reaper.util.Page<MiniBean> res = new reaper.util.Page<MiniBean>();
+    public reaper.util.Page<FundMiniBean> findFundByKeyword(String keyword, String order, int size, int page) {
+        reaper.util.Page<FundMiniBean> res = new reaper.util.Page<>();
         res.setOrder(order);
         res.setSize(size);
         res.setPage(page);
         //默认以升序进行排列
-        org.springframework.data.domain.Page<FundShortMessage> fundPage = fundShortMessageRepository.findAllByNameLike("%" + keyword + "%", new PageRequest(page - 1, size, new Sort(Sort.Direction.ASC, order)));
-        List<MiniBean> miniBeans = new ArrayList<>();
-        for (FundShortMessage fund : fundPage.getContent()) {
-            miniBeans.add(new MiniBean(fund.getCode(), fund.getName()));
+        org.springframework.data.domain.Page<Fund> fundPage = fundRepository.findAllByNameLike("%" + keyword + "%", new PageRequest(page - 1, size, new Sort(Sort.Direction.ASC, order==null?"code":order)));
+        List<FundMiniBean> miniBeans = new ArrayList<>();
+        for (Fund fund : fundPage.getContent()) {
+            //根据基金代码找到经理代码
+            List<FundManager> fundManagers = fundManagerRepository.findByFundCode(fund.getCode());
+            //根据经理代码找到经理名
+            List<MiniBean> managerList = new ArrayList<>();
+            for(FundManager fundManager:fundManagers){
+                managerList.add(new MiniBean(fundManager.getManagerId(),managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
+            }
+            miniBeans.add(new FundMiniBean(fund.getCode(), fund.getName(), fund.getAnnualProfit(), fund.getVolatility(), managerList));
         }
         res.setResult(miniBeans);
         res.setTotalCount((int) fundPage.getTotalElements());
@@ -72,15 +79,17 @@ public class FundServiceImpl implements FundService {
     @Override
     public FundBean findFundByCode(String code) {
         FundModelToBean fundModelToBean = new FundModelToBean();
-        Fund fund = fundRepository.findByFundCode(code);
+        Fund fund = fundRepository.findByCode(code);
         FundNetValue fundNetValue = fundNetValueRepository.findFirstByCodeOrderByDateDesc(code);
         RateBean rateBean = getFundRate(code);
-        //暂存经理和公司id的变量
-        String id = fundManagerRepository.findByFundCode(code).getManagerId();
-        MiniBean manager = new MiniBean(id, managerRepository.findByManagerId(id).getName());
-        id = fundCompanyRepository.findByFundId(code).getcompanyId();
+
+        List<MiniBean> managers = new ArrayList<>();
+        for(FundManager fundManager:fundManagerRepository.findByFundCode(code)){
+            managers.add(new MiniBean(fundManager.getManagerId(), managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
+        }
+        String id = fundCompanyRepository.findByFundId(code).getcompanyId();
         MiniBean company = new MiniBean(id, companyRepository.findByCompanyId(id).getName());
-        return fundModelToBean.modelToBean(fund, fundNetValue, rateBean, manager, company);
+        return fundModelToBean.modelToBean(fund, fundNetValue, rateBean, managers, company);
     }
 
     @Override
@@ -130,14 +139,13 @@ public class FundServiceImpl implements FundService {
         return res;
     }
 
-    //TODO 没数据，还未测试
     @Override
     public List<HistoryManagerBean> findHistoryManagersByCode(String code) {
         List<HistoryManagerBean> res = new ArrayList<>();
 
         for (FundHistory fundHistory : fundHistoryRepository.findAllByFundCodeOrderByStartDateAsc(code)) {
             //计算相差的天数
-            int difDays = (int) ((fundHistory.getEndDate().getTime() - fundHistory.getStartDate().getTime()) / (1000 * 3600 * 24));
+            int difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(),fundHistory.getEndDate());
             res.add(new HistoryManagerBean(fundHistory.getManagerId(), managerRepository.findByManagerId(fundHistory.getManagerId()).getName(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()), difDays, fundHistory.getPayback()));
         }
         return res;
@@ -147,6 +155,26 @@ public class FundServiceImpl implements FundService {
     public CurrentAssetBean findCurrentAssetByCode(String code) {
         AssetAllocation assetAllocation = assetAllocationRepository.findByCode(code);
         return new CurrentAssetBean(assetAllocation.bond,assetAllocation.stock,assetAllocation.bank);
+    }
+
+    @Override
+    public List<ManagerHistoryBean> findHistoryManagerByCode(String code) {
+        List<ManagerHistoryBean> res = new ArrayList<>();
+
+        for(FundHistory fundHistory:fundHistoryRepository.findAllByFundCode(code)){
+            //找到对应经理名字
+            Manager manager = managerRepository.findByManagerId(fundHistory.getManagerId());
+            System.out.println(fundHistory);
+            System.out.println(manager);
+            int difDays;
+            if(fundHistory.getEndDate()!=null){
+                difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(),fundHistory.getEndDate());
+            }else {
+                difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(), new Date());
+            }
+            res.add(new ManagerHistoryBean(fundHistory.getManagerId(), manager.getName(), sdf.format(fundHistory.getStartDate()), fundHistory.getEndDate()==null?null:sdf.format(fundHistory.getEndDate()), difDays,fundHistory.getPayback()));
+        }
+        return res;
     }
 
     /**

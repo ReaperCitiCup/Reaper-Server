@@ -11,5 +11,5 @@ import java.util.List;
 public interface FundRepository extends JpaRepository<Fund, Integer> {
     public Page<Fund> findAllByNameLike(String keyword, Pageable pageable);
 
-    public Fund findByFundCode(String fundCode);
+    public Fund findByCode(String code);
 }

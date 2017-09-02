@@ -2,13 +2,8 @@ package reaper.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reaper.bean.CompanyMiniBean;
-import reaper.bean.FundHistoryBean;
-import reaper.bean.ManagerBean;
-import reaper.model.Company;
-import reaper.model.FundHistory;
-import reaper.model.Manager;
-import reaper.model.ManagerCompany;
+import reaper.bean.*;
+import reaper.model.*;
 import reaper.repository.*;
 import reaper.service.ManagerService;
 
@@ -60,16 +55,54 @@ public class ManagerServiceImpl implements ManagerService {
         List<FundHistoryBean> res=new ArrayList<>();
         List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId(id);
         if(fundHistories!=null){
-//            for(FundHistory fundHistory:fundHistories){
-//                List<String> type=new ArrayList<>();
-//                type.add(fundHistory.getFundType1());
-//                type.add(fundHistory.getFundType2());
-//                res.add(new FundHistoryBean(fundHistory.getFundCode(),fundHistory.getFundName(),type,
-//                        fundRepository.findByFundCode(fundHistory.getFundCode()).getScope(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()),
-//                        (int)((fundHistory.getEndDate().getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24)),
-//                        fundHistory.getPayback()));
-//            }
+            for(FundHistory fundHistory:fundHistories){
+                Fund fund=fundRepository.findByCode(fundHistory.getFundCode());
+                if(fund!=null){
+                    List<String> type=new ArrayList<>();
+                    type.add(fund.getType1());
+                    type.add(fund.getType2());
+                    res.add(new FundHistoryBean(fundHistory.getFundCode(),fund.getName(),type,
+                            fund.getScope(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()),
+                            (int)((fundHistory.getEndDate().getTime()-fundHistory.getStartDate().getTime())/(1000*3600*24)),
+                            fundHistory.getPayback()));
+                }
+            }
         }
         return res;
+    }
+
+    @Override
+    public List<ReturnBean> findFundReturnsByManagerId(String managerId) {
+        return null;
+    }
+
+    @Override
+    public List<RankBean> findFundRankByManagerId(String managerId) {
+        return null;
+    }
+
+    @Override
+    public List<RateTrendBean> findFundRateTrendByManagerId(String managerId) {
+        return null;
+    }
+
+    @Override
+    public List<RankTrendBean> findFundRankTrendByManagerId(String managerId) {
+        return null;
+    }
+
+    @Override
+    public List<FundPerformanceBean> findFundPerformanceByManagerId(String managerId) {
+        return null;
+    }
+
+    @Override
+    public List<ManagerPerformanceBean> findManagerPerformanceByManagerId(String managerId) {
+        return null;
+    }
+
+    @Override
+    public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
+        return null;
     }
 }

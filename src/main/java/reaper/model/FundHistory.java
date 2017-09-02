@@ -72,6 +72,15 @@ public class FundHistory {
     private Double payback;
 
 
-
-
+    @Override
+    public String toString() {
+        return "FundHistory{" +
+                "managerId='" + managerId + '\'' +
+                ", fundCode='" + fundCode + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", time='" + time + '\'' +
+                ", payback=" + payback +
+                '}';
+    }
 }
