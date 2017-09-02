@@ -8,6 +8,7 @@ import reaper.bean.*;
 import reaper.model.*;
 import reaper.repository.*;
 import reaper.service.FundService;
+import reaper.util.DaysBetween;
 import reaper.util.FundModelToBean;
 
 import java.text.SimpleDateFormat;
@@ -138,14 +139,13 @@ public class FundServiceImpl implements FundService {
         return res;
     }
 
-    //TODO 没数据，还未测试
     @Override
     public List<HistoryManagerBean> findHistoryManagersByCode(String code) {
         List<HistoryManagerBean> res = new ArrayList<>();
 
         for (FundHistory fundHistory : fundHistoryRepository.findAllByFundCodeOrderByStartDateAsc(code)) {
             //计算相差的天数
-            int difDays = (int) ((fundHistory.getEndDate().getTime() - fundHistory.getStartDate().getTime()) / (1000 * 3600 * 24));
+            int difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(),fundHistory.getEndDate());
             res.add(new HistoryManagerBean(fundHistory.getManagerId(), managerRepository.findByManagerId(fundHistory.getManagerId()).getName(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()), difDays, fundHistory.getPayback()));
         }
         return res;
@@ -155,6 +155,26 @@ public class FundServiceImpl implements FundService {
     public CurrentAssetBean findCurrentAssetByCode(String code) {
         AssetAllocation assetAllocation = assetAllocationRepository.findByCode(code);
         return new CurrentAssetBean(assetAllocation.bond,assetAllocation.stock,assetAllocation.bank);
+    }
+
+    @Override
+    public List<ManagerHistoryBean> findHistoryManagerByCode(String code) {
+        List<ManagerHistoryBean> res = new ArrayList<>();
+
+        for(FundHistory fundHistory:fundHistoryRepository.findAllByFundCode(code)){
+            //找到对应经理名字
+            Manager manager = managerRepository.findByManagerId(fundHistory.getManagerId());
+            System.out.println(fundHistory);
+            System.out.println(manager);
+            int difDays;
+            if(fundHistory.getEndDate()!=null){
+                difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(),fundHistory.getEndDate());
+            }else {
+                difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(), new Date());
+            }
+            res.add(new ManagerHistoryBean(fundHistory.getManagerId(), manager.getName(), sdf.format(fundHistory.getStartDate()), fundHistory.getEndDate()==null?null:sdf.format(fundHistory.getEndDate()), difDays,fundHistory.getPayback()));
+        }
+        return res;
     }
 
     /**

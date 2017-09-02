@@ -116,4 +116,20 @@ public class FundController {
     public CurrentAssetBean findCurrentAssetByCode(@PathVariable String code){
         return fundService.findCurrentAssetByCode(code);
     }
+
+    /**
+     * 基金历史经理
+     * @param code 基金代码
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/managers",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"}
+    )
+    public List<ManagerHistoryBean> findHistoryManager(@PathVariable String code){
+        System.out.println("controller:"+fundService.findHistoryManagerByCode(code).size());
+        return fundService.findHistoryManagerByCode(code);
+    }
 }

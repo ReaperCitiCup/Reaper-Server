@@ -59,4 +59,11 @@ public interface FundService {
      * @return 当前资产配置
      */
     public CurrentAssetBean findCurrentAssetByCode(String code);
+
+    /**
+     * 基金历史经理
+     * @param code 基金代码
+     * @return
+     */
+    public List<ManagerHistoryBean> findHistoryManagerByCode(String code);
 }
