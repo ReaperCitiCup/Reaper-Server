@@ -24,6 +24,11 @@ public class ManagerController {
     @Autowired
     private ManagerService managerService;
 
+    /**
+     * 根据经理id获得经理信息
+     * @param id 经理id
+     * @return 经理信息
+     */
     @ResponseBody
     @RequestMapping(
             value = "/{id}",
@@ -33,6 +38,11 @@ public class ManagerController {
         return managerService.findManagerById(id);
     }
 
+    /**
+     * 根据经理id获得经理历史基金信息
+     * @param id 经理id
+     * @return 经理历史基金信息
+     */
     @ResponseBody
     @RequestMapping(
             value = "/{id}/funds",
