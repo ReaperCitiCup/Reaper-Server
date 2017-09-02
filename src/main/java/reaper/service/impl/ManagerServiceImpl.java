@@ -82,8 +82,8 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public ManagerAbilityBean findManagerAbilityById(String id) {
-        return new ManagerAbilityBean(managerAbilityRepository.findByManagerId(id));
+    public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
+        return new ManagerAbilityBean(managerAbilityRepository.findByManagerId(managerId));
     }
 
     @Override
@@ -117,8 +117,4 @@ public class ManagerServiceImpl implements ManagerService {
         return null;
     }
 
-    @Override
-    public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
-        return null;
-    }
 }
