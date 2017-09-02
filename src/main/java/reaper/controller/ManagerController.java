@@ -25,7 +25,7 @@ public class ManagerController {
     private ManagerService managerService;
 
     /**
-     * 根据经理id获得经理信息
+     * 根据经理id获得经理基本信息
      * @param id 经理id
      * @return 经理信息
      */
@@ -36,6 +36,20 @@ public class ManagerController {
             produces = {"application/json; charset=UTF-8"})
     public ManagerBean findManagerById(@PathVariable String id){
         return managerService.findManagerById(id);
+    }
+
+    /**
+     * 根据经理id获得经理综合能力
+     * @param managerId 经理id
+     * @return 经理综合能力
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{id}/ability",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public ManagerAbilityBean findManagerAbilityByManagerId(@PathVariable String managerId){
+        return managerService.findManagerAbilityByManagerId(managerId);
     }
 
     /**
@@ -52,6 +66,18 @@ public class ManagerController {
         return managerService.findFundHistoryById(id);
     }
 
+    /**
+     * 根据经理id获得经理现任基金排名
+     * @param managerId 经理id
+     * @return 经理现任基金排名
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{managerId}/fund-rank",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public List<RankBean> findFundRankByManagerId(@PathVariable String managerId){
+        return managerService.findFundRankByManagerId(managerId);
     /**
      * @param id 经理Id
      * @return 经理能力雷达图数据
