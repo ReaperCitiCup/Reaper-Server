@@ -76,6 +76,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public List<ReturnBean> findFundReturnsByManagerId(String managerId) {
+        
         return null;
     }
 
