@@ -39,7 +39,7 @@ public class FundNetValueTest {
 
 
         int i=0;
-        for (i=1005;i<codes.size();i++){
+        for (i=10;i<codes.size();i++){
 
                 System.out.println(codes.get(i));
             getSingleFoundMessage(codes.get(i));

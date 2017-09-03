@@ -123,10 +123,10 @@ public class FundHistoryTest {
                 fundHistory.setManagerId(managerId);
                 fundHistory.setEndDate(endDate);
                 fundHistory.setFundCode(fundCode);
-                //fundHistory.setFundName(fundName);
-               // fundHistory.setFundType1(fundType1);
+                fundHistory.setFundName(fundName);
+                fundHistory.setFundType1(fundType1);
                 fundHistory.setTime(time);
-                //fundHistory.setSize(size);
+                fundHistory.setSize(size);
                 fundHistory.setPayback(payback);
                 fundHistory.setStartDate(startDate);
 
