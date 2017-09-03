@@ -76,12 +76,20 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public List<ReturnBean> findFundReturnsByManagerId(String managerId) {
-        
-        return null;
+        List<ReturnBean> res=new ArrayList<>();
+        List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId(managerId);
+        if(fundHistories!=null){
+            for(FundHistory fundHistory : fundHistories){
+                res.add(new ReturnBean(fundHistory.getFundCode(),
+                        fundRepository.findByCode(fundHistory.getFundCode()).getName(), fundHistory.getPayback()));
+            }
+        }
+        return res;
     }
 
     @Override
     public List<RankBean> findFundRankByManagerId(String managerId) {
+
         return null;
     }
 
