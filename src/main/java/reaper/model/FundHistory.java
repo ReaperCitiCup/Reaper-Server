@@ -9,8 +9,6 @@ import java.util.Date;
 @Entity
 @Table(name = "fund_history")
 public class FundHistory {
-
-
     @Id
     @GeneratedValue
     private Integer id;
