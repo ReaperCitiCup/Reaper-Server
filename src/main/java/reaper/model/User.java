@@ -9,11 +9,10 @@ import javax.persistence.Table;
  * Created by Sorumi on 17/5/12.
  */
 @Entity
-@Table(name = "User")
+@Table(name = "user")
 public class User {
 
     @Id
-    @GeneratedValue
     private Integer id;
 
     private String username;
@@ -45,5 +44,11 @@ public class User {
     }
 
     public User() {
+    }
+
+    public User(Integer id, String username, String password) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
     }
 }
