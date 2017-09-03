@@ -93,28 +93,28 @@ public class FundServiceImpl implements FundService {
     }
 
     @Override
-    public List<NetValueDateBean> findUnitNetValueTrendByCode(String code) {
-        List<NetValueDateBean> res = new ArrayList<>();
+    public List<ValueDateBean> findUnitNetValueTrendByCode(String code) {
+        List<ValueDateBean> res = new ArrayList<>();
 
         for (FundNetValue fundNetValue : fundNetValueRepository.findAllByCodeOrderByDateAsc(code)) {
-            res.add(new NetValueDateBean(sdf.format(fundNetValue.getDate()), fundNetValue.getUnitNetValue()));
+            res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), fundNetValue.getUnitNetValue()));
         }
         return res;
     }
 
     @Override
-    public List<NetValueDateBean> findCumulativeNetValueTrendByCode(String code) {
-        List<NetValueDateBean> res = new ArrayList<>();
+    public List<ValueDateBean> findCumulativeNetValueTrendByCode(String code) {
+        List<ValueDateBean> res = new ArrayList<>();
 
         for (FundNetValue fundNetValue : fundNetValueRepository.findAllByCodeOrderByDateAsc(code)) {
-            res.add(new NetValueDateBean(sdf.format(fundNetValue.getDate()), fundNetValue.getCumulativeNetValue()));
+            res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), fundNetValue.getCumulativeNetValue()));
         }
         return res;
     }
 
     @Override
-    public List<NetValueDateBean> findCumulativeRateTrendByCode(String code, String month) {
-        List<NetValueDateBean> res = new ArrayList<>();
+    public List<ValueDateBean> findCumulativeRateTrendByCode(String code, String month) {
+        List<ValueDateBean> res = new ArrayList<>();
 
         //累加结果
         double cumulativeValue = 0;
@@ -133,7 +133,7 @@ public class FundServiceImpl implements FundService {
 
         for (FundNetValue fundNetValue : fundNetValues) {
             cumulativeValue += fundNetValue.getDailyRate();
-            res.add(new NetValueDateBean(sdf.format(fundNetValue.getDate()), cumulativeValue));
+            res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), cumulativeValue));
         }
 
         return res;

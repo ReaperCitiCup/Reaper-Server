@@ -66,7 +66,7 @@ public class FundController {
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"}
     )
-    public List<NetValueDateBean> findUnitNetValueDateByCode(@PathVariable String code){
+    public List<ValueDateBean> findUnitNetValueDateByCode(@PathVariable String code){
         return fundService.findUnitNetValueTrendByCode(code);
     }
 
@@ -81,7 +81,7 @@ public class FundController {
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"}
     )
-    public List<NetValueDateBean> findCumulativeNetValueDateByCode(@PathVariable String code){
+    public List<ValueDateBean> findCumulativeNetValueDateByCode(@PathVariable String code){
         return fundService.findCumulativeNetValueTrendByCode(code);
     }
 
@@ -98,7 +98,7 @@ public class FundController {
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"}
     )
-    public List<NetValueDateBean> findCumulativeRateByCode(@PathVariable String code,@RequestParam(value = "month") String month){
+    public List<ValueDateBean> findCumulativeRateByCode(@PathVariable String code, @RequestParam(value = "month") String month){
         return fundService.findCumulativeRateTrendByCode(code, month);
     }
 

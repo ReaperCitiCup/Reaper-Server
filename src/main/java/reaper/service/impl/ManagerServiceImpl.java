@@ -2,6 +2,10 @@ package reaper.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reaper.bean.CompanyMiniBean;
+import reaper.bean.FundHistoryBean;
+import reaper.bean.ManagerAbilityBean;
+import reaper.bean.ManagerBean;
 import reaper.bean.*;
 import reaper.model.*;
 import reaper.repository.*;
@@ -32,6 +36,9 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Autowired
     FundRepository fundRepository;
+
+    @Autowired
+    ManagerAbilityRepository managerAbilityRepository;
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -75,8 +82,13 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
+    public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
+        return new ManagerAbilityBean(managerAbilityRepository.findByManagerId(managerId));
+    }
+
+    @Override
     public List<ReturnBean> findFundReturnsByManagerId(String managerId) {
-        
+
         return null;
     }
 
@@ -105,8 +117,4 @@ public class ManagerServiceImpl implements ManagerService {
         return null;
     }
 
-    @Override
-    public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
-        return null;
-    }
 }
