@@ -18,9 +18,9 @@ import java.util.Collections;
 /**
  * Created by Sorumi on 17/5/12.
  */
-public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
+public class JWTSignInFilter extends AbstractAuthenticationProcessingFilter {
 
-    public JWTLoginFilter(String url, AuthenticationManager authManager) {
+    public JWTSignInFilter(String url, AuthenticationManager authManager) {
         super(new AntPathRequestMatcher(url));
         setAuthenticationManager(authManager);
     }
@@ -43,4 +43,12 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) throws IOException, ServletException {
         TokenAuthenticationService.addAuthentication(res, auth.getName());
     }
+
+//    @Override
+//    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+//
+//        response.setContentType("application/json");
+//        response.setStatus(HttpServletResponse.SC_OK);
+//        response.getOutputStream().println(JSONResult.fillResultString(500, "Internal Server Error!!!", JSONObject.NULL));
+//    }
 }
