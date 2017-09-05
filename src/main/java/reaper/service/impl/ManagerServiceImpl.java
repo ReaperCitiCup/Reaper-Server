@@ -40,6 +40,9 @@ public class ManagerServiceImpl implements ManagerService {
     @Autowired
     ManagerAbilityRepository managerAbilityRepository;
 
+    @Autowired
+    FundNetValueRepository fundNetValueRepository;
+
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
@@ -88,20 +91,44 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public List<ReturnBean> findFundReturnsByManagerId(String managerId) {
-
-        return null;
+        List<ReturnBean> res=new ArrayList<>();
+        List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId(managerId);
+        if(fundHistories!=null){
+            for(FundHistory fundHistory : fundHistories){
+                res.add(new ReturnBean(fundHistory.getFundCode(), fundHistory.getFundName(), fundHistory.getPayback()));
+            }
+        }
+        return res;
     }
 
+    //TODO
     @Override
     public List<RankBean> findFundRankByManagerId(String managerId) {
+        List<RankBean> res=new ArrayList<>();
+        List<FundHistory> fundHistories = fundHistoryRepository.findAllByManagerId(managerId);
+        for(FundHistory fundHistory : fundHistories){
+
+        }
         return null;
     }
 
     @Override
     public List<RateTrendBean> findFundRateTrendByManagerId(String managerId) {
-        return null;
+        List<RateTrendBean> res=new ArrayList<>();
+        List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId(managerId);
+        if(fundHistories!=null){
+            for(FundHistory fundHistory : fundHistories){
+                List<RateTrendDataBean> data=new ArrayList<>();
+                for (FundNetValue fundNetValue : fundNetValueRepository.findAllByCodeOrderByDateAsc(fundHistory.getFundCode())){
+                    data.add(new RateTrendDataBean(sdf.format(fundNetValue.getDate()), fundNetValue.getUnitNetValue()));
+                }
+                res.add(new RateTrendBean(fundHistory.getFundCode(),fundHistory.getFundName(),data));
+            }
+        }
+        return res;
     }
 
+    //TODO
     @Override
     public List<RankTrendBean> findFundRankTrendByManagerId(String managerId) {
         return null;
@@ -109,12 +136,30 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public List<FundPerformanceBean> findFundPerformanceByManagerId(String managerId) {
-        return null;
+        List<FundPerformanceBean> res=new ArrayList<>();
+        List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId(managerId);
+        if(fundHistories!=null){
+            for(FundHistory fundHistory:fundHistories){
+                Fund fund=fundRepository.findByCode(fundHistory.getFundCode());
+                if(fund!=null){
+                    res.add(new FundPerformanceBean(fund.getCode(),fund.getName(),fund.getAnnualProfit(),fund.getVolatility()));
+                }
+            }
+        }
+        return res;
     }
 
     @Override
     public List<ManagerPerformanceBean> findManagerPerformanceByManagerId(String managerId) {
-        return null;
+        List<ManagerPerformanceBean> res=new ArrayList<>();
+        try {
+            Manager manager=managerRepository.findByManagerId(managerId);
+            ManagerAbility managerAbility =managerAbilityRepository.findByManagerId(managerId);
+            res.add(new ManagerPerformanceBean(managerAbility.getManagerId(),manager.getName(),managerAbility.getReturns(),managerAbility.getAntirisk()));
+        }catch (NullPointerException ex){
+            throw ex;
+        }
+        return res;
     }
 
 }

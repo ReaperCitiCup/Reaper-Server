@@ -10,7 +10,7 @@ public class RateTrendDataBean {
     public String date;
 
     /**
-     * 不知
+     * 净值
      */
     public Double value;
 
