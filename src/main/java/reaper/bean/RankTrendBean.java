@@ -19,9 +19,9 @@ public class RankTrendBean {
     /**
      * 基金数据
      */
-    public List<RateTrendDataBean> data;
+    public List<RankTrendDataBean> data;
 
-    public RankTrendBean(String id, String name, List<RateTrendDataBean> data) {
+    public RankTrendBean(String id, String name, List<RankTrendDataBean> data) {
         this.id = id;
         this.name = name;
         this.data = data;

@@ -15,12 +15,12 @@ public class FundPerformanceBean {
     public String name;
 
     /**
-     * 收益率
+     * 收益率,年化收益率？
      */
     public Double rate;
 
     /**
-     * 风险
+     * 风险,波动率？
      */
     public Double risk;
 

@@ -15,11 +15,6 @@ public class ManagerBean {
     public String name;
 
     /**
-     *爬不到gender的数据
-     */
-    public String gender;
-
-    /**
      * 任命时间
      */
     public String appointedDate;
