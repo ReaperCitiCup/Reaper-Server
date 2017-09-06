@@ -3,23 +3,24 @@ package reaper.service;
 import org.hibernate.mapping.Collection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reaper.bean.FundHistoryBean;
 import reaper.bean.ManagerBean;
+import reaper.bean.ReturnBean;
 
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.OptionalInt;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
 /**
  * Created by wuyuhan on 17/9/5.
  */
+//TODO 不需要判断fund不存在的情况
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest()
 public class ManagerServiceTest {
@@ -31,42 +32,50 @@ public class ManagerServiceTest {
 
     //测试根据managerId查找manager
 
-    //测试不存在的id=0
+    //测试不存在的id=0,mmmm
     @Test
     public void findManagerById1() throws Exception {
-        ManagerBean managerBean=managerService.findManagerById("0");
-        assertEquals(null,managerBean);
+        assertArrayEquals(new ManagerBean[]{null,null},
+                new ManagerBean[]{
+                managerService.findManagerById("0"),managerService.findManagerById("mmmm")
+        });
     }
 
     //测试存在的id=30304626
     @Test
     public void findManagerById2() throws Exception{
         ManagerBean managerBean=managerService.findManagerById("30304626");
-        assertEquals("金梓才",managerBean.name);
-        assertEquals(67.91,managerBean.bestReturns,0.000001);
-        assertEquals("80161341",managerBean.company.id);
+        assertArrayEquals(new String[]{"金梓才",67.91+"","80161341"},
+                new String[]{managerBean.name, managerBean.bestReturns+"",managerBean.company.id});
     }
 
     //测试根据managerId查找fundHistory
 
-    //测试不存在的id=0
+    //测试不存在的id=0,mmmm,mm1
     @Test
     public void findFundHistoryById1() throws Exception {
-        List<FundHistoryBean> fundHistoryBeans=managerService.findFundHistoryById("0");
-        assertEquals(0,fundHistoryBeans.size());
+        assertArrayEquals(new int[]{0,0},
+                new int[]{
+                        managerService.findFundHistoryById("0").size(),
+                        managerService.findFundHistoryById("mmmm").size()
+                });
     }
 
+    //TODO 改
     //测试存在的id=30413691
     @Test
     public void findFundHistoryById2() throws Exception {
         List<FundHistoryBean> fundHistoryBeans=managerService.findFundHistoryById("30413691");
         int code=fundHistoryBeans.stream().mapToInt((x)->Integer.parseInt(x.id)).summaryStatistics().getMax();
         int time=fundHistoryBeans.stream().mapToInt((x)->x.days).summaryStatistics().getMin();
-        assertEquals(2,fundHistoryBeans.size());
-        assertEquals(60,time);
-        assertEquals(4476,code);
+        assertArrayEquals(new int[]{2,61,4476},new int[]{fundHistoryBeans.size(),time,code});
+//        assertEquals(2,fundHistoryBeans.size());
+//        assertEquals(60,time);
+//        assertEquals(4476,code);
     }
 
+
+    //TODO 改
     //测试存在的id=30045022
     @Test
     public void findFundHistoryById3() throws Exception {
@@ -79,8 +88,36 @@ public class ManagerServiceTest {
         assertEquals(796,fundHistoryBeans.get(16).days.intValue());
     }
 
+    //测试很奇怪的基金经理
     @Test
-    public void findFundReturnsByManagerId() throws Exception {
+    public void findFundHistoryById4() throws Exception {
+        List<FundHistoryBean> fundHistoryBeans=managerService.findFundHistoryById("m1");
+        assertEquals(0,fundHistoryBeans.size());
+    }
+
+    //测试根据managerId查找其基金的收益
+
+    //测试不存在的id=0,mmmm
+    @Test
+    public void findFundReturnsByManagerId1() throws Exception {
+        List<ReturnBean> returnBeans=managerService.findFundReturnsByManagerId("0");
+        assertArrayEquals(new int[]{0,0},
+                new int[]{
+                managerService.findFundReturnsByManagerId("0").size(),
+                managerService.findFundReturnsByManagerId("mmmm").size()
+                });
+    }
+
+    //TODO 改
+    //测试存在的id=30132007,有不存在的fund,
+    @Test
+    public void findFundReturnsByManagerId2() throws Exception {
+        List<ReturnBean> returnBeans=managerService.findFundReturnsByManagerId("30132007");
+        returnBeans.sort(Comparator.comparing((x)->x.id));
+        assertEquals(17,returnBeans.size());
+        assertEquals("000287",returnBeans.get(0).id);
+        assertEquals("银华永利债券C",returnBeans.get(1).name);
+        assertEquals(3.4,returnBeans.get(12).returns,0.000001);
     }
 
     @Test
