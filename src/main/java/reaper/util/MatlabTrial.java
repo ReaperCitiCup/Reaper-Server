@@ -6,12 +6,12 @@ package reaper.util;
 /**
  * @author keenan on 04/09/2017
  */
-//public class MatlabTrial {
-//    public static void main(String[] args) {
+public class MatlabTrial {
+    public static void main(String[] args) {
 //        /**
 //         * 参数
 //         */
-//        MWNumericArray n = null;
+//        MWCharArray n = null;
 //        /**
 //         * 结果
 //         */
@@ -33,8 +33,7 @@ package reaper.util;
 //        try {
 //            /**
 //             */
-//            n = new MWNumericArray("000001",
-//                    MWClassID.UNKNOWN);
+//            n = new MWCharArray("000001");
 //
 //            theMagic = new Class1();
 //
@@ -56,5 +55,5 @@ package reaper.util;
 //            MWArray.disposeArray(result);
 ////            theMagic.dispose();
 //        }
-//    }
-//}
+    }
+}

@@ -103,4 +103,18 @@ public class Fund {
     public void setVolatility(Double volatility) {
         this.volatility = volatility;
     }
+
+    @Override
+    public String toString() {
+        return "Fund{" +
+                "code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", type1='" + type1 + '\'' +
+                ", type2='" + type2 + '\'' +
+                ", establishmentDate=" + establishmentDate +
+                ", scope=" + scope +
+                ", annualProfit=" + annualProfit +
+                ", volatility=" + volatility +
+                '}';
+    }
 }

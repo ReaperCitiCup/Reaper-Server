@@ -10,7 +10,9 @@ import reaper.repository.*;
 import reaper.service.FundService;
 import reaper.util.DaysBetween;
 import reaper.util.FundModelToBean;
+import reaper.util.PythonUser;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -51,6 +53,8 @@ public class FundServiceImpl implements FundService {
     AssetAllocationRepository assetAllocationRepository;
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+    private DecimalFormat decimalFormat = new DecimalFormat("#.00");
 
     @Override
     public reaper.util.Page<FundMiniBean> findFundByKeyword(String keyword, String order, int size, int page) {
@@ -177,6 +181,21 @@ public class FundServiceImpl implements FundService {
         return res;
     }
 
+    @Override
+    public List<ValueDateBean> findJensenByCode(String code) {
+        List<ValueDateBean> res = new ArrayList<>();
+        String pyRes = PythonUser.usePy("基金因子计算以及回归分析.py",code);
+        for(String line:pyRes.split("\n")){
+            //处理每行
+            String attrs[] = line.split(" ");
+            //判断是否是日期行
+            if(attrs[0].startsWith("2")) {
+                res.add(new ValueDateBean(attrs[0], Double.valueOf(attrs[1])));
+            }
+        }
+        return res;
+    }
+
     /**
      * 计算基金近1、3、6、12、36月和成立以来的累计收益率
      *
@@ -215,13 +234,15 @@ public class FundServiceImpl implements FundService {
 
         for (FundNetValue netValue : netValues) {
             if (countDate != 5 && netValue.getDate().before(dates[countDate])) {
-                rates[countDate] = rate;
+                rates[countDate] = Double.parseDouble(decimalFormat.format(rate));
                 countDate++;
             }
-            rate += netValue.getDailyRate();
+            if(netValue.getDailyRate()!=null) {
+                rate += netValue.getDailyRate();
+            }
         }
         //成立以来的收益率
-        rates[5] = rate;
+        rates[5] = Double.parseDouble(decimalFormat.format(rate));
 
         return new RateBean(rates);
     }

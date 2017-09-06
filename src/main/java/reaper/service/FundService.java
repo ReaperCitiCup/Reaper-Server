@@ -66,4 +66,11 @@ public interface FundService {
      * @return
      */
     public List<ManagerHistoryBean> findHistoryManagerByCode(String code);
+
+    /**
+     * 詹森指数
+     * @param code 代码
+     * @return
+     */
+    public List<ValueDateBean> findJensenByCode(String code);
 }

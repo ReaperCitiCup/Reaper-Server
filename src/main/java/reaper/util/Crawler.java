@@ -19,7 +19,7 @@ public class Crawler {
     public static void main(String[] args) {
         Code code = new Code();
         Crawler crawler = new Crawler();
-        crawler.crawlFondHoldStock("000979","2016",null);
+        crawler.crawlFundDetail("000001",null);
     }
 
     /**
@@ -131,8 +131,8 @@ public class Crawler {
         matcher.find();
         fund.setScope(matcher.group(1).equals("--")?null:Double.valueOf(matcher.group(1)));
 
-//        System.out.println(fund);
-        fundRepository.save(fund);
+        System.out.println(fund);
+//        fundRepository.save(fund);
     }
 
     public void crawlManager(String managerId, ManagerRepository managerRepository){
