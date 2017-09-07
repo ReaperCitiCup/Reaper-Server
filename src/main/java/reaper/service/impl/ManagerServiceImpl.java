@@ -119,8 +119,11 @@ public class ManagerServiceImpl implements ManagerService {
         if(fundHistories!=null){
             for(FundHistory fundHistory : fundHistories){
                 List<RateTrendDataBean> data=new ArrayList<>();
-                for (FundNetValue fundNetValue : fundNetValueRepository.findAllByCodeOrderByDateAsc(fundHistory.getFundCode())){
-                    data.add(new RateTrendDataBean(sdf.format(fundNetValue.getDate()), fundNetValue.getUnitNetValue()));
+                List<FundNetValue> fundNetValues=fundNetValueRepository.findAllByCodeOrderByDateAsc(fundHistory.getFundCode());
+                if(fundNetValues!=null){
+                    for (FundNetValue fundNetValue : fundNetValues){
+                        data.add(new RateTrendDataBean(sdf.format(fundNetValue.getDate()), fundNetValue.getUnitNetValue()));
+                    }
                 }
                 res.add(new RateTrendBean(fundHistory.getFundCode(),fundHistory.getFundName(),data));
             }
@@ -145,21 +148,23 @@ public class ManagerServiceImpl implements ManagerService {
                     res.add(new FundPerformanceBean(fund.getCode(),fund.getName(),fund.getAnnualProfit(),fund.getVolatility()));
                 }
             }
+            return res;
         }
-        return res;
+        return null;
     }
 
     @Override
     public List<ManagerPerformanceBean> findManagerPerformanceByManagerId(String managerId) {
-        List<ManagerPerformanceBean> res=new ArrayList<>();
-        try {
-            Manager manager=managerRepository.findByManagerId(managerId);
+        Manager manager=managerRepository.findByManagerId(managerId);
+        if(manager!=null){
+            List<ManagerPerformanceBean> res=new ArrayList<>();
             ManagerAbility managerAbility =managerAbilityRepository.findByManagerId(managerId);
-            res.add(new ManagerPerformanceBean(managerAbility.getManagerId(),manager.getName(),managerAbility.getReturns(),managerAbility.getAntirisk()));
-        }catch (NullPointerException ex){
-            throw ex;
+            if(managerAbility!=null){
+                res.add(new ManagerPerformanceBean(managerAbility.getManagerId(),manager.getName(),managerAbility.getReturns(),managerAbility.getAntirisk()));
+            }
+            return res;
         }
-        return res;
+        return null;
     }
 
 }
