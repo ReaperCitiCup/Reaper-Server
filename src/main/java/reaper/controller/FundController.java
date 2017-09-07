@@ -7,6 +7,7 @@ import reaper.bean.*;
 import reaper.service.FundService;
 import reaper.util.Page;
 
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,7 +21,6 @@ public class FundController {
 
     @Autowired
     private FundService fundService;
-
 
     /**
      * @param keyword 关键字
@@ -147,5 +147,20 @@ public class FundController {
     )
     public List<ValueDateBean> findVolatilityByCode(@PathVariable String code) {
         return Collections.emptyList();
+    }
+
+    /**
+     * 詹森指数
+     * @param code 代码
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/jensen-index",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"}
+    )
+    public List<ValueDateBean> findJensenByCode(@PathVariable String code){
+        return fundService.findJensenByCode(code);
     }
 }
