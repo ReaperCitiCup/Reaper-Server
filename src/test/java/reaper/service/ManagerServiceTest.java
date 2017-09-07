@@ -19,8 +19,6 @@ import static org.junit.Assert.*;
 /**
  * Created by wuyuhan on 17/9/5.
  */
-//TODO 不需要判断fund不存在的情况
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest()
 public class ManagerServiceTest {
@@ -51,7 +49,7 @@ public class ManagerServiceTest {
 
     //测试根据managerId查找fundHistory
 
-    //测试不存在的id=0,mmmm,mm1
+    //测试不存在的id=0,mmm
     @Test
     public void findFundHistoryById1() throws Exception {
         assertArrayEquals(new int[]{0,0},
@@ -61,38 +59,27 @@ public class ManagerServiceTest {
                 });
     }
 
-    //TODO 改
-    //测试存在的id=30413691
+    //测试存在的id=30413691，时间是2017-09-06
     @Test
     public void findFundHistoryById2() throws Exception {
         List<FundHistoryBean> fundHistoryBeans=managerService.findFundHistoryById("30413691");
         int code=fundHistoryBeans.stream().mapToInt((x)->Integer.parseInt(x.id)).summaryStatistics().getMax();
         int time=fundHistoryBeans.stream().mapToInt((x)->x.days).summaryStatistics().getMin();
         assertArrayEquals(new int[]{2,61,4476},new int[]{fundHistoryBeans.size(),time,code});
-//        assertEquals(2,fundHistoryBeans.size());
-//        assertEquals(60,time);
-//        assertEquals(4476,code);
     }
 
-
-    //TODO 改
-    //测试存在的id=30045022
+    //测试存在的id=30045022，时间是2017-09-06
     @Test
     public void findFundHistoryById3() throws Exception {
         List<FundHistoryBean> fundHistoryBeans=managerService.findFundHistoryById("30045022");
         fundHistoryBeans.sort(Comparator.comparing(h -> h.id));
-        System.out.println(fundHistoryBeans.get(0).id);
-        assertEquals(21,fundHistoryBeans.size());
-        assertEquals(39.67,fundHistoryBeans.get(0).returns,0.000001);
-        assertEquals("中低风险",fundHistoryBeans.get(0).type.get(1));
-        assertEquals(796,fundHistoryBeans.get(16).days.intValue());
-    }
-
-    //测试很奇怪的基金经理
-    @Test
-    public void findFundHistoryById4() throws Exception {
-        List<FundHistoryBean> fundHistoryBeans=managerService.findFundHistoryById("m1");
-        assertEquals(0,fundHistoryBeans.size());
+        assertArrayEquals(new String[]{21+"",39.67+"","中低风险",796+""},
+                new String[]{
+                        fundHistoryBeans.size()+"",
+                        fundHistoryBeans.get(0).returns+"",
+                        fundHistoryBeans.get(0).type.get(1)+"",
+                        fundHistoryBeans.get(16).days.intValue()+""
+                });
     }
 
     //测试根据managerId查找其基金的收益
@@ -100,7 +87,6 @@ public class ManagerServiceTest {
     //测试不存在的id=0,mmmm
     @Test
     public void findFundReturnsByManagerId1() throws Exception {
-        List<ReturnBean> returnBeans=managerService.findFundReturnsByManagerId("0");
         assertArrayEquals(new int[]{0,0},
                 new int[]{
                 managerService.findFundReturnsByManagerId("0").size(),
@@ -108,21 +94,26 @@ public class ManagerServiceTest {
                 });
     }
 
-    //TODO 改
-    //测试存在的id=30132007,有不存在的fund,
+    //测试存在的id=30132007
     @Test
     public void findFundReturnsByManagerId2() throws Exception {
         List<ReturnBean> returnBeans=managerService.findFundReturnsByManagerId("30132007");
         returnBeans.sort(Comparator.comparing((x)->x.id));
-        assertEquals(17,returnBeans.size());
-        assertEquals("000287",returnBeans.get(0).id);
-        assertEquals("银华永利债券C",returnBeans.get(1).name);
-        assertEquals(3.4,returnBeans.get(12).returns,0.000001);
+        assertArrayEquals(new String[]{17+"","000287","银华永利债券C",1.19+""},
+                new String[]{
+                        returnBeans.size()+"",
+                        returnBeans.get(0).id,
+                        returnBeans.get(1).name,
+                        returnBeans.get(2).returns+""
+                });
     }
 
     @Test
     public void findFundRankByManagerId() throws Exception {
     }
+
+    //TODO
+    //测试根据managerId查看rate trend
 
     @Test
     public void findFundRateTrendByManagerId() throws Exception {
@@ -139,6 +130,9 @@ public class ManagerServiceTest {
     @Test
     public void findManagerPerformanceByManagerId() throws Exception {
     }
+
+    //TODO
+    //查看根据managerId查看manager ability
 
     @Test
     public void findManagerAbilityByManagerId() throws Exception {
