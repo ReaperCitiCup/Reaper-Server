@@ -84,6 +84,7 @@ public class ManagerServiceImpl implements ManagerService {
         return res;
     }
 
+    //TODO 这里仍没有对不存在的managerId的处理(应该是加错位置了，加到performance那里了)
     @Override
     public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
         ManagerAbility managerAbility=managerAbilityRepository.findByManagerId(managerId);

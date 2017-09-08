@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reaper.bean.FundHistoryBean;
 import reaper.bean.ManagerBean;
+import reaper.bean.RateTrendBean;
 import reaper.bean.ReturnBean;
 
 import java.text.SimpleDateFormat;
@@ -18,6 +19,8 @@ import static org.junit.Assert.*;
 
 /**
  * Created by wuyuhan on 17/9/5.
+ * 注意：
+ * 本测试不仅包含黑盒测试，也包含白盒测试
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest()
@@ -78,7 +81,7 @@ public class ManagerServiceTest {
                         fundHistoryBeans.size()+"",
                         fundHistoryBeans.get(0).returns+"",
                         fundHistoryBeans.get(0).type.get(1)+"",
-                        fundHistoryBeans.get(16).days.intValue()+""
+                        fundHistoryBeans.get(16).days +""
                 });
     }
 
@@ -112,30 +115,90 @@ public class ManagerServiceTest {
     public void findFundRankByManagerId() throws Exception {
     }
 
-    //TODO
     //测试根据managerId查看rate trend
 
+    //测试不存在的id=0，mmmm
     @Test
-    public void findFundRateTrendByManagerId() throws Exception {
+    public void findFundRateTrendByManagerId1() throws Exception {
+        assertArrayEquals(new int[]{0,0}, new int[]{
+                managerService.findFundRateTrendByManagerId("0").size(),
+                managerService.findFundRateTrendByManagerId("mmmm").size()
+        });
+    }
+
+    //测试存在的id=30505449,时间是2017-09-07
+    @Test
+    public void findFundRateTrendByManagerId2() throws Exception {
+        List<RateTrendBean> rateTrendBeans=managerService.findFundRateTrendByManagerId("30505449");
+        assertArrayEquals(new String[]{1+"",833+"","2014-03-19",1.0+""}, new String[]{
+                rateTrendBeans.size()+"",
+                rateTrendBeans.get(0).data.size()+"",
+                rateTrendBeans.get(0).data.get(0).date,
+                rateTrendBeans.get(0).data.get(0).value+""
+                });
+    }
+
+    //测试存在的id=30324725，时间是2017-09-07
+    @Test
+    public void findFundRateTrendByManagerId3() throws Exception {
+        List<RateTrendBean> rateTrendBeans=managerService.findFundRateTrendByManagerId("30324725");
+        rateTrendBeans.sort(Comparator.comparing((x)->x.id));
+        assertArrayEquals(new String[]{2+"",3115+"","160105","南方积极配置混合(LOF)",1.0602+""},new String[]{
+             rateTrendBeans.size()+"",
+             rateTrendBeans.get(1).data.size()+"",
+             rateTrendBeans.get(1).id,
+             rateTrendBeans.get(1).name,
+             rateTrendBeans.get(1).data.get(3114).value+""
+        });
+    }
+
+    //测试存在的id=30198307，时间是2017-09-07
+    @Test
+    public void findFundRateTrendByManagerId4() throws Exception {
+        List<RateTrendBean> rateTrendBeans=managerService.findFundRateTrendByManagerId("30198307");
+        rateTrendBeans.sort(Comparator.comparing((x)->x.id));
+        assertEquals(6,rateTrendBeans.size());
     }
 
     @Test
     public void findFundRankTrendByManagerId() throws Exception {
     }
 
+    //测试根据managerId查看该经理的基金的表现
+
+    //TODO 还差有效值
+    //测试不存在的id=0,mmmm
     @Test
-    public void findFundPerformanceByManagerId() throws Exception {
+    public void findFundPerformanceByManagerId1() throws Exception {
+        assertArrayEquals(new int[]{0,0}, new int[]{
+                managerService.findFundPerformanceByManagerId("0").size(),
+                managerService.findFundPerformanceByManagerId("mmmm").size()
+        });
     }
 
+    //测试根据managerId查看经理的综合表现
+
+    //TODO 还差有效值
+    //测试不存在的id=0，mmmm
     @Test
-    public void findManagerPerformanceByManagerId() throws Exception {
+    public void findManagerPerformanceByManagerId1() throws Exception {
+        assertArrayEquals(new int[]{0,0}, new int[]{
+                managerService.findManagerPerformanceByManagerId("0").size(),
+                managerService.findManagerPerformanceByManagerId("mmmm").size()
+        });
     }
 
-    //TODO
+    //TODO 还差有效值
     //查看根据managerId查看manager ability
 
+    //测试不存在的id=0，mmmm
     @Test
-    public void findManagerAbilityByManagerId() throws Exception {
+    public void findManagerAbilityByManagerId1() throws Exception {
+        assertArrayEquals(new Object[]{null,null},
+                new Object[]{
+                        managerService.findManagerAbilityByManagerId("0"),
+                        managerService.findManagerAbilityByManagerId("mmmm")
+                });
     }
 
 }
