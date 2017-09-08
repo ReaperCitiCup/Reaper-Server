@@ -87,7 +87,11 @@ public class ManagerServiceImpl implements ManagerService {
     //TODO 这里仍没有对不存在的managerId的处理(应该是加错位置了，加到performance那里了)
     @Override
     public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
-        return new ManagerAbilityBean(managerAbilityRepository.findByManagerId(managerId));
+        ManagerAbility managerAbility=managerAbilityRepository.findByManagerId(managerId);
+        if(managerAbility!=null){
+            return new ManagerAbilityBean(managerAbilityRepository.findByManagerId(managerId));
+        }
+        return null;
     }
 
     @Override
@@ -156,16 +160,15 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public List<ManagerPerformanceBean> findManagerPerformanceByManagerId(String managerId) {
+        List<ManagerPerformanceBean> res=new ArrayList<>();
         Manager manager=managerRepository.findByManagerId(managerId);
         if(manager!=null){
-            List<ManagerPerformanceBean> res=new ArrayList<>();
             ManagerAbility managerAbility =managerAbilityRepository.findByManagerId(managerId);
             if(managerAbility!=null){
                 res.add(new ManagerPerformanceBean(managerAbility.getManagerId(),manager.getName(),managerAbility.getReturns(),managerAbility.getAntirisk()));
             }
-            return res;
         }
-        return null;
+        return res;
     }
 
 }
