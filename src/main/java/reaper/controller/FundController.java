@@ -43,6 +43,20 @@ public class FundController {
     }
 
     /**
+     * 返回基金名
+     * @param code 代码
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/name",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public MiniBean findFundNameByCode(@PathVariable String code){
+        return fundService.findFundNameByCode(code);
+    }
+
+    /**
      * @param code 基金代码
      * @return 基金详细信息
      */
@@ -135,7 +149,6 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<ManagerHistoryBean> findHistoryManager(@PathVariable String code) {
-        System.out.println("controller:" + fundService.findHistoryManagerByCode(code).size());
         return fundService.findHistoryManagerByCode(code);
     }
 
@@ -162,5 +175,50 @@ public class FundController {
     )
     public List<ValueDateBean> findJensenByCode(@PathVariable String code){
         return fundService.findJensenByCode(code);
+    }
+
+    /**
+     * 基金对应公司
+     * @param code 代码
+     * @return 公司id+名字
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/company",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"}
+    )
+    public MiniBean findFundCompanyByCode(@PathVariable String code){
+        return fundService.findFundCompanyByCode(code);
+    }
+
+    /**
+     * 基金行业归因-主动收益
+     * @param code 代码
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/industry-attribution/profit",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"}
+    )
+    public List<FieldValueBean> findIndustryAttributionProfit(@PathVariable String code){
+        return fundService.findIndustryAttributionProfit(code);
+    }
+
+    /**
+     * 基金行业归因-主动风险
+     * @param code 代码
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/industry-attribution/risk",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"}
+    )
+    public List<FieldValueBean> findIndustryAttributionRisk(@PathVariable String code){
+        return fundService.findIndustryAttributionRisk(code);
     }
 }

@@ -19,6 +19,13 @@ public interface FundService {
     public Page<FundMiniBean> findFundByKeyword(String keyword, String order, int size, int page);
 
     /**
+     * 基金名
+     * @param code 基金代码
+     * @return
+     */
+    public MiniBean findFundNameByCode(String code);
+
+    /**
      * @param code 基金代码
      * @return 基金详细信息
      */
@@ -73,4 +80,25 @@ public interface FundService {
      * @return
      */
     public List<ValueDateBean> findJensenByCode(String code);
+
+    /**
+     * 基金的对应公司
+     * @param code 代码
+     * @return
+     */
+    public MiniBean findFundCompanyByCode(String code);
+
+    /**
+     * 基金行业归因-主动收益
+     * @param code 代码
+     * @return
+     */
+    public List<FieldValueBean> findIndustryAttributionProfit(String code);
+
+    /**
+     * 基金行业归因-主动风险
+     * @param code 代码
+     * @return
+     */
+    public List<FieldValueBean> findIndustryAttributionRisk(String code);
 }

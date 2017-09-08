@@ -11,6 +11,7 @@ import reaper.service.FundService;
 import reaper.util.DaysBetween;
 import reaper.util.FundModelToBean;
 import reaper.util.PythonUser;
+import reaper.util.ToFieldBean;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -52,6 +53,9 @@ public class FundServiceImpl implements FundService {
     @Autowired
     AssetAllocationRepository assetAllocationRepository;
 
+    @Autowired
+    FactorResultRepository factorResultRepository;
+
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     private DecimalFormat decimalFormat = new DecimalFormat("#.00");
@@ -78,6 +82,12 @@ public class FundServiceImpl implements FundService {
         res.setResult(miniBeans);
         res.setTotalCount((int) fundPage.getTotalElements());
         return res;
+    }
+
+    @Override
+    public MiniBean findFundNameByCode(String code) {
+        String name = fundRepository.findByCode(code).getName();
+        return new MiniBean(code,name);
     }
 
     @Override
@@ -158,7 +168,7 @@ public class FundServiceImpl implements FundService {
     @Override
     public CurrentAssetBean findCurrentAssetByCode(String code) {
         AssetAllocation assetAllocation = assetAllocationRepository.findByCode(code);
-        return new CurrentAssetBean(assetAllocation.bond,assetAllocation.stock,assetAllocation.bank);
+        return new CurrentAssetBean(Double.valueOf(decimalFormat.format(assetAllocation.bond)),Double.valueOf(decimalFormat.format(assetAllocation.stock)),Double.valueOf(decimalFormat.format(assetAllocation.bank)));
     }
 
     @Override
@@ -168,8 +178,6 @@ public class FundServiceImpl implements FundService {
         for(FundHistory fundHistory:fundHistoryRepository.findAllByFundCode(code)){
             //找到对应经理名字
             Manager manager = managerRepository.findByManagerId(fundHistory.getManagerId());
-            System.out.println(fundHistory);
-            System.out.println(manager);
             int difDays;
             if(fundHistory.getEndDate()!=null){
                 difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(),fundHistory.getEndDate());
@@ -194,6 +202,23 @@ public class FundServiceImpl implements FundService {
             }
         }
         return res;
+    }
+
+    @Override
+    public MiniBean findFundCompanyByCode(String code) {
+        String companyId = fundCompanyRepository.findByFundId(code).getcompanyId();
+        String companyName = companyRepository.findByCompanyId(companyId).getName();
+        return new MiniBean(companyId,companyName);
+    }
+
+    @Override
+    public List<FieldValueBean> findIndustryAttributionProfit(String code) {
+        return new ToFieldBean().factorResultToFieldBean(factorResultRepository.findByCodeAndFactorType(code,'N'));
+    }
+
+    @Override
+    public List<FieldValueBean> findIndustryAttributionRisk(String code) {
+        return null;
     }
 
     /**
