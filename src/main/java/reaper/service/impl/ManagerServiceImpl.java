@@ -84,6 +84,7 @@ public class ManagerServiceImpl implements ManagerService {
         return res;
     }
 
+    //TODO 这里仍没有对不存在的managerId的处理
     @Override
     public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
         return new ManagerAbilityBean(managerAbilityRepository.findByManagerId(managerId));
