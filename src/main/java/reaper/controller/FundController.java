@@ -53,7 +53,7 @@ public class FundController {
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"})
     public MiniBean findFundNameByCode(@PathVariable String code){
-        return fundService.findFundNameByCode(code);
+        return fundService.checkCodeExist(code)?fundService.findFundNameByCode(code):null;
     }
 
     /**
@@ -67,7 +67,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public FundBean findFundByCode(@PathVariable String code) {
-        return fundService.findFundByCode(code);
+        return fundService.checkCodeExist(code)?fundService.findFundByCode(code):null;
     }
 
     /**
@@ -83,7 +83,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<ValueDateBean> findUnitNetValueDateByCode(@PathVariable String code) {
-        return fundService.findUnitNetValueTrendByCode(code);
+        return fundService.checkCodeExist(code)?fundService.findUnitNetValueTrendByCode(code):null;
     }
 
     /**
@@ -99,7 +99,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<ValueDateBean> findCumulativeNetValueDateByCode(@PathVariable String code) {
-        return fundService.findCumulativeNetValueTrendByCode(code);
+        return fundService.checkCodeExist(code)?fundService.findCumulativeNetValueTrendByCode(code):null;
     }
 
     /**
@@ -117,7 +117,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<ValueDateBean> findCumulativeRateByCode(@PathVariable String code, @RequestParam(value = "month") String month) {
-        return fundService.findCumulativeRateTrendByCode(code, month);
+        return fundService.checkCodeExist(code)?fundService.findCumulativeRateTrendByCode(code, month):null;
     }
 
     /**
@@ -133,7 +133,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public CurrentAssetBean findCurrentAssetByCode(@PathVariable String code) {
-        return fundService.findCurrentAssetByCode(code);
+        return fundService.checkCodeExist(code)?fundService.findCurrentAssetByCode(code):null;
     }
 
     /**
@@ -149,7 +149,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<ManagerHistoryBean> findHistoryManager(@PathVariable String code) {
-        return fundService.findHistoryManagerByCode(code);
+        return fundService.checkCodeExist(code)?fundService.findHistoryManagerByCode(code):null;
     }
 
     @ResponseBody
@@ -174,7 +174,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<ValueDateBean> findJensenByCode(@PathVariable String code){
-        return fundService.findJensenByCode(code);
+        return fundService.findJensenByCode(fundService.checkCodeExist(code)?code:null);
     }
 
     /**
@@ -189,7 +189,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public MiniBean findFundCompanyByCode(@PathVariable String code){
-        return fundService.findFundCompanyByCode(code);
+        return fundService.checkCodeExist(code)?fundService.findFundCompanyByCode(code):null;
     }
 
     /**
@@ -204,7 +204,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<FieldValueBean> findIndustryAttributionProfit(@PathVariable String code){
-        return fundService.findIndustryAttributionProfit(code);
+        return fundService.checkCodeExist(code)?fundService.findIndustryAttributionProfit(code):null;
     }
 
     /**
@@ -219,6 +219,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<FieldValueBean> findIndustryAttributionRisk(@PathVariable String code){
-        return fundService.findIndustryAttributionRisk(code);
+        return fundService.checkCodeExist(code)?fundService.findIndustryAttributionRisk(code):null;
     }
+
 }

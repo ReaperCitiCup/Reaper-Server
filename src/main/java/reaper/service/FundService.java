@@ -19,6 +19,13 @@ public interface FundService {
     public Page<FundMiniBean> findFundByKeyword(String keyword, String order, int size, int page);
 
     /**
+     * 判断code是否存在
+     * @param code 代码
+     * @return
+     */
+    public boolean checkCodeExist(String code);
+
+    /**
      * 基金名
      * @param code 基金代码
      * @return

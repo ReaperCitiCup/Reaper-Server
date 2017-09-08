@@ -84,6 +84,17 @@ public class FundServiceImpl implements FundService {
         return res;
     }
 
+    /**
+     * 判断code是否存在
+     *
+     * @param code 代码
+     * @return
+     */
+    @Override
+    public boolean checkCodeExist(String code) {
+        return !(fundRepository.findByCode(code)==null);
+    }
+
     @Override
     public MiniBean findFundNameByCode(String code) {
         String name = fundRepository.findByCode(code).getName();
@@ -143,10 +154,12 @@ public class FundServiceImpl implements FundService {
             calendar.setTime(new Date());
             calendar.add(Calendar.MONTH, -Integer.valueOf(month));
             fundNetValues = fundNetValueRepository.findAllByCodeAndDateAfterOrderByDateAsc(code, calendar.getTime());
+            //加上第一天的内容
+            res.add(new ValueDateBean(sdf.format(calendar.getTime()),0.0));
         }
 
         for (FundNetValue fundNetValue : fundNetValues) {
-            cumulativeValue += fundNetValue.getDailyRate();
+            cumulativeValue += fundNetValue.getDailyRate()==null?0:fundNetValue.getDailyRate();
             res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), cumulativeValue));
         }
 
@@ -218,7 +231,7 @@ public class FundServiceImpl implements FundService {
 
     @Override
     public List<FieldValueBean> findIndustryAttributionRisk(String code) {
-        return null;
+        return new ToFieldBean().factorResultToFieldBean(factorResultRepository.findByCodeAndFactorType(code,'R'));
     }
 
     /**
