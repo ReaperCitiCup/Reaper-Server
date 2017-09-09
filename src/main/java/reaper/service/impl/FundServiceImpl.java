@@ -154,12 +154,10 @@ public class FundServiceImpl implements FundService {
             calendar.setTime(new Date());
             calendar.add(Calendar.MONTH, -Integer.valueOf(month));
             fundNetValues = fundNetValueRepository.findAllByCodeAndDateAfterOrderByDateAsc(code, calendar.getTime());
-            //加上第一天的内容
-            res.add(new ValueDateBean(sdf.format(calendar.getTime()),0.0));
         }
 
         for (FundNetValue fundNetValue : fundNetValues) {
-            cumulativeValue += fundNetValue.getDailyRate()==null?0:fundNetValue.getDailyRate();
+            cumulativeValue += fundNetValue.getDailyRate();
             res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), cumulativeValue));
         }
 
@@ -226,12 +224,22 @@ public class FundServiceImpl implements FundService {
 
     @Override
     public List<FieldValueBean> findIndustryAttributionProfit(String code) {
-        return new ToFieldBean().factorResultToFieldBean(factorResultRepository.findByCodeAndFactorType(code,'N'));
+        return new ToFieldBean().factorResultToIndustryAttribution(factorResultRepository.findByCodeAndFactorType(code,'N'));
     }
 
     @Override
     public List<FieldValueBean> findIndustryAttributionRisk(String code) {
-        return new ToFieldBean().factorResultToFieldBean(factorResultRepository.findByCodeAndFactorType(code,'R'));
+        return new ToFieldBean().factorResultToIndustryAttribution(factorResultRepository.findByCodeAndFactorType(code,'R'));
+    }
+
+    @Override
+    public List<FieldValueBean> findStyleAttributionProfit(String code) {
+        return new ToFieldBean().factorResultToStyleAttribution(factorResultRepository.findByCodeAndFactorType(code,'N'));
+    }
+
+    @Override
+    public List<FieldValueBean> findStyleAttributionRisk(String code) {
+        return new ToFieldBean().factorResultToStyleAttribution(factorResultRepository.findByCodeAndFactorType(code,'R'));
     }
 
     /**

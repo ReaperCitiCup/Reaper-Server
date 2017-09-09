@@ -108,4 +108,18 @@ public interface FundService {
      * @return
      */
     public List<FieldValueBean> findIndustryAttributionRisk(String code);
+
+    /**
+     * 基金风格归因-主动收益
+     * @param code 代码
+     * @return
+     */
+    public List<FieldValueBean> findStyleAttributionProfit(String code);
+
+    /**
+     * 基金风格归因-主动风险
+     * @param code 代码
+     * @return
+     */
+    public List<FieldValueBean> findStyleAttributionRisk(String code);
 }

@@ -222,4 +222,34 @@ public class FundController {
         return fundService.checkCodeExist(code)?fundService.findIndustryAttributionRisk(code):null;
     }
 
+    /**
+     * 基金风格归因-主动收益
+     * @param code 代码
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/style-attribution/profit",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"}
+    )
+    public List<FieldValueBean> findStyleAttributionProfit(@PathVariable String code){
+        return fundService.checkCodeExist(code)?fundService.findStyleAttributionProfit(code):null;
+    }
+
+    /**
+     * 基金风格归因-主动风险
+     * @param code 代码
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/style-attribution/risk",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"}
+    )
+    public List<FieldValueBean> findStyleAttributionRisk(@PathVariable String code){
+        return fundService.checkCodeExist(code)?fundService.findStyleAttributionRisk(code):null;
+    }
+
 }
