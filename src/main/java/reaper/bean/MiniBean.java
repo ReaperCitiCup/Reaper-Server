@@ -20,4 +20,7 @@ public class MiniBean {
         this.code = code;
         this.name = name;
     }
+
+    public MiniBean() {
+    }
 }
