@@ -53,7 +53,7 @@ public class FundController {
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"})
     public MiniBean findFundNameByCode(@PathVariable String code){
-        return fundService.checkCodeExist(code)?fundService.findFundNameByCode(code):null;
+        return fundService.findFundNameByCode(code);
     }
 
     /**
@@ -67,7 +67,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public FundBean findFundByCode(@PathVariable String code) {
-        return fundService.checkCodeExist(code)?fundService.findFundByCode(code):null;
+        return fundService.findFundByCode(code);
     }
 
     /**
@@ -83,7 +83,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<ValueDateBean> findUnitNetValueDateByCode(@PathVariable String code) {
-        return fundService.checkCodeExist(code)?fundService.findUnitNetValueTrendByCode(code):null;
+        return fundService.findUnitNetValueTrendByCode(code);
     }
 
     /**
@@ -99,7 +99,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<ValueDateBean> findCumulativeNetValueDateByCode(@PathVariable String code) {
-        return fundService.checkCodeExist(code)?fundService.findCumulativeNetValueTrendByCode(code):null;
+        return fundService.findCumulativeNetValueTrendByCode(code);
     }
 
     /**
@@ -117,7 +117,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<ValueDateBean> findCumulativeRateByCode(@PathVariable String code, @RequestParam(value = "month") String month) {
-        return fundService.checkCodeExist(code)?fundService.findCumulativeRateTrendByCode(code, month):null;
+        return fundService.findCumulativeRateTrendByCode(code, month);
     }
 
     /**
@@ -133,7 +133,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public CurrentAssetBean findCurrentAssetByCode(@PathVariable String code) {
-        return fundService.checkCodeExist(code)?fundService.findCurrentAssetByCode(code):null;
+        return fundService.findCurrentAssetByCode(code);
     }
 
     /**
@@ -149,7 +149,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<ManagerHistoryBean> findHistoryManager(@PathVariable String code) {
-        return fundService.checkCodeExist(code)?fundService.findHistoryManagerByCode(code):null;
+        return fundService.findHistoryManagerByCode(code);
     }
 
     @ResponseBody
@@ -174,7 +174,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<ValueDateBean> findJensenByCode(@PathVariable String code){
-        return fundService.findJensenByCode(fundService.checkCodeExist(code)?code:null);
+        return fundService.findJensenByCode(code);
     }
 
     /**
@@ -189,7 +189,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public MiniBean findFundCompanyByCode(@PathVariable String code){
-        return fundService.checkCodeExist(code)?fundService.findFundCompanyByCode(code):null;
+        return fundService.findFundCompanyByCode(code);
     }
 
     /**
@@ -204,7 +204,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<FieldValueBean> findIndustryAttributionProfit(@PathVariable String code){
-        return fundService.checkCodeExist(code)?fundService.findIndustryAttributionProfit(code):null;
+        return fundService.findIndustryAttributionProfit(code);
     }
 
     /**
@@ -219,7 +219,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<FieldValueBean> findIndustryAttributionRisk(@PathVariable String code){
-        return fundService.checkCodeExist(code)?fundService.findIndustryAttributionRisk(code):null;
+        return fundService.findIndustryAttributionRisk(code);
     }
 
     /**
@@ -234,7 +234,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<FieldValueBean> findStyleAttributionProfit(@PathVariable String code){
-        return fundService.checkCodeExist(code)?fundService.findStyleAttributionProfit(code):null;
+        return fundService.findStyleAttributionProfit(code);
     }
 
     /**
@@ -249,7 +249,7 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<FieldValueBean> findStyleAttributionRisk(@PathVariable String code){
-        return fundService.checkCodeExist(code)?fundService.findStyleAttributionRisk(code):null;
+        return fundService.findStyleAttributionRisk(code);
     }
 
 }
