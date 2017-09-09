@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ToFieldBean {
-    public List<FieldValueBean> factorResultToFieldBean(FactorResult factorResult){
+    public List<FieldValueBean> factorResultToIndustryAttribution(FactorResult factorResult){
         List<FieldValueBean> res = new ArrayList<>();
         res.add(new FieldValueBean("综合",factorResult.getZh()));
         res.add(new FieldValueBean("机械",factorResult.getJx()));
@@ -39,6 +39,21 @@ public class ToFieldBean {
         res.add(new FieldValueBean("非银行金融",factorResult.getFyhjr()));
         res.add(new FieldValueBean("传媒",factorResult.getCm()));
         res.add(new FieldValueBean("行业因子合计",factorResult.getHyyzhj()));
+        return res;
+    }
+
+    public List<FieldValueBean> factorResultToStyleAttribution(FactorResult factorResult){
+        List<FieldValueBean> res = new ArrayList<>();
+        res.add(new FieldValueBean("beta",factorResult.getBeta()));
+        res.add(new FieldValueBean("价值",factorResult.getBtop()));
+        res.add(new FieldValueBean("盈利能力",factorResult.getEarningsYield()));
+        res.add(new FieldValueBean("成长性",factorResult.getGrowth()));
+        res.add(new FieldValueBean("杠杆率",factorResult.getLeverage()));
+        res.add(new FieldValueBean("流动性",factorResult.getLiquidity()));
+        res.add(new FieldValueBean("动量",factorResult.getMomentum()));
+        res.add(new FieldValueBean("非线性市值",factorResult.getNlsize()));
+        res.add(new FieldValueBean("波动率",factorResult.getResidualvolatility()));
+        res.add(new FieldValueBean("市值",factorResult.getNlsize()));
         return res;
     }
 }
