@@ -158,7 +158,13 @@ public class FundServiceImpl implements FundService {
             //获得n月前的日期
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date());
-            calendar.add(Calendar.MONTH, -Integer.valueOf(month));
+            //若不是数字，则返回空串
+            try {
+                calendar.add(Calendar.MONTH, -Integer.valueOf(month));
+            }catch (NumberFormatException e){
+                return res;
+            }
+
             fundNetValues = fundNetValueRepository.findAllByCodeAndDateAfterOrderByDateAsc(code, calendar.getTime());
         }
 
