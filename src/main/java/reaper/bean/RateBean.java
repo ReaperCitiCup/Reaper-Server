@@ -11,11 +11,11 @@ public class RateBean {
     /**
      * 近三月
      */
-    public double threeMonth;
+    public double threeMonths;
     /**
      * 近六月
      */
-    public double sixMonth;
+    public double sixMonths;
     /**
      * 近一年
      */
@@ -23,7 +23,7 @@ public class RateBean {
     /**
      * 近三年
      */
-    public double threeYear;
+    public double threeYears;
     /**
      *
      */
@@ -31,19 +31,19 @@ public class RateBean {
 
     public RateBean(double[] rates) {
         oneMonth = rates[0];
-        threeMonth = rates[1];
-        sixMonth = rates[2];
+        threeMonths = rates[1];
+        sixMonths = rates[2];
         oneYear = rates[3];
-        threeYear = rates[4];
+        threeYears = rates[4];
         sinceFounded = rates[5];
     }
 
-    public RateBean(double oneMonth, double threeMonth, double sixMonth, double oneYear, double threeYear, double sinceFounded) {
+    public RateBean(double oneMonth, double threeMonths, double sixMonths, double oneYear, double threeYears, double sinceFounded) {
         this.oneMonth = oneMonth;
-        this.threeMonth = threeMonth;
-        this.sixMonth = sixMonth;
+        this.threeMonths = threeMonths;
+        this.sixMonths = sixMonths;
         this.oneYear = oneYear;
-        this.threeYear = threeYear;
+        this.threeYears = threeYears;
         this.sinceFounded = sinceFounded;
     }
 
@@ -51,10 +51,10 @@ public class RateBean {
     public String toString() {
         return "RateBean{" +
                 "oneMonth=" + oneMonth +
-                ", threeMonth=" + threeMonth +
-                ", sixMonth=" + sixMonth +
+                ", threeMonth=" + threeMonths +
+                ", sixMonths=" + sixMonths +
                 ", oneYear=" + oneYear +
-                ", threeYear=" + threeYear +
+                ", threeYear=" + threeYears +
                 ", sinceFounded=" + sinceFounded +
                 '}';
     }

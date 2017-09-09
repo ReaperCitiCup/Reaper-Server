@@ -1,6 +1,6 @@
 package reaper.bean;
 
-public class NetValueDateBean {
+public class ValueDateBean {
     /**
      * 日期
      */
@@ -11,7 +11,7 @@ public class NetValueDateBean {
      */
     public Double value;
 
-    public NetValueDateBean(String date, Double value) {
+    public ValueDateBean(String date, Double value) {
         this.date = date;
         this.value = value;
     }

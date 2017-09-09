@@ -2,6 +2,10 @@ package reaper.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reaper.bean.CompanyMiniBean;
+import reaper.bean.FundHistoryBean;
+import reaper.bean.ManagerAbilityBean;
+import reaper.bean.ManagerBean;
 import reaper.bean.*;
 import reaper.model.*;
 import reaper.repository.*;
@@ -32,6 +36,12 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Autowired
     FundRepository fundRepository;
+
+    @Autowired
+    ManagerAbilityRepository managerAbilityRepository;
+
+    @Autowired
+    FundNetValueRepository fundNetValueRepository;
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -74,22 +84,59 @@ public class ManagerServiceImpl implements ManagerService {
         return res;
     }
 
+    //TODO 这里仍没有对不存在的managerId的处理(应该是加错位置了，加到performance那里了)
     @Override
-    public List<ReturnBean> findFundReturnsByManagerId(String managerId) {
-        
+    public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
+        ManagerAbility managerAbility=managerAbilityRepository.findByManagerId(managerId);
+        if(managerAbility!=null){
+            return new ManagerAbilityBean(managerAbilityRepository.findByManagerId(managerId));
+        }
         return null;
     }
 
     @Override
+    public List<ReturnBean> findFundReturnsByManagerId(String managerId) {
+        List<ReturnBean> res=new ArrayList<>();
+        List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId(managerId);
+        if(fundHistories!=null){
+            for(FundHistory fundHistory : fundHistories){
+                res.add(new ReturnBean(fundHistory.getFundCode(), fundHistory.getFundName(), fundHistory.getPayback()));
+            }
+        }
+        return res;
+    }
+
+    //TODO
+    @Override
     public List<RankBean> findFundRankByManagerId(String managerId) {
+        List<RankBean> res=new ArrayList<>();
+        List<FundHistory> fundHistories = fundHistoryRepository.findAllByManagerId(managerId);
+        for(FundHistory fundHistory : fundHistories){
+
+        }
         return null;
     }
 
     @Override
     public List<RateTrendBean> findFundRateTrendByManagerId(String managerId) {
-        return null;
+        List<RateTrendBean> res=new ArrayList<>();
+        List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId(managerId);
+        if(fundHistories!=null){
+            for(FundHistory fundHistory : fundHistories){
+                List<RateTrendDataBean> data=new ArrayList<>();
+                List<FundNetValue> fundNetValues=fundNetValueRepository.findAllByCodeOrderByDateAsc(fundHistory.getFundCode());
+                if(fundNetValues!=null){
+                    for (FundNetValue fundNetValue : fundNetValues){
+                        data.add(new RateTrendDataBean(sdf.format(fundNetValue.getDate()), fundNetValue.getUnitNetValue()));
+                    }
+                }
+                res.add(new RateTrendBean(fundHistory.getFundCode(),fundHistory.getFundName(),data));
+            }
+        }
+        return res;
     }
 
+    //TODO
     @Override
     public List<RankTrendBean> findFundRankTrendByManagerId(String managerId) {
         return null;
@@ -97,16 +144,31 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public List<FundPerformanceBean> findFundPerformanceByManagerId(String managerId) {
+        List<FundPerformanceBean> res=new ArrayList<>();
+        List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId(managerId);
+        if(fundHistories!=null){
+            for(FundHistory fundHistory:fundHistories){
+                Fund fund=fundRepository.findByCode(fundHistory.getFundCode());
+                if(fund!=null){
+                    res.add(new FundPerformanceBean(fund.getCode(),fund.getName(),fund.getAnnualProfit(),fund.getVolatility()));
+                }
+            }
+            return res;
+        }
         return null;
     }
 
     @Override
     public List<ManagerPerformanceBean> findManagerPerformanceByManagerId(String managerId) {
-        return null;
+        List<ManagerPerformanceBean> res=new ArrayList<>();
+        Manager manager=managerRepository.findByManagerId(managerId);
+        if(manager!=null){
+            ManagerAbility managerAbility =managerAbilityRepository.findByManagerId(managerId);
+            if(managerAbility!=null){
+                res.add(new ManagerPerformanceBean(managerAbility.getManagerId(),manager.getName(),managerAbility.getReturns(),managerAbility.getAntirisk()));
+            }
+        }
+        return res;
     }
 
-    @Override
-    public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
-        return null;
-    }
 }

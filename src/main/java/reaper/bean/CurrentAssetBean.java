@@ -10,9 +10,12 @@ public class CurrentAssetBean {
 
     public Double bank;
 
+    public Double other;
+
     public CurrentAssetBean(Double bond, Double stock, Double bank) {
         this.bond = bond;
         this.stock = stock;
         this.bank = bank;
+        other = 100-bank-bond-stock;
     }
 }

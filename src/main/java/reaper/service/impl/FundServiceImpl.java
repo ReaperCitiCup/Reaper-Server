@@ -10,7 +10,10 @@ import reaper.repository.*;
 import reaper.service.FundService;
 import reaper.util.DaysBetween;
 import reaper.util.FundModelToBean;
+import reaper.util.PythonUser;
+import reaper.util.ToFieldBean;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,7 +53,12 @@ public class FundServiceImpl implements FundService {
     @Autowired
     AssetAllocationRepository assetAllocationRepository;
 
+    @Autowired
+    FactorResultRepository factorResultRepository;
+
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+    private DecimalFormat decimalFormat = new DecimalFormat("#.00");
 
     @Override
     public reaper.util.Page<FundMiniBean> findFundByKeyword(String keyword, String order, int size, int page) {
@@ -76,6 +84,23 @@ public class FundServiceImpl implements FundService {
         return res;
     }
 
+    /**
+     * 判断code是否存在
+     *
+     * @param code 代码
+     * @return
+     */
+    @Override
+    public boolean checkCodeExist(String code) {
+        return !(fundRepository.findByCode(code)==null);
+    }
+
+    @Override
+    public MiniBean findFundNameByCode(String code) {
+        String name = fundRepository.findByCode(code).getName();
+        return new MiniBean(code,name);
+    }
+
     @Override
     public FundBean findFundByCode(String code) {
         FundModelToBean fundModelToBean = new FundModelToBean();
@@ -93,28 +118,28 @@ public class FundServiceImpl implements FundService {
     }
 
     @Override
-    public List<NetValueDateBean> findUnitNetValueTrendByCode(String code) {
-        List<NetValueDateBean> res = new ArrayList<>();
+    public List<ValueDateBean> findUnitNetValueTrendByCode(String code) {
+        List<ValueDateBean> res = new ArrayList<>();
 
         for (FundNetValue fundNetValue : fundNetValueRepository.findAllByCodeOrderByDateAsc(code)) {
-            res.add(new NetValueDateBean(sdf.format(fundNetValue.getDate()), fundNetValue.getUnitNetValue()));
+            res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), fundNetValue.getUnitNetValue()));
         }
         return res;
     }
 
     @Override
-    public List<NetValueDateBean> findCumulativeNetValueTrendByCode(String code) {
-        List<NetValueDateBean> res = new ArrayList<>();
+    public List<ValueDateBean> findCumulativeNetValueTrendByCode(String code) {
+        List<ValueDateBean> res = new ArrayList<>();
 
         for (FundNetValue fundNetValue : fundNetValueRepository.findAllByCodeOrderByDateAsc(code)) {
-            res.add(new NetValueDateBean(sdf.format(fundNetValue.getDate()), fundNetValue.getCumulativeNetValue()));
+            res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), fundNetValue.getCumulativeNetValue()));
         }
         return res;
     }
 
     @Override
-    public List<NetValueDateBean> findCumulativeRateTrendByCode(String code, String month) {
-        List<NetValueDateBean> res = new ArrayList<>();
+    public List<ValueDateBean> findCumulativeRateTrendByCode(String code, String month) {
+        List<ValueDateBean> res = new ArrayList<>();
 
         //累加结果
         double cumulativeValue = 0;
@@ -129,11 +154,13 @@ public class FundServiceImpl implements FundService {
             calendar.setTime(new Date());
             calendar.add(Calendar.MONTH, -Integer.valueOf(month));
             fundNetValues = fundNetValueRepository.findAllByCodeAndDateAfterOrderByDateAsc(code, calendar.getTime());
+            //加上第一天的内容
+            res.add(new ValueDateBean(sdf.format(calendar.getTime()),0.0));
         }
 
         for (FundNetValue fundNetValue : fundNetValues) {
-            cumulativeValue += fundNetValue.getDailyRate();
-            res.add(new NetValueDateBean(sdf.format(fundNetValue.getDate()), cumulativeValue));
+            cumulativeValue += fundNetValue.getDailyRate()==null?0:fundNetValue.getDailyRate();
+            res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), cumulativeValue));
         }
 
         return res;
@@ -154,7 +181,7 @@ public class FundServiceImpl implements FundService {
     @Override
     public CurrentAssetBean findCurrentAssetByCode(String code) {
         AssetAllocation assetAllocation = assetAllocationRepository.findByCode(code);
-        return new CurrentAssetBean(assetAllocation.bond,assetAllocation.stock,assetAllocation.bank);
+        return new CurrentAssetBean(Double.valueOf(decimalFormat.format(assetAllocation.bond)),Double.valueOf(decimalFormat.format(assetAllocation.stock)),Double.valueOf(decimalFormat.format(assetAllocation.bank)));
     }
 
     @Override
@@ -164,8 +191,6 @@ public class FundServiceImpl implements FundService {
         for(FundHistory fundHistory:fundHistoryRepository.findAllByFundCode(code)){
             //找到对应经理名字
             Manager manager = managerRepository.findByManagerId(fundHistory.getManagerId());
-            System.out.println(fundHistory);
-            System.out.println(manager);
             int difDays;
             if(fundHistory.getEndDate()!=null){
                 difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(),fundHistory.getEndDate());
@@ -175,6 +200,38 @@ public class FundServiceImpl implements FundService {
             res.add(new ManagerHistoryBean(fundHistory.getManagerId(), manager.getName(), sdf.format(fundHistory.getStartDate()), fundHistory.getEndDate()==null?null:sdf.format(fundHistory.getEndDate()), difDays,fundHistory.getPayback()));
         }
         return res;
+    }
+
+    @Override
+    public List<ValueDateBean> findJensenByCode(String code) {
+        List<ValueDateBean> res = new ArrayList<>();
+        String pyRes = PythonUser.usePy("基金因子计算以及回归分析.py",code);
+        for(String line:pyRes.split("\n")){
+            //处理每行
+            String attrs[] = line.split(" ");
+            //判断是否是日期行
+            if(attrs[0].startsWith("2")) {
+                res.add(new ValueDateBean(attrs[0], Double.valueOf(attrs[1])));
+            }
+        }
+        return res;
+    }
+
+    @Override
+    public MiniBean findFundCompanyByCode(String code) {
+        String companyId = fundCompanyRepository.findByFundId(code).getcompanyId();
+        String companyName = companyRepository.findByCompanyId(companyId).getName();
+        return new MiniBean(companyId,companyName);
+    }
+
+    @Override
+    public List<FieldValueBean> findIndustryAttributionProfit(String code) {
+        return new ToFieldBean().factorResultToFieldBean(factorResultRepository.findByCodeAndFactorType(code,'N'));
+    }
+
+    @Override
+    public List<FieldValueBean> findIndustryAttributionRisk(String code) {
+        return new ToFieldBean().factorResultToFieldBean(factorResultRepository.findByCodeAndFactorType(code,'R'));
     }
 
     /**
@@ -215,13 +272,15 @@ public class FundServiceImpl implements FundService {
 
         for (FundNetValue netValue : netValues) {
             if (countDate != 5 && netValue.getDate().before(dates[countDate])) {
-                rates[countDate] = rate;
+                rates[countDate] = Double.parseDouble(decimalFormat.format(rate));
                 countDate++;
             }
-            rate += netValue.getDailyRate();
+            if(netValue.getDailyRate()!=null) {
+                rate += netValue.getDailyRate();
+            }
         }
         //成立以来的收益率
-        rates[5] = rate;
+        rates[5] = Double.parseDouble(decimalFormat.format(rate));
 
         return new RateBean(rates);
     }

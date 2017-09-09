@@ -1,5 +1,8 @@
 package reaper.service;
 
+import reaper.bean.FundHistoryBean;
+import reaper.bean.ManagerAbilityBean;
+import reaper.bean.ManagerBean;
 import reaper.bean.*;
 
 import java.util.List;
