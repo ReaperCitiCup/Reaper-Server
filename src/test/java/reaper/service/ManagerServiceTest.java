@@ -7,10 +7,7 @@ import org.junit.runners.Parameterized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import reaper.bean.FundHistoryBean;
-import reaper.bean.ManagerBean;
-import reaper.bean.RateTrendBean;
-import reaper.bean.ReturnBean;
+import reaper.bean.*;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -173,6 +170,28 @@ public class ManagerServiceTest {
         assertArrayEquals(new int[]{0,0}, new int[]{
                 managerService.findFundPerformanceByManagerId("0").size(),
                 managerService.findFundPerformanceByManagerId("mmmm").size()
+        });
+    }
+
+    //测试存在的id=30365855，时间是2017-09-10
+    @Test
+    public void findFundPerformanceByManagerId2() throws Exception {
+        List<FundPerformanceBean> fundPerformanceBeans=managerService.findFundPerformanceByManagerId("30365855");
+        assertArrayEquals(new String[]{1+"","001245","-7.53"}, new String[]{
+                fundPerformanceBeans.size()+"",
+                fundPerformanceBeans.get(0).id,
+                fundPerformanceBeans.get(0).rate+""
+                });
+    }
+
+    //测试存在的id=30070812，时间是2017-09-10
+    @Test
+    public void findFundPerformanceByManagerId3() throws Exception{
+        List<FundPerformanceBean> fundPerformanceBeans=managerService.findFundPerformanceByManagerId("30070812");
+        fundPerformanceBeans.sort(Comparator.comparing((x)->x.id));
+        assertArrayEquals(new String[]{7+"","004445"},new String[]{
+                fundPerformanceBeans.size()+"",
+                fundPerformanceBeans.get(3).id
         });
     }
 

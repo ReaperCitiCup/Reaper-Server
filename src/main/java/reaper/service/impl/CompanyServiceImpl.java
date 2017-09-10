@@ -13,7 +13,6 @@ import java.util.List;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
-
     @Override
     public List<FundPerformanceBean> findFundPerformanceByCompanyId(String companyId) {
         return null;
