@@ -10,13 +10,13 @@ import java.util.regex.Pattern;
  */
 public class RightNowMessage {
 
-    public ArrayList<Double> getSingleFundRightNowMessage(String fundCode) {
+    public static ArrayList<Double> getSingleFundRightNowMessage(String fundCode) {
         // write your code here
         MyBug myBug = new MyBug();
         String allmessage = myBug.sendGet("http://fund.eastmoney.com/"+fundCode+".html?spm=001.2.swh", "");
 
         // System.out.println(allmessage);
-        Pattern pattern = Pattern.compile("<span class=\"ui-font-large ui-color-green ui-num\" id=\"gz_gsz\">(.*?)</span>");
+        Pattern pattern = Pattern.compile("<span class=\"ui-font-large ui-color-(green|red) ui-num\" id=\"gz_gsz\">(.*?)</span>");
 
         Matcher matcher = pattern.matcher(allmessage);
 
@@ -29,7 +29,7 @@ public class RightNowMessage {
         while (matcher.find()) {
 
 
-            String code = matcher.group(1);
+            String code = matcher.group(2);
 
             net_now = Double.parseDouble(code);
             System.out.println(net_now);
@@ -37,12 +37,12 @@ public class RightNowMessage {
 
         }
 
-        Pattern pattern1 = Pattern.compile("<span class=\"ui-font-middle ui-color-green ui-num\" id=\"gz_gszze\">(.*?)</span>");
+        Pattern pattern1 = Pattern.compile("<span class=\"ui-font-middle ui-color-(green|red) ui-num\" id=\"gz_gszze\">(.*?)</span>");
         Matcher matcher1 = pattern1.matcher(allmessage);
         while (matcher1.find()) {
 
 
-            String code = matcher1.group(1);
+            String code = matcher1.group(2);
             change = Double.parseDouble(code);
             System.out.println(change);
 
@@ -50,12 +50,12 @@ public class RightNowMessage {
         }
 
 
-        Pattern pattern2 = Pattern.compile("<span class=\"ui-font-middle ui-color-green ui-num\" id=\"gz_gszzl\">(.*?)%</span>");
+        Pattern pattern2 = Pattern.compile("<span class=\"ui-font-middle ui-color-(green|red) ui-num\" id=\"gz_gszzl\">(.*?)%</span>");
         Matcher matcher2 = pattern2.matcher(allmessage);
         while (matcher2.find()) {
 
 
-            String fundup = matcher2.group(1);
+            String fundup = matcher2.group(2);
             //
             poportion = Double.parseDouble(fundup);
             System.out.println(poportion);
@@ -69,6 +69,6 @@ public class RightNowMessage {
             arrayList.add(change);
             arrayList.add(poportion);
 
-            return null;
+            return arrayList;
     }
 }

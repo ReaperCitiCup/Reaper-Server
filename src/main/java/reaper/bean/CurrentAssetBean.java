@@ -13,9 +13,14 @@ public class CurrentAssetBean {
     public Double other;
 
     public CurrentAssetBean(Double bond, Double stock, Double bank) {
+
         this.bond = bond;
         this.stock = stock;
         this.bank = bank;
-        other = 100-bank-bond-stock;
+        //若为债券型基金
+        if(stock.equals(0.0)&&bank.equals(0.0)){
+            this.bond = 100.0;
+        }
+        other = 100-this.bank-this.bond-this.stock;
     }
 }

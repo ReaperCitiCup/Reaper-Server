@@ -63,4 +63,9 @@ public class FundBean {
      */
     public MiniBean company;
 
+    public Double assessNetValue;
+
+    public Double assessIncrease;
+
+    public Double assessDailyRate;
 }
