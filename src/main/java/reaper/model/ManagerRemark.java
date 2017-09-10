@@ -15,6 +15,9 @@ import javax.persistence.Table;
 public class ManagerRemark {
 
 
+
+
+
     @Id
     @GeneratedValue
     private Integer id;
