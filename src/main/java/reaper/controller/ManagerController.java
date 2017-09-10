@@ -149,6 +149,11 @@ public class ManagerController {
         return managerService.findManagerPerformanceByManagerId(managerId);
     }
 
+    /**
+     * 根据经理id获得经理社会关系网络图
+     * @param managerId 经理id
+     * @return 经理社会关系网络图
+     */
     @ResponseBody
     @RequestMapping(
             value = "/{managerId}/social-network",

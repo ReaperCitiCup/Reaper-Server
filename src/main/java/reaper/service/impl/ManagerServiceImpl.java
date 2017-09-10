@@ -45,6 +45,11 @@ public class ManagerServiceImpl implements ManagerService {
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
+    /**
+     * 根据经理id获得经理信息
+     * @param id 经理id
+     * @return 经理信息
+     */
     @Override
     public ManagerBean findManagerById(String id) {
         Manager manager=managerRepository.findByManagerId(id);
@@ -62,6 +67,11 @@ public class ManagerServiceImpl implements ManagerService {
         return null;
     }
 
+    /**
+     * 根据经理id获得经理历史基金信息
+     * @param id 经理id
+     * @return 经理历史基金信息
+     */
     @Override
     public List<FundHistoryBean> findFundHistoryById(String id) {
         List<FundHistoryBean> res=new ArrayList<>();
@@ -85,25 +95,11 @@ public class ManagerServiceImpl implements ManagerService {
         return res;
     }
 
-    //TODO 这里仍没有对不存在的managerId的处理(应该是加错位置了，加到performance那里了) + 已修改
-    @Override
-    public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
-<<<<<<< HEAD
-        Manager manager=managerRepository.findByManagerId(managerId);
-        if(manager!=null){
-            ManagerAbility managerAbility=managerAbilityRepository.findByManagerId(managerId);
-            if(managerAbility!=null){
-                return new ManagerAbilityBean(managerAbility);
-            }
-=======
-        ManagerRemark managerRemark = managerRemarkRepository.findByManagerId(Integer.valueOf(managerId));
-        if(managerRemark!=null){
-            return new ManagerAbilityBean(managerRemark);
->>>>>>> 89f891c2d3a7ff117d57c94c21434c3b546f12b2
-        }
-        return null;
-    }
-
+    /**
+     * 根据经理id获得经理任期中的基金收益
+     * @param managerId 经理id
+     * @return 经理任期中的基金收益
+     */
     @Override
     public List<ReturnBean> findFundReturnsByManagerId(String managerId) {
         List<ReturnBean> res=new ArrayList<>();
@@ -116,6 +112,11 @@ public class ManagerServiceImpl implements ManagerService {
         return res;
     }
 
+    /**
+     * 根据经理id获得经理现任基金排名
+     * @param managerId 经理id
+     * @return 经理现任基金排名
+     */
     //TODO
     @Override
     public List<RankBean> findFundRankByManagerId(String managerId) {
@@ -127,6 +128,11 @@ public class ManagerServiceImpl implements ManagerService {
         return null;
     }
 
+    /**
+     * 根据经理id获得经理现任基金收益率走势
+     * @param managerId 经理id
+     * @return 经理现任基金收益率走势
+     */
     @Override
     public List<RateTrendBean> findFundRateTrendByManagerId(String managerId) {
         List<RateTrendBean> res=new ArrayList<>();
@@ -146,38 +152,64 @@ public class ManagerServiceImpl implements ManagerService {
         return res;
     }
 
+    /**
+     * 根据经理id获得经理现任基金排名走势
+     * @param managerId 经理id
+     * @return 经理现任基金排名走势
+     */
     //TODO
     @Override
     public List<RankTrendBean> findFundRankTrendByManagerId(String managerId) {
         return null;
     }
 
+    /**
+     * 根据经理id获得经理历任基金表现
+     * @param managerId 经理id
+     * @return 经理历任基金表现
+     */
     @Override
     public FundPerformanceBean findFundPerformanceByManagerId(String managerId) {
         return null;
     }
 
+    /**
+     * 根据经理id获得经理综合表现
+     * @param managerId 经理id
+     * @return 经理综合表现
+     * @apiNote 第一个为当前经理，剩下的为其他经理
+     */
     @Override
-<<<<<<< HEAD
     public ManagerPerformanceBean findManagerPerformanceByManagerId(String managerId) {
         return null;
     }
 
+    /**
+     * 根据经理id获得经理综合能力
+     * @param managerId 经理id
+     * @return 经理综合能力
+     */
+    @Override
+    public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
+        Manager manager=managerRepository.findByManagerId(managerId);
+        if(manager!=null){
+            ManagerRemark managerRemark=managerRemarkRepository.findByManagerId(Integer.parseInt(managerId));
+            if(managerRemark!=null){
+                return new ManagerAbilityBean(managerRemark);
+            }
+
+        }
+        return null;
+    }
+
+    /**
+     * 根据经理id获得经理社会关系网络图
+     * @param managerId 经理id
+     * @return 经理社会关系网络图
+     */
     @Override
     public NetworkBean findSocialNetworkByManagerId(String managerId) {
         return null;
-=======
-    public List<ManagerPerformanceBean> findManagerPerformanceByManagerId(String managerId) {
-        List<ManagerPerformanceBean> res=new ArrayList<>();
-        Manager manager=managerRepository.findByManagerId(managerId);
-        if(manager!=null){
-            ManagerRemark managerRemark = managerRemarkRepository.findByManagerId(Integer.valueOf(managerId));
-            if(managerRemark!=null){
-                res.add(new ManagerPerformanceBean(managerId,manager.getName(),Double.valueOf(managerRemark.getYieldAbility()),Double.valueOf(managerRemark.getWindControlAbility())));
-            }
-        }
-        return res;
->>>>>>> 89f891c2d3a7ff117d57c94c21434c3b546f12b2
     }
 
 }
