@@ -187,6 +187,10 @@ public class FactorResult {
      */
     private Double hyyzhj;
 
+    private Double max1;
+
+    private Double max2;
+
     public String getCode() {
         return code;
     }
@@ -521,6 +525,22 @@ public class FactorResult {
 
     public void setHyyzhj(Double hyyzhj) {
         this.hyyzhj = hyyzhj;
+    }
+
+    public Double getMax1() {
+        return max1;
+    }
+
+    public void setMax1(Double max1) {
+        this.max1 = max1;
+    }
+
+    public Double getMax2() {
+        return max2;
+    }
+
+    public void setMax2(Double max2) {
+        this.max2 = max2;
     }
 
     @Override

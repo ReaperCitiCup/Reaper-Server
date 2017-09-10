@@ -1,40 +1,38 @@
 package reaper.bean;
 
-import reaper.model.ManagerAbility;
+import reaper.model.ManagerRemark;
 
 public class ManagerAbilityBean {
     /**
      * 经验值
      */
-    public Double experience;
+    public Integer experience;
 
     /**
      * 择时能力
      */
-    public Double timing;
+    public Integer timing;
 
     /**
-     * 收益率
+     * 收益能力
      */
-    public Double returns;
+    public Integer returns;
 
     /**
-     * 稳定性
+     * 择股能力
      */
-    public Double stability;
+    public Integer stockSelect;
 
     /**
-     * 抗风险
+     * 风控能力
      */
-    public Double antirisk;
+    public Integer antirisk;
 
-    public ManagerAbilityBean(ManagerAbility managerAbility) {
-        if(managerAbility!=null) {
-            experience = managerAbility.getExperience();
-            timing = managerAbility.getTiming();
-            returns = managerAbility.getReturns();
-            stability = managerAbility.getStability();
-            antirisk = managerAbility.getAntirisk();
-        }
+    public ManagerAbilityBean(ManagerRemark managerRemark) {
+        experience = managerRemark.getExperience();
+        timing = managerRemark.getMarketTimingAbility();
+        returns = managerRemark.getYieldAbility();
+        stockSelect = managerRemark.getStockOptionAbility();
+        antirisk = managerRemark.getWindControlAbility();
     }
 }
