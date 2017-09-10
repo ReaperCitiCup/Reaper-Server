@@ -209,7 +209,7 @@ public class FundServiceImpl implements FundService {
     @Override
     public List<ValueDateBean> findJensenByCode(String code) {
         List<ValueDateBean> res = new ArrayList<>();
-        String pyRes = PythonUser.usePy("基金因子计算以及回归分析.py",fillCode(code));
+        String pyRes = PythonUser.usePy("alpha.py", fillCode(code));
         for(String line:pyRes.split("\n")){
             //处理每行
             String attrs[] = line.split(" ");

@@ -2,15 +2,11 @@
 #!/usr/bin/env python
 #@author: xiexian
 import csv
-import pymysql
-import xlrd
-from xlutils.copy import copy
-import numpy
-import pandas as pd
 import math
-from sklearn.cross_validation import train_test_split  #引用交叉验证
-from sklearn.linear_model import LinearRegression  
+import numpy
+import pymysql
 import sys
+
 
 #计算标准差
 def standardDeviation(rate):
@@ -291,27 +287,5 @@ def test():
      print "beta=",beta
      for i in range(len(alpha)):
          print temp.date[i],alpha[i]
-     print "目标基金净值序列的标准差=",standardDeviation(fundDict[code].nav)
-     print "目标基金收益率序列的下行标准差=",downsideStdDev(temp.fundRate,temp.rf)
-     
-     #T-M回归模型（详情见指标数据归纳.pdf)
-     y=ListSub(temp.fundRate,temp.rf)
-     x1=ListSub(temp.rm,temp.rf)
-     x2=ListSubSqare(temp.rm,temp.rf)
-     obj_dict={'y':y,'x1':x1,'x2':x2}
-     data=pd.DataFrame(obj_dict)#通过字典创建dataframe
-     #data.to_csv("testfoo.csv")
-     x=data[['x1','x2']]
-     y=data['y']
-     X_train,X_test, y_train, y_test = train_test_split(x, y, random_state=1)
-     linreg = LinearRegression()  
-     model=linreg.fit(X_train, y_train)  
-     #print model  
-     print '截距：',linreg.intercept_  
-     print '回归系数：',linreg.coef_
-
 
 test()
-
-
-   
