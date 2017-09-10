@@ -1,9 +1,6 @@
 package reaper.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "brison_result")
@@ -12,6 +9,7 @@ public class BrisonResult {
     @GeneratedValue
     private Integer id;
 
+    @Column(length = 6)
     private String code;
 
     /**

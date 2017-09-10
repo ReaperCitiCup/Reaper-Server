@@ -38,7 +38,7 @@ public class ManagerServiceImpl implements ManagerService {
     FundRepository fundRepository;
 
     @Autowired
-    ManagerAbilityRepository managerAbilityRepository;
+    ManagerRemarkRepository managerRemarkRepository;
 
     @Autowired
     FundNetValueRepository fundNetValueRepository;
@@ -88,12 +88,18 @@ public class ManagerServiceImpl implements ManagerService {
     //TODO 这里仍没有对不存在的managerId的处理(应该是加错位置了，加到performance那里了) + 已修改
     @Override
     public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
+<<<<<<< HEAD
         Manager manager=managerRepository.findByManagerId(managerId);
         if(manager!=null){
             ManagerAbility managerAbility=managerAbilityRepository.findByManagerId(managerId);
             if(managerAbility!=null){
                 return new ManagerAbilityBean(managerAbility);
             }
+=======
+        ManagerRemark managerRemark = managerRemarkRepository.findByManagerId(Integer.valueOf(managerId));
+        if(managerRemark!=null){
+            return new ManagerAbilityBean(managerRemark);
+>>>>>>> 89f891c2d3a7ff117d57c94c21434c3b546f12b2
         }
         return null;
     }
@@ -152,6 +158,7 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
+<<<<<<< HEAD
     public ManagerPerformanceBean findManagerPerformanceByManagerId(String managerId) {
         return null;
     }
@@ -159,6 +166,18 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public NetworkBean findSocialNetworkByManagerId(String managerId) {
         return null;
+=======
+    public List<ManagerPerformanceBean> findManagerPerformanceByManagerId(String managerId) {
+        List<ManagerPerformanceBean> res=new ArrayList<>();
+        Manager manager=managerRepository.findByManagerId(managerId);
+        if(manager!=null){
+            ManagerRemark managerRemark = managerRemarkRepository.findByManagerId(Integer.valueOf(managerId));
+            if(managerRemark!=null){
+                res.add(new ManagerPerformanceBean(managerId,manager.getName(),Double.valueOf(managerRemark.getYieldAbility()),Double.valueOf(managerRemark.getWindControlAbility())));
+            }
+        }
+        return res;
+>>>>>>> 89f891c2d3a7ff117d57c94c21434c3b546f12b2
     }
 
 }

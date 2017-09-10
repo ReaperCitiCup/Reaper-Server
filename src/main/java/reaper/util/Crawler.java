@@ -19,7 +19,8 @@ public class Crawler {
     public static void main(String[] args) {
         Code code = new Code();
         Crawler crawler = new Crawler();
-        crawler.crawlFundDetail("000001",null);
+        for(int i=1;i<=123;i++)
+            crawler.crawlTotalPortion(String.valueOf(i),null);
     }
 
     /**
@@ -131,8 +132,8 @@ public class Crawler {
         matcher.find();
         fund.setScope(matcher.group(1).equals("--")?null:Double.valueOf(matcher.group(1)));
 
-        System.out.println(fund);
-//        fundRepository.save(fund);
+//        System.out.println(fund);
+        fundRepository.save(fund);
     }
 
     public void crawlManager(String managerId, ManagerRepository managerRepository){
@@ -216,6 +217,24 @@ public class Crawler {
         }
 //        System.out.println(assetAllocation);
         assetAllocationRepository.save(assetAllocation);
+    }
+
+    public void crawlTotalPortion(String page,TotalPortionRepository totalPortionRepository){
+        String url = "http://fund.eastmoney.com/data/FundDataPortfolio_Interface.aspx?dt=8&t=2017_2&pi="+page+"&pn=50&mc=returnJson&st=asc&sc=bzdm";
+        String res = getHtml(url);
+
+        Pattern pattern = Pattern.compile("\\[\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\"]");
+        Matcher matcher = pattern.matcher(res);
+
+        TotalPortion totalPortion = new TotalPortion();
+
+        while (matcher.find()){
+            totalPortion.setCode(matcher.group(1));
+            totalPortion.setValue(Double.valueOf(matcher.group(5).replace(",","")));
+            System.out.println(totalPortion);
+            totalPortionRepository.save(totalPortion);
+        }
+
     }
 
     private String getHtml(String url) {
