@@ -25,11 +25,101 @@ public class FundServiceTest {
     @Autowired
     FundService fundService;
 
+    //TODO
     @Test
     public void findFundByKeywordTest() throws Exception {
         reaper.util.Page<FundMiniBean> fundMiniBeanPage=
         fundService.findFundByKeyword("000005", "code", 5, 3);
         System.out.println();
+    }
+
+    @Test
+    public void findFundNameByCodeTest1() throws Exception {
+        MiniBean miniBean=fundService.findFundNameByCode("000005");
+        assertArrayEquals(
+                new String[]{
+                        "000005", "嘉实增强信用定期债券"
+                },
+                new String[]{
+                        miniBean.code, miniBean.name
+                }
+        );
+    }
+
+    @Test
+    public void findFundNameByCodeTest2() throws Exception {
+        MiniBean miniBean=fundService.findFundNameByCode("000006");
+        Assert.assertNull(miniBean);
+    }
+
+    @Test
+    public void findFundNameByCodeTest3() throws Exception {
+        MiniBean miniBean=fundService.findFundNameByCode("000007");
+        assertArrayEquals(
+                new String[]{
+                        "000007", "鹏华国企债债券"
+                },
+                new String[]{
+                        miniBean.code, miniBean.name
+                }
+        );
+    }
+
+    @Test
+    public void findFundNameByCodeTest4() throws Exception {
+        MiniBean miniBean=fundService.findFundNameByCode("000950");
+        assertArrayEquals(
+                new String[]{
+                        "000950", "易方达沪深300非银ETF联接"
+                },
+                new String[]{
+                        miniBean.code, miniBean.name
+                }
+        );
+    }
+
+    @Test
+    public void findFundNameByCodeTest5() throws Exception {
+        MiniBean miniBean=fundService.findFundNameByCode("5");
+        assertArrayEquals(
+                new String[]{
+                        "000005", "嘉实增强信用定期债券"
+                },
+                new String[]{
+                        miniBean.code, miniBean.name
+                }
+        );
+    }
+
+    @Test
+    public void findFundNameByCodeTest6() throws Exception {
+        MiniBean miniBean=fundService.findFundNameByCode("005");
+        assertArrayEquals(
+                new String[]{
+                        "000005", "嘉实增强信用定期债券"
+                },
+                new String[]{
+                        miniBean.code, miniBean.name
+                }
+        );
+    }
+
+    @Test
+    public void findFundNameByCodeTest7() throws Exception {
+        MiniBean miniBean=fundService.findFundNameByCode("0000005");
+        Assert.assertNull(miniBean);
+    }
+
+    @Test
+    public void findFundNameByCodeTest8() throws Exception {
+        MiniBean miniBean=fundService.findFundNameByCode("0");
+        Assert.assertNull(miniBean);
+    }
+
+    @Test
+    public void findFundNameByCodeTest9() throws Exception {
+        MiniBean miniBean=fundService.findFundNameByCode(null);
+        Assert.assertNull(miniBean);
     }
 
     //当fund存在时
@@ -389,9 +479,8 @@ public class FundServiceTest {
 //        );
     }
 
-    //TODO
     @Test
-    public void findHistoryManagerByCodeTest() throws Exception {
+    public void findHistoryManagerByCodeTest1() throws Exception {
         List<ManagerHistoryBean> managerHistoryBeans=fundService.findHistoryManagerByCode("000005");
         Assert.assertEquals(2, managerHistoryBeans.size());
         ManagerHistoryBean managerHistoryBean1=managerHistoryBeans.get(0);
@@ -415,8 +504,113 @@ public class FundServiceTest {
     }
 
     @Test
+    public void findHistoryManagerByCodeTest2() throws Exception {
+        List<ManagerHistoryBean> managerHistoryBeans=fundService.findHistoryManagerByCode("000006");
+        Assert.assertEquals(0, managerHistoryBeans.size());
+    }
+
+    @Test
+    public void findHistoryManagerByCodeTest3() throws Exception {
+        List<ManagerHistoryBean> managerHistoryBeans=fundService.findHistoryManagerByCode("000948");
+        Assert.assertEquals(2, managerHistoryBeans.size());
+        ManagerHistoryBean managerHistoryBean1=managerHistoryBeans.get(0);
+        assertArrayEquals(
+                new String[]{
+                        "30050861", "张弘弢", "2015-01-13", null, "240", "19.44"
+                },
+                new String[]{
+                        managerHistoryBean1.id, managerHistoryBean1.name, managerHistoryBean1.startDate, managerHistoryBean1.endDate, managerHistoryBean1.days.toString(), managerHistoryBean1.returns.toString()
+                }
+        );
+        ManagerHistoryBean managerHistoryBean2=managerHistoryBeans.get(1);
+        assertArrayEquals(
+                new String[]{
+                        "30106590", "徐猛", "2015-03-12", null, "182", "21.01"
+                },
+                new String[]{
+                        managerHistoryBean2.id, managerHistoryBean2.name, managerHistoryBean2.startDate, managerHistoryBean2.endDate, managerHistoryBean2.days.toString(), managerHistoryBean2.returns.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findHistoryManagerByCodeTest4() throws Exception {
+        List<ManagerHistoryBean> managerHistoryBeans=fundService.findHistoryManagerByCode("000950");
+        Assert.assertEquals(1, managerHistoryBeans.size());
+        ManagerHistoryBean managerHistoryBean=managerHistoryBeans.get(0);
+        assertArrayEquals(
+                new String[]{
+                        "30066753", "余海燕", "2015-01-22", null, "231", "-7.3"
+                },
+                new String[]{
+                        managerHistoryBean.id, managerHistoryBean.name, managerHistoryBean.startDate, managerHistoryBean.endDate, managerHistoryBean.days.toString(), managerHistoryBean.returns.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findHistoryManagerByCodeTest5() throws Exception {
+        List<ManagerHistoryBean> managerHistoryBeans=fundService.findHistoryManagerByCode("5");
+        Assert.assertEquals(2, managerHistoryBeans.size());
+        ManagerHistoryBean managerHistoryBean1=managerHistoryBeans.get(0);
+        assertArrayEquals(
+                new String[]{
+                        "30198173", "刘宁", "2013-03-08", null, "186", "21.63"
+                },
+                new String[]{
+                        managerHistoryBean1.id, managerHistoryBean1.name, managerHistoryBean1.startDate, managerHistoryBean1.endDate, managerHistoryBean1.days.toString(), managerHistoryBean1.returns.toString()
+                }
+        );
+        ManagerHistoryBean managerHistoryBean2=managerHistoryBeans.get(1);
+        assertArrayEquals(
+                new String[]{
+                        "30138351", "曲扬", "2016-07-11", "2016-12-02", "144", "0.36"
+                },
+                new String[]{
+                        managerHistoryBean2.id, managerHistoryBean2.name, managerHistoryBean2.startDate, managerHistoryBean2.endDate, managerHistoryBean2.days.toString(), managerHistoryBean2.returns.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findHistoryManagerByCodeTest6() throws Exception {
+        List<ManagerHistoryBean> managerHistoryBeans=fundService.findHistoryManagerByCode("005");
+        Assert.assertEquals(2, managerHistoryBeans.size());
+        ManagerHistoryBean managerHistoryBean1=managerHistoryBeans.get(0);
+        assertArrayEquals(
+                new String[]{
+                        "30198173", "刘宁", "2013-03-08", null, "186", "21.63"
+                },
+                new String[]{
+                        managerHistoryBean1.id, managerHistoryBean1.name, managerHistoryBean1.startDate, managerHistoryBean1.endDate, managerHistoryBean1.days.toString(), managerHistoryBean1.returns.toString()
+                }
+        );
+        ManagerHistoryBean managerHistoryBean2=managerHistoryBeans.get(1);
+        assertArrayEquals(
+                new String[]{
+                        "30138351", "曲扬", "2016-07-11", "2016-12-02", "144", "0.36"
+                },
+                new String[]{
+                        managerHistoryBean2.id, managerHistoryBean2.name, managerHistoryBean2.startDate, managerHistoryBean2.endDate, managerHistoryBean2.days.toString(), managerHistoryBean2.returns.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findHistoryManagerByCodeTest7() throws Exception {
+        List<ManagerHistoryBean> managerHistoryBeans=fundService.findHistoryManagerByCode("0");
+        Assert.assertEquals(0, managerHistoryBeans.size());
+    }
+
+    @Test
+    public void findHistoryManagerByCodeTest8() throws Exception {
+        List<ManagerHistoryBean> managerHistoryBeans=fundService.findHistoryManagerByCode(null);
+        Assert.assertEquals(0, managerHistoryBeans.size());
+    }
+
+    @Test
     public void findJensenByCodeTest1() throws Exception {
-        List<ValueDateBean> valueDateBeans=fundService.findJensenByCode("000005");
+        List<ValueDateBean> valueDateBeans=fundService.findJensenByCode("000948");
         Assert.assertEquals(931, valueDateBeans.size());
         Assert.assertEquals("2016-12-30", valueDateBeans.get(0).date);
         Assert.assertEquals(-0.000290714438132, valueDateBeans.get(0).value.doubleValue());
@@ -499,5 +693,561 @@ public class FundServiceTest {
     public void findJensenByCodeTest10() throws Exception {
         List<ValueDateBean> valueDateBeans=fundService.findJensenByCode(null);
         Assert.assertEquals(0, valueDateBeans.size());
+    }
+
+    @Test
+    public void findFundCompanyByCodeTest1() throws Exception {
+        MiniBean miniBean=fundService.findFundCompanyByCode("000005");
+        Assert.assertEquals("80000223", miniBean.code);
+        Assert.assertEquals("嘉实", miniBean.name);
+    }
+
+    @Test
+    public void findFundCompanyByCodeTest2() throws Exception {
+        MiniBean miniBean=fundService.findFundCompanyByCode("000006");
+        Assert.assertNull(miniBean);
+    }
+
+    @Test
+    public void findFundCompanyByCodeTest3() throws Exception {
+        MiniBean miniBean=fundService.findFundCompanyByCode("000007");
+        Assert.assertEquals("80000230", miniBean.code);
+        Assert.assertEquals("鹏华", miniBean.name);
+    }
+
+    @Test
+    public void findFundCompanyByCodeTest4() throws Exception {
+        MiniBean miniBean=fundService.findFundCompanyByCode("000948");
+        Assert.assertEquals("80000222", miniBean.code);
+        Assert.assertEquals("华夏", miniBean.name);
+    }
+
+    @Test
+    public void findFundCompanyByCodeTest5() throws Exception {
+        MiniBean miniBean=fundService.findFundCompanyByCode("000950");
+        Assert.assertEquals("80000229", miniBean.code);
+        Assert.assertEquals("易方达", miniBean.name);
+    }
+
+    @Test
+    public void findFundCompanyByCodeTest6() throws Exception {
+        MiniBean miniBean=fundService.findFundCompanyByCode("5");
+        Assert.assertEquals("80000223", miniBean.code);
+        Assert.assertEquals("嘉实", miniBean.name);
+    }
+
+    @Test
+    public void findFundCompanyByCodeTest7() throws Exception {
+        MiniBean miniBean=fundService.findFundCompanyByCode("005");
+        Assert.assertEquals("80000223", miniBean.code);
+        Assert.assertEquals("嘉实", miniBean.name);
+    }
+
+    @Test
+    public void findFundCompanyByCodeTest8() throws Exception {
+        MiniBean miniBean=fundService.findFundCompanyByCode("0");
+        Assert.assertNull(miniBean);
+    }
+
+    @Test
+    public void findFundCompanyByCodeTest9() throws Exception {
+        MiniBean miniBean=fundService.findFundCompanyByCode(null);
+        Assert.assertNull(miniBean);
+    }
+
+    @Test
+    public void findIndustryAttributionProfitTest1() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionProfit("000005");
+        Assert.assertEquals(30, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "行业因子合计", "0.0144071"
+                },
+                new String[]{
+                        fieldValueBeans.get(29).field, fieldValueBeans.get(29).value.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findIndustryAttributionProfitTest2() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionProfit("000006");
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findIndustryAttributionProfitTest3() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionProfit("000007");
+        Assert.assertEquals(30, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "行业因子合计", "0.1701597"
+                },
+                new String[]{
+                        fieldValueBeans.get(29).field, fieldValueBeans.get(29).value.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findIndustryAttributionProfitTest4() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionProfit("000950");
+        Assert.assertEquals(30, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "行业因子合计", "0.0116296"
+                },
+                new String[]{
+                        fieldValueBeans.get(29).field, fieldValueBeans.get(29).value.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findIndustryAttributionProfitTest5() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionProfit("5");
+        Assert.assertEquals(30, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "行业因子合计", "0.0144071"
+                },
+                new String[]{
+                        fieldValueBeans.get(29).field, fieldValueBeans.get(29).value.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findIndustryAttributionProfitTest6() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionProfit("005");
+        Assert.assertEquals(30, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "行业因子合计", "0.0144071"
+                },
+                new String[]{
+                        fieldValueBeans.get(29).field, fieldValueBeans.get(29).value.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findIndustryAttributionProfitTest7() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionProfit("0");
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findIndustryAttributionProfitTest8() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionProfit("0000005");
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findIndustryAttributionProfitTest9() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionProfit(null);
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findIndustryAttributionRiskTest1() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionRisk("000005");
+        Assert.assertEquals(30, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "行业因子合计", "-0.0116994"
+                },
+                new String[]{
+                        fieldValueBeans.get(29).field, fieldValueBeans.get(29).value.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findIndustryAttributionRiskTest2() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionRisk("000006");
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findIndustryAttributionRiskTest3() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionRisk("000007");
+        Assert.assertEquals(30, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "行业因子合计", "-0.11921745999999998"
+                },
+                new String[]{
+                        fieldValueBeans.get(29).field, fieldValueBeans.get(29).value.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findIndustryAttributionRiskTest4() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionRisk("000950");
+        Assert.assertEquals(30, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "行业因子合计", "-0.168855"
+                },
+                new String[]{
+                        fieldValueBeans.get(29).field, fieldValueBeans.get(29).value.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findIndustryAttributionRiskTest5() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionRisk("5");
+        Assert.assertEquals(30, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "行业因子合计", "-0.0116994"
+                },
+                new String[]{
+                        fieldValueBeans.get(29).field, fieldValueBeans.get(29).value.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findIndustryAttributionRiskTest6() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionRisk("005");
+        Assert.assertEquals(30, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "行业因子合计", "-0.0116994"
+                },
+                new String[]{
+                        fieldValueBeans.get(29).field, fieldValueBeans.get(29).value.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findIndustryAttributionRiskTest7() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionRisk("0");
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findIndustryAttributionRiskTest8() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionRisk("0000005");
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findIndustryAttributionRiskTest9() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionRisk(null);
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findStyleAttributionProfitTest1() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionProfit("000005");
+        Assert.assertEquals(10, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "beta", "价值", "盈利能力", "成长性", "杠杆率",
+                        "流动性", "动量", "非线性市值", "波动率", "市值"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field, fieldValueBeans.get(4).field,
+                        fieldValueBeans.get(5).field, fieldValueBeans.get(6).field, fieldValueBeans.get(7).field, fieldValueBeans.get(8).field, fieldValueBeans.get(9).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        0.00135313, -0.000126082, 0.00000548214, 0.000438674, -0.000167033,
+                        -0.000289582, 0.000219128, -0.00085754, -0.000230756, -0.00085754
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value, fieldValueBeans.get(4).value,
+                        fieldValueBeans.get(5).value, fieldValueBeans.get(6).value, fieldValueBeans.get(7).value, fieldValueBeans.get(8).value, fieldValueBeans.get(9).value
+                }
+        );
+    }
+
+    @Test
+    public void findStyleAttributionProfitTest2() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionProfit("000006");
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findStyleAttributionProfitTest3() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionProfit("000007");
+        Assert.assertEquals(10, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "beta", "价值", "盈利能力", "成长性", "杠杆率",
+                        "流动性", "动量", "非线性市值", "波动率", "市值"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field, fieldValueBeans.get(4).field,
+                        fieldValueBeans.get(5).field, fieldValueBeans.get(6).field, fieldValueBeans.get(7).field, fieldValueBeans.get(8).field, fieldValueBeans.get(9).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        0.00680164, 0.0011665, -0.0000030105, 0.0038812, -0.000971991,
+                        -0.0145181, 0.00569287, 0.0184638, 0.00656989, 0.0184638
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value, fieldValueBeans.get(4).value,
+                        fieldValueBeans.get(5).value, fieldValueBeans.get(6).value, fieldValueBeans.get(7).value, fieldValueBeans.get(8).value, fieldValueBeans.get(9).value
+                }
+        );
+    }
+
+    @Test
+    public void findStyleAttributionProfitTest4() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionProfit("000950");
+        Assert.assertEquals(10, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "beta", "价值", "盈利能力", "成长性", "杠杆率",
+                        "流动性", "动量", "非线性市值", "波动率", "市值"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field, fieldValueBeans.get(4).field,
+                        fieldValueBeans.get(5).field, fieldValueBeans.get(6).field, fieldValueBeans.get(7).field, fieldValueBeans.get(8).field, fieldValueBeans.get(9).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        0.000330407, 0.000379858, 0.00111042, -0.000523612, -0.00000181085,
+                        0.0010156, -0.000167934, 0.0038418, 0.000420719, 0.0038418
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value, fieldValueBeans.get(4).value,
+                        fieldValueBeans.get(5).value, fieldValueBeans.get(6).value, fieldValueBeans.get(7).value, fieldValueBeans.get(8).value, fieldValueBeans.get(9).value
+                }
+        );
+    }
+
+    @Test
+    public void findStyleAttributionProfitTest5() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionProfit("5");
+        Assert.assertEquals(10, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "beta", "价值", "盈利能力", "成长性", "杠杆率",
+                        "流动性", "动量", "非线性市值", "波动率", "市值"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field, fieldValueBeans.get(4).field,
+                        fieldValueBeans.get(5).field, fieldValueBeans.get(6).field, fieldValueBeans.get(7).field, fieldValueBeans.get(8).field, fieldValueBeans.get(9).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        0.00135313, -0.000126082, 0.00000548214, 0.000438674, -0.000167033,
+                        -0.000289582, 0.000219128, -0.00085754, -0.000230756, -0.00085754
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value, fieldValueBeans.get(4).value,
+                        fieldValueBeans.get(5).value, fieldValueBeans.get(6).value, fieldValueBeans.get(7).value, fieldValueBeans.get(8).value, fieldValueBeans.get(9).value
+                }
+        );
+    }
+
+    @Test
+    public void findStyleAttributionProfitTest6() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionProfit("005");
+        Assert.assertEquals(10, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "beta", "价值", "盈利能力", "成长性", "杠杆率",
+                        "流动性", "动量", "非线性市值", "波动率", "市值"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field, fieldValueBeans.get(4).field,
+                        fieldValueBeans.get(5).field, fieldValueBeans.get(6).field, fieldValueBeans.get(7).field, fieldValueBeans.get(8).field, fieldValueBeans.get(9).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        0.00135313, -0.000126082, 0.00000548214, 0.000438674, -0.000167033,
+                        -0.000289582, 0.000219128, -0.00085754, -0.000230756, -0.00085754
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value, fieldValueBeans.get(4).value,
+                        fieldValueBeans.get(5).value, fieldValueBeans.get(6).value, fieldValueBeans.get(7).value, fieldValueBeans.get(8).value, fieldValueBeans.get(9).value
+                }
+        );
+    }
+
+    @Test
+    public void findStyleAttributionProfitTest7() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionProfit("0000005");
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findStyleAttributionProfitTest8() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionProfit("0");
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findStyleAttributionProfitTest9() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionProfit(null);
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findStyleAttributionRiskTest1() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionRisk("000005");
+        Assert.assertEquals(10, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "beta", "价值", "盈利能力", "成长性", "杠杆率",
+                        "流动性", "动量", "非线性市值", "波动率", "市值"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field, fieldValueBeans.get(4).field,
+                        fieldValueBeans.get(5).field, fieldValueBeans.get(6).field, fieldValueBeans.get(7).field, fieldValueBeans.get(8).field, fieldValueBeans.get(9).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        0.00556793, -0.000559648, 0.0019378, 0.000410749, -0.00332839,
+                        0.00711846, -0.012186, -0.00160753, 0.00795333, -0.00160753
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value, fieldValueBeans.get(4).value,
+                        fieldValueBeans.get(5).value, fieldValueBeans.get(6).value, fieldValueBeans.get(7).value, fieldValueBeans.get(8).value, fieldValueBeans.get(9).value
+                }
+        );
+    }
+
+    @Test
+    public void findStyleAttributionRiskTest2() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionRisk("000006");
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findStyleAttributionRiskTest3() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionRisk("000007");
+        Assert.assertEquals(10, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "beta", "价值", "盈利能力", "成长性", "杠杆率",
+                        "流动性", "动量", "非线性市值", "波动率", "市值"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field, fieldValueBeans.get(4).field,
+                        fieldValueBeans.get(5).field, fieldValueBeans.get(6).field, fieldValueBeans.get(7).field, fieldValueBeans.get(8).field, fieldValueBeans.get(9).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        0.00648608, 0.00105316, 0.00709018, 0.000891195, -0.00393044,
+                        0.0800572, -0.0734779, 0.00816473, -0.0631256, 0.00816473
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value, fieldValueBeans.get(4).value,
+                        fieldValueBeans.get(5).value, fieldValueBeans.get(6).value, fieldValueBeans.get(7).value, fieldValueBeans.get(8).value, fieldValueBeans.get(9).value
+                }
+        );
+    }
+
+    @Test
+    public void findStyleAttributionRiskTest4() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionRisk("000950");
+        Assert.assertEquals(10, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "beta", "价值", "盈利能力", "成长性", "杠杆率",
+                        "流动性", "动量", "非线性市值", "波动率", "市值"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field, fieldValueBeans.get(4).field,
+                        fieldValueBeans.get(5).field, fieldValueBeans.get(6).field, fieldValueBeans.get(7).field, fieldValueBeans.get(8).field, fieldValueBeans.get(9).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        -0.012655, 0.00164214, -0.0170877, 0.000359096, 0.00119224,
+                        -0.0316193, -0.0112253, -0.00717504, 0.0507355, -0.00717504
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value, fieldValueBeans.get(4).value,
+                        fieldValueBeans.get(5).value, fieldValueBeans.get(6).value, fieldValueBeans.get(7).value, fieldValueBeans.get(8).value, fieldValueBeans.get(9).value
+                }
+        );
+    }
+
+    @Test
+    public void findStyleAttributionRiskTest5() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionRisk("5");
+        Assert.assertEquals(10, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "beta", "价值", "盈利能力", "成长性", "杠杆率",
+                        "流动性", "动量", "非线性市值", "波动率", "市值"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field, fieldValueBeans.get(4).field,
+                        fieldValueBeans.get(5).field, fieldValueBeans.get(6).field, fieldValueBeans.get(7).field, fieldValueBeans.get(8).field, fieldValueBeans.get(9).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        0.00556793, -0.000559648, 0.0019378, 0.000410749, -0.00332839,
+                        0.00711846, -0.012186, -0.00160753, 0.00795333, -0.00160753
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value, fieldValueBeans.get(4).value,
+                        fieldValueBeans.get(5).value, fieldValueBeans.get(6).value, fieldValueBeans.get(7).value, fieldValueBeans.get(8).value, fieldValueBeans.get(9).value
+                }
+        );
+    }
+
+    @Test
+    public void findStyleAttributionRiskTest6() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionRisk("005");
+        Assert.assertEquals(10, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "beta", "价值", "盈利能力", "成长性", "杠杆率",
+                        "流动性", "动量", "非线性市值", "波动率", "市值"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field, fieldValueBeans.get(4).field,
+                        fieldValueBeans.get(5).field, fieldValueBeans.get(6).field, fieldValueBeans.get(7).field, fieldValueBeans.get(8).field, fieldValueBeans.get(9).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        0.00556793, -0.000559648, 0.0019378, 0.000410749, -0.00332839,
+                        0.00711846, -0.012186, -0.00160753, 0.00795333, -0.00160753
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value, fieldValueBeans.get(4).value,
+                        fieldValueBeans.get(5).value, fieldValueBeans.get(6).value, fieldValueBeans.get(7).value, fieldValueBeans.get(8).value, fieldValueBeans.get(9).value
+                }
+        );
+    }
+
+    @Test
+    public void findStyleAttributionRiskTest7() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionRisk("0000005");
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findStyleAttributionRiskTest8() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionRisk("0");
+        Assert.assertEquals(0, fieldValueBeans.size());
+    }
+
+    @Test
+    public void findStyleAttributionRiskTest9() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionRisk(null);
+        Assert.assertEquals(0, fieldValueBeans.size());
     }
 }
