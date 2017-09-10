@@ -97,14 +97,20 @@ public class FundServiceImpl implements FundService {
 
     @Override
     public MiniBean findFundNameByCode(String code) {
-        String name = fundRepository.findByCode(code).getName();
-        return new MiniBean(code,name);
+        Fund fund = fundRepository.findByCode(fillCode(code));
+        return fund==null?null:new MiniBean(code,fund.getName());
     }
 
     @Override
     public FundBean findFundByCode(String code) {
-        FundModelToBean fundModelToBean = new FundModelToBean();
+        code = fillCode(code);
+
         Fund fund = fundRepository.findByCode(code);
+        if(fund==null){
+            return null;
+        }
+        FundModelToBean fundModelToBean = new FundModelToBean();
+
         FundNetValue fundNetValue = fundNetValueRepository.findFirstByCodeOrderByDateDesc(code);
         RateBean rateBean = getFundRate(code);
 
@@ -121,7 +127,7 @@ public class FundServiceImpl implements FundService {
     public List<ValueDateBean> findUnitNetValueTrendByCode(String code) {
         List<ValueDateBean> res = new ArrayList<>();
 
-        for (FundNetValue fundNetValue : fundNetValueRepository.findAllByCodeOrderByDateAsc(code)) {
+        for (FundNetValue fundNetValue : fundNetValueRepository.findAllByCodeOrderByDateAsc(fillCode(code))) {
             res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), fundNetValue.getUnitNetValue()));
         }
         return res;
@@ -131,7 +137,7 @@ public class FundServiceImpl implements FundService {
     public List<ValueDateBean> findCumulativeNetValueTrendByCode(String code) {
         List<ValueDateBean> res = new ArrayList<>();
 
-        for (FundNetValue fundNetValue : fundNetValueRepository.findAllByCodeOrderByDateAsc(code)) {
+        for (FundNetValue fundNetValue : fundNetValueRepository.findAllByCodeOrderByDateAsc(fillCode(code))) {
             res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), fundNetValue.getCumulativeNetValue()));
         }
         return res;
@@ -147,19 +153,23 @@ public class FundServiceImpl implements FundService {
         List<FundNetValue> fundNetValues;
 
         if (month.equals("all")) {
-            fundNetValues = fundNetValueRepository.findAllByCodeOrderByDateAsc(code);
+            fundNetValues = fundNetValueRepository.findAllByCodeOrderByDateAsc(fillCode(code));
         } else {
             //获得n月前的日期
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date());
-            calendar.add(Calendar.MONTH, -Integer.valueOf(month));
+            //若不是数字，则返回空串
+            try {
+                calendar.add(Calendar.MONTH, -Integer.valueOf(month));
+            }catch (NumberFormatException e){
+                return res;
+            }
+
             fundNetValues = fundNetValueRepository.findAllByCodeAndDateAfterOrderByDateAsc(code, calendar.getTime());
-            //加上第一天的内容
-            res.add(new ValueDateBean(sdf.format(calendar.getTime()),0.0));
         }
 
         for (FundNetValue fundNetValue : fundNetValues) {
-            cumulativeValue += fundNetValue.getDailyRate()==null?0:fundNetValue.getDailyRate();
+            cumulativeValue += fundNetValue.getDailyRate();
             res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), cumulativeValue));
         }
 
@@ -170,7 +180,7 @@ public class FundServiceImpl implements FundService {
     public List<HistoryManagerBean> findHistoryManagersByCode(String code) {
         List<HistoryManagerBean> res = new ArrayList<>();
 
-        for (FundHistory fundHistory : fundHistoryRepository.findAllByFundCodeOrderByStartDateAsc(code)) {
+        for (FundHistory fundHistory : fundHistoryRepository.findAllByFundCodeOrderByStartDateAsc(fillCode(code))) {
             //计算相差的天数
             int difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(),fundHistory.getEndDate());
             res.add(new HistoryManagerBean(fundHistory.getManagerId(), managerRepository.findByManagerId(fundHistory.getManagerId()).getName(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()), difDays, fundHistory.getPayback()));
@@ -180,15 +190,15 @@ public class FundServiceImpl implements FundService {
 
     @Override
     public CurrentAssetBean findCurrentAssetByCode(String code) {
-        AssetAllocation assetAllocation = assetAllocationRepository.findByCode(code);
-        return new CurrentAssetBean(Double.valueOf(decimalFormat.format(assetAllocation.bond)),Double.valueOf(decimalFormat.format(assetAllocation.stock)),Double.valueOf(decimalFormat.format(assetAllocation.bank)));
+        AssetAllocation assetAllocation = assetAllocationRepository.findByCode(fillCode(code));
+        return assetAllocation==null?null:new CurrentAssetBean(Double.valueOf(decimalFormat.format(assetAllocation.bond)),Double.valueOf(decimalFormat.format(assetAllocation.stock)),Double.valueOf(decimalFormat.format(assetAllocation.bank)));
     }
 
     @Override
     public List<ManagerHistoryBean> findHistoryManagerByCode(String code) {
         List<ManagerHistoryBean> res = new ArrayList<>();
 
-        for(FundHistory fundHistory:fundHistoryRepository.findAllByFundCode(code)){
+        for(FundHistory fundHistory:fundHistoryRepository.findAllByFundCode(fillCode(code))){
             //找到对应经理名字
             Manager manager = managerRepository.findByManagerId(fundHistory.getManagerId());
             int difDays;
@@ -205,7 +215,7 @@ public class FundServiceImpl implements FundService {
     @Override
     public List<ValueDateBean> findJensenByCode(String code) {
         List<ValueDateBean> res = new ArrayList<>();
-        String pyRes = PythonUser.usePy("基金因子计算以及回归分析.py",code);
+        String pyRes = PythonUser.usePy("基金因子计算以及回归分析.py",fillCode(code));
         for(String line:pyRes.split("\n")){
             //处理每行
             String attrs[] = line.split(" ");
@@ -219,19 +229,33 @@ public class FundServiceImpl implements FundService {
 
     @Override
     public MiniBean findFundCompanyByCode(String code) {
-        String companyId = fundCompanyRepository.findByFundId(code).getcompanyId();
+        FundCompany fundCompany = fundCompanyRepository.findByFundId(fillCode(code));
+        if(fundCompany==null){
+            return null;
+        }
+        String companyId = fundCompany.getcompanyId();
         String companyName = companyRepository.findByCompanyId(companyId).getName();
         return new MiniBean(companyId,companyName);
     }
 
     @Override
     public List<FieldValueBean> findIndustryAttributionProfit(String code) {
-        return new ToFieldBean().factorResultToFieldBean(factorResultRepository.findByCodeAndFactorType(code,'N'));
+        return new ToFieldBean().factorResultToIndustryAttribution(factorResultRepository.findByCodeAndFactorType(fillCode(code),'N'));
     }
 
     @Override
     public List<FieldValueBean> findIndustryAttributionRisk(String code) {
-        return new ToFieldBean().factorResultToFieldBean(factorResultRepository.findByCodeAndFactorType(code,'R'));
+        return new ToFieldBean().factorResultToIndustryAttribution(factorResultRepository.findByCodeAndFactorType(fillCode(code),'R'));
+    }
+
+    @Override
+    public List<FieldValueBean> findStyleAttributionProfit(String code) {
+        return new ToFieldBean().factorResultToStyleAttribution(factorResultRepository.findByCodeAndFactorType(fillCode(code),'N'));
+    }
+
+    @Override
+    public List<FieldValueBean> findStyleAttributionRisk(String code) {
+        return new ToFieldBean().factorResultToStyleAttribution(factorResultRepository.findByCodeAndFactorType(fillCode(code),'R'));
     }
 
     /**
@@ -285,4 +309,15 @@ public class FundServiceImpl implements FundService {
         return new RateBean(rates);
     }
 
+    /**
+     * 不足6为则在前面补0
+     * @param code 代码
+     * @return
+     */
+    private String fillCode(String code){
+        while (code.length()<6){
+            code = "0"+code;
+        }
+        return code;
+    }
 }

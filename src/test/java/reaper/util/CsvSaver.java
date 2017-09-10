@@ -10,6 +10,8 @@ import reaper.model.FactorResult;
 import reaper.repository.BrisonResultRepository;
 import reaper.repository.FactorResultRepository;
 
+import java.io.File;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest()
 public class CsvSaver {
@@ -35,5 +37,10 @@ public class CsvSaver {
             System.out.println(brisonResult);
             brisonResultRepository.save(brisonResult);
         }
+    }
+
+     @Test
+    public void updateFundInfo(){
+         File file = new File("");
     }
 }

@@ -26,6 +26,10 @@ public class FundModelToBean {
         res.rate = rateBean;
         res.manager = manager;
         res.company = company;
+        List<Double> assesses = RightNowMessage.getSingleFundRightNowMessage(fund.getCode());
+        res.assessNetValue = assesses.get(0);
+        res.assessIncrease = assesses.get(1);
+        res.assessDailyRate = assesses.get(2);
         return res;
     }
 }
