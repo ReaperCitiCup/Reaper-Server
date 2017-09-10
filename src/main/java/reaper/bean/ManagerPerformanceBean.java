@@ -4,34 +4,24 @@ package reaper.bean;
  * Created by Feng on 2017/9/2.
  */
 
+import java.util.List;
+
 /**
  * 第一个为当前经理，剩下的为其他经理
  */
 public class ManagerPerformanceBean {
     /**
-     * 经理id
+     * 经理自己
      */
-    public String id;
+    List<PerformanceDataBean> managers;
 
     /**
-     * 经理姓名
+     * 其他的经理
      */
-    public String name;
+    List<PerformanceDataBean> others;
 
-    /**
-     * 收益率
-     */
-    public Double rate;
-
-    /**
-     * 风险
-     */
-    public Double risk;
-
-    public ManagerPerformanceBean(String id, String name, Double rate, Double risk) {
-        this.id = id;
-        this.name = name;
-        this.rate = rate;
-        this.risk = risk;
+    public ManagerPerformanceBean(List<PerformanceDataBean> managers, List<PerformanceDataBean> others) {
+        this.managers = managers;
+        this.others = others;
     }
 }

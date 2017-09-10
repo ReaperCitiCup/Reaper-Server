@@ -1,33 +1,22 @@
 package reaper.bean;
 
+import java.util.List;
+
 /**
  * Created by Feng on 2017/9/2.
  */
 public class FundPerformanceBean {
     /**
-     * 基金代码
+     * 历任的基金
      */
-    public String id;
-
+    List<PerformanceDataBean> funds;
     /**
-     * 基金名称
+     * 其他的基金
      */
-    public String name;
+    List<PerformanceDataBean> others;
 
-    /**
-     * 收益率,年化收益率？
-     */
-    public Double rate;
-
-    /**
-     * 风险,波动率？
-     */
-    public Double risk;
-
-    public FundPerformanceBean(String id, String name, Double rate, Double risk) {
-        this.id = id;
-        this.name = name;
-        this.rate = rate;
-        this.risk = risk;
+    public FundPerformanceBean(List<PerformanceDataBean> funds, List<PerformanceDataBean> others) {
+        this.funds = funds;
+        this.others = others;
     }
 }

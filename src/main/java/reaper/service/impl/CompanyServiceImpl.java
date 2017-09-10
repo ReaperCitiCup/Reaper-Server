@@ -1,6 +1,7 @@
 package reaper.service.impl;
 
 import org.springframework.stereotype.Service;
+import reaper.bean.FieldValueBean;
 import reaper.bean.FundPerformanceBean;
 import reaper.bean.ManagerPerformanceBean;
 import reaper.service.CompanyService;
@@ -15,12 +16,42 @@ import java.util.List;
 public class CompanyServiceImpl implements CompanyService {
 
     @Override
-    public List<FundPerformanceBean> findFundPerformanceByCompanyId(String companyId) {
+    public FundPerformanceBean findFundPerformanceByCompanyId(String companyId) {
         return null;
     }
 
     @Override
-    public List<ManagerPerformanceBean> findManagerPerformanceByCompanyId(String companyId) {
+    public ManagerPerformanceBean findManagerPerformanceByCompanyId(String companyId) {
+        return null;
+    }
+
+    @Override
+    public List<FieldValueBean> findProductStrategyByCompanyId(String companyId) {
+        return null;
+    }
+
+    @Override
+    public List<FieldValueBean> findAssetAllocationByCompanyId(String companyId) {
+        return null;
+    }
+
+    @Override
+    public List<FieldValueBean> findStyleAttributionProfitByCompanyId(String companyId) {
+        return null;
+    }
+
+    @Override
+    public List<FieldValueBean> findStyleAttributionRiskByCompanyId(String companyId) {
+        return null;
+    }
+
+    @Override
+    public List<FieldValueBean> findIndustryAttributionProfitByCompanyId(String companyId) {
+        return null;
+    }
+
+    @Override
+    public List<FieldValueBean> findIndustryAttributionRiskByCompanyId(String companyId) {
         return null;
     }
 }

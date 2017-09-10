@@ -19,9 +19,9 @@ public class ManagerAbilityBean {
     public Double returns;
 
     /**
-     * 稳定性
+     * 择股能力
      */
-    public Double stability;
+    public Double stockSelect;
 
     /**
      * 抗风险
@@ -33,7 +33,7 @@ public class ManagerAbilityBean {
             experience = managerAbility.getExperience();
             timing = managerAbility.getTiming();
             returns = managerAbility.getReturns();
-            stability = managerAbility.getStability();
+            stockSelect = managerAbility.getStockSelect();
             antirisk = managerAbility.getAntirisk();
         }
     }
