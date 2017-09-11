@@ -31,9 +31,9 @@ public class ManagerAbility {
     private Double returns;
 
     /**
-     * 稳定性
+     * 择股能力
      */
-    private Double stability;
+    private Double stockSelect;
 
     /**
      * 抗风险
@@ -72,12 +72,12 @@ public class ManagerAbility {
         this.returns = returns;
     }
 
-    public Double getStability() {
-        return stability;
+    public Double getStockSelect() {
+        return stockSelect;
     }
 
-    public void setStability(Double stability) {
-        this.stability = stability;
+    public void setStockSelect(Double stockSelect) {
+        this.stockSelect = stockSelect;
     }
 
     public Double getAntirisk() {

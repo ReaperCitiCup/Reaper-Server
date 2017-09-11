@@ -38,13 +38,18 @@ public class ManagerServiceImpl implements ManagerService {
     FundRepository fundRepository;
 
     @Autowired
-    ManagerAbilityRepository managerAbilityRepository;
+    ManagerRemarkRepository managerRemarkRepository;
 
     @Autowired
     FundNetValueRepository fundNetValueRepository;
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
+    /**
+     * 根据经理id获得经理信息
+     * @param id 经理id
+     * @return 经理信息
+     */
     @Override
     public ManagerBean findManagerById(String id) {
         Manager manager=managerRepository.findByManagerId(id);
@@ -54,6 +59,7 @@ public class ManagerServiceImpl implements ManagerService {
                 Company company=companyRepository.findByCompanyId(managerCompany.getCompanyId());
                 if(company!=null){
                     return  new ManagerBean(manager.getManagerId(), manager.getName(), sdf.format(manager.getAppointedDate()),
+                            String.valueOf((int)((new Date().getTime()-manager.getAppointedDate().getTime())/(1000*3600*24))),
                             new CompanyMiniBean(company.getCompanyId(), company.getName()), manager.getTotalScope(), manager.getBestReturns(), manager.getIntroduction());
                 }
             }
@@ -61,6 +67,11 @@ public class ManagerServiceImpl implements ManagerService {
         return null;
     }
 
+    /**
+     * 根据经理id获得经理历史基金信息
+     * @param id 经理id
+     * @return 经理历史基金信息
+     */
     @Override
     public List<FundHistoryBean> findFundHistoryById(String id) {
         List<FundHistoryBean> res=new ArrayList<>();
@@ -84,16 +95,11 @@ public class ManagerServiceImpl implements ManagerService {
         return res;
     }
 
-    //TODO 这里仍没有对不存在的managerId的处理(应该是加错位置了，加到performance那里了)
-    @Override
-    public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
-        ManagerAbility managerAbility=managerAbilityRepository.findByManagerId(managerId);
-        if(managerAbility!=null){
-            return new ManagerAbilityBean(managerAbilityRepository.findByManagerId(managerId));
-        }
-        return null;
-    }
-
+    /**
+     * 根据经理id获得经理任期中的基金收益
+     * @param managerId 经理id
+     * @return 经理任期中的基金收益
+     */
     @Override
     public List<ReturnBean> findFundReturnsByManagerId(String managerId) {
         List<ReturnBean> res=new ArrayList<>();
@@ -106,6 +112,11 @@ public class ManagerServiceImpl implements ManagerService {
         return res;
     }
 
+    /**
+     * 根据经理id获得经理现任基金排名
+     * @param managerId 经理id
+     * @return 经理现任基金排名
+     */
     //TODO
     @Override
     public List<RankBean> findFundRankByManagerId(String managerId) {
@@ -117,6 +128,11 @@ public class ManagerServiceImpl implements ManagerService {
         return null;
     }
 
+    /**
+     * 根据经理id获得经理现任基金收益率走势
+     * @param managerId 经理id
+     * @return 经理现任基金收益率走势
+     */
     @Override
     public List<RateTrendBean> findFundRateTrendByManagerId(String managerId) {
         List<RateTrendBean> res=new ArrayList<>();
@@ -136,39 +152,64 @@ public class ManagerServiceImpl implements ManagerService {
         return res;
     }
 
+    /**
+     * 根据经理id获得经理现任基金排名走势
+     * @param managerId 经理id
+     * @return 经理现任基金排名走势
+     */
     //TODO
     @Override
     public List<RankTrendBean> findFundRankTrendByManagerId(String managerId) {
         return null;
     }
 
+    /**
+     * 根据经理id获得经理历任基金表现
+     * @param managerId 经理id
+     * @return 经理历任基金表现
+     */
     @Override
-    public List<FundPerformanceBean> findFundPerformanceByManagerId(String managerId) {
-        List<FundPerformanceBean> res=new ArrayList<>();
-        List<FundHistory> fundHistories=fundHistoryRepository.findAllByManagerId(managerId);
-        if(fundHistories!=null){
-            for(FundHistory fundHistory:fundHistories){
-                Fund fund=fundRepository.findByCode(fundHistory.getFundCode());
-                if(fund!=null){
-                    res.add(new FundPerformanceBean(fund.getCode(),fund.getName(),fund.getAnnualProfit(),fund.getVolatility()));
-                }
+    public FundPerformanceBean findFundPerformanceByManagerId(String managerId) {
+        return null;
+    }
+
+    /**
+     * 根据经理id获得经理综合表现
+     * @param managerId 经理id
+     * @return 经理综合表现
+     * @apiNote 第一个为当前经理，剩下的为其他经理
+     */
+    @Override
+    public ManagerPerformanceBean findManagerPerformanceByManagerId(String managerId) {
+        return null;
+    }
+
+    /**
+     * 根据经理id获得经理综合能力
+     * @param managerId 经理id
+     * @return 经理综合能力
+     */
+    @Override
+    public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
+        Manager manager=managerRepository.findByManagerId(managerId);
+        if(manager!=null){
+            ManagerRemark managerRemark=managerRemarkRepository.findByManagerId(Integer.parseInt(managerId));
+            if(managerRemark!=null){
+                return new ManagerAbilityBean(managerRemark);
             }
-            return res;
+
         }
         return null;
     }
 
+    /**
+     * 根据经理id获得经理社会关系网络图
+     * @param managerId 经理id
+     * @return 经理社会关系网络图
+     */
     @Override
-    public List<ManagerPerformanceBean> findManagerPerformanceByManagerId(String managerId) {
-        List<ManagerPerformanceBean> res=new ArrayList<>();
-        Manager manager=managerRepository.findByManagerId(managerId);
-        if(manager!=null){
-            ManagerAbility managerAbility =managerAbilityRepository.findByManagerId(managerId);
-            if(managerAbility!=null){
-                res.add(new ManagerPerformanceBean(managerAbility.getManagerId(),manager.getName(),managerAbility.getReturns(),managerAbility.getAntirisk()));
-            }
-        }
-        return res;
+    public NetworkBean findSocialNetworkByManagerId(String managerId) {
+        return null;
     }
 
 }

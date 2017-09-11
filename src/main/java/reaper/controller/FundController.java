@@ -152,6 +152,12 @@ public class FundController {
         return fundService.findHistoryManagerByCode(code);
     }
 
+    //TODO 这一部分修改了之前的，不知道对不对，请多注意
+    /**
+     * 基金波动率
+     * @param code
+     * @return
+     */
     @ResponseBody
     @RequestMapping(
             value = "/{code}/volatility",
@@ -159,7 +165,8 @@ public class FundController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<ValueDateBean> findVolatilityByCode(@PathVariable String code) {
-        return Collections.emptyList();
+//        return Collections.emptyList();
+        return fundService.findVolatility(code);
     }
 
     /**
@@ -250,6 +257,230 @@ public class FundController {
     )
     public List<FieldValueBean> findStyleAttributionRisk(@PathVariable String code){
         return fundService.findStyleAttributionRisk(code);
+    }
+
+    /**
+     * 基金风险走势
+     * @param code 代码
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/risk-trend",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public List<ValueDateBean> findRiskTrendById(@PathVariable String code){
+        return fundService.findRiskTrend(code);
+    }
+
+    /**
+     * 基金每日回撤
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/daily-retracement",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public List<ValueDateBean> findDailyRetracement(@PathVariable String code){
+        return fundService.findDailyRetracement(code);
+    }
+
+    /**
+     * 基金在险价值
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/value-at-risk",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public List<ValueDateBean> findValueAtRisk(@PathVariable String code){
+        return fundService.findValueAtRisk(code);
+    }
+
+    /**
+     * 基金下行波动率
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/downside-volatility",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public List<ValueDateBean> findDownsideVolatility(@PathVariable String code){
+        return fundService.findDownsideVolatility(code);
+    }
+
+    /**
+     * 基金夏普指标
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/sharpe-index",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public List<ValueDateBean> findSharpeIndex(@PathVariable String code){
+        return fundService.findSharpeIndex(code);
+    }
+
+    /**
+     * 基金特雷诺指标
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/treynor-index",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public List<ValueDateBean> findTreynorIndex(@PathVariable String code){
+        return fundService.findTreynorIndex(code);
+    }
+
+    /**
+     * 基金业绩持续性指标
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/performance-index",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public PerformanceIndexBean findPerformanceIndex(@PathVariable String code){
+        return fundService.findPerformanceIndex(code);
+    }
+
+    /**
+     * 基金品种归因
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/variety-attribution",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public List<FieldValueBean> findVarietyAttribution(@PathVariable String code){
+        return fundService.findVarietyAttribution(code);
+    }
+
+    /**
+     * 基金Brison归因-基于股票持仓
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/brison-attribution/stock",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public List<FieldValueBean> findBrisonAttributionStock(@PathVariable String code){
+        return fundService.findBrisonAttributionStock(code);
+    }
+
+    /**
+     * 基金Brison归因-基于债券持仓
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/brison-attribution/bond",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public List<FieldValueBean> findBrisonAttributionBond(@PathVariable String code){
+        return fundService.findBrisonAttributionBond(code);
+    }
+
+    /**
+     * 基金择时能力
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/choose-time",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public ChooseBean findChooseTime(@PathVariable String code){
+        return fundService.findChooseTime(code);
+    }
+
+    /**
+     * 基金择股能力
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/choose-stock",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public ChooseBean findChooseStock(@PathVariable String code){
+        return fundService.findChooseStock(code);
+    }
+
+    /**
+     * 当前基金经理历任基金表现
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/fund-performance",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public FundPerformanceBean findFundPerformance(@PathVariable String code){
+        return fundService.findFundPerformance(code);
+    }
+
+    /**
+     * 当前基金经理表现
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/manager-performance",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public ManagerPerformanceBean findManagerPerformance(@PathVariable String code){
+        return fundService.findManagerPerformance(code);
+    }
+
+    /**
+     * 基金舆情分析
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/pubic-opinion",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public List<PublicOpinionBean> findPublicOpinion(@PathVariable String code){
+        return fundService.findPublicOpinion(code);
+    }
+
+    /**
+     * 基金持仓关联网络图
+     * @param code
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/position-network",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"})
+    public List<NetworkBean> findPositionNetwork(String code){
+        return fundService.findPositionNetwork(code);
     }
 
 }

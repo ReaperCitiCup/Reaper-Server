@@ -27,12 +27,12 @@ public class Fund {
     private Double scope;
 
     /**
-     * 年化率
+     * 年化率（经过百分化）
      */
     private Double annualProfit;
 
     /**
-     * 波动率
+     * 波动率（经过百分化）
      */
     private Double volatility;
 

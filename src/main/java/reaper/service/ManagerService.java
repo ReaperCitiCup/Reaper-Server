@@ -58,7 +58,7 @@ public interface ManagerService {
      * @param managerId 经理id
      * @return 经理历任基金表现
      */
-    public List<FundPerformanceBean> findFundPerformanceByManagerId(String managerId);
+    public FundPerformanceBean findFundPerformanceByManagerId(String managerId);
 
     /**
      * 根据经理id获得经理综合表现
@@ -66,7 +66,7 @@ public interface ManagerService {
      * @return 经理综合表现
      * @apiNote 第一个为当前经理，剩下的为其他经理
      */
-    public List<ManagerPerformanceBean> findManagerPerformanceByManagerId(String managerId);
+    public ManagerPerformanceBean findManagerPerformanceByManagerId(String managerId);
 
     /**
      * 根据经理id获得经理综合能力
@@ -74,4 +74,11 @@ public interface ManagerService {
      * @return 经理综合能力
      */
     public ManagerAbilityBean findManagerAbilityByManagerId(String managerId);
+
+    /**
+     * 根据经理id获得经理社会关系网络图
+     * @param managerId 经理id
+     * @return 经理社会关系网络图
+     */
+    public NetworkBean findSocialNetworkByManagerId(String managerId);
 }

@@ -20,6 +20,11 @@ public class ManagerBean {
     public String appointedDate;
 
     /**
+     * 累计时间
+     */
+    public String cumulativeDays;
+
+    /**
      * 所在公司
      */
     public CompanyMiniBean company;
@@ -39,10 +44,11 @@ public class ManagerBean {
      */
     public String introduction;
 
-    public ManagerBean(String id, String name, String appointedDate, CompanyMiniBean company, Double totalScope, Double bestReturns, String introduction) {
+    public ManagerBean(String id, String name, String appointedDate, String cumulativeDays, CompanyMiniBean company, Double totalScope, Double bestReturns, String introduction) {
         this.id = id;
         this.name = name;
         this.appointedDate = appointedDate;
+        this.cumulativeDays = cumulativeDays;
         this.company = company;
         this.totalScope = totalScope;
         this.bestReturns = bestReturns;

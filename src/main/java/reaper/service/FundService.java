@@ -1,9 +1,12 @@
 package reaper.service;
 
 import reaper.bean.*;
+import reaper.model.Manager;
 import reaper.util.Page;
 
+import java.io.File;
 import java.util.List;
+import java.util.LongSummaryStatistics;
 
 /**
  * Created by Sorumi on 17/8/21.
@@ -122,4 +125,123 @@ public interface FundService {
      * @return
      */
     public List<FieldValueBean> findStyleAttributionRisk(String code);
+
+    /**
+     * 基金风险走势
+     * @param code 代码
+     * @return
+     */
+    public List<ValueDateBean> findRiskTrend(String code);
+
+    /**
+     * 基金每日回撤
+     * @param code
+     * @return
+     */
+    public List<ValueDateBean> findDailyRetracement(String code);
+
+    /**
+     * 基金波动率
+     * @param code
+     * @return
+     */
+    public List<ValueDateBean> findVolatility(String code);
+
+    /**
+     * 基金在险价值
+     * @param code
+     * @return
+     */
+    public List<ValueDateBean> findValueAtRisk(String code);
+
+    /**
+     * 基金下行波动率
+     * @param code
+     * @return
+     */
+    public List<ValueDateBean> findDownsideVolatility(String code);
+
+    /**
+     * 基金夏普指标
+     * @param code
+     * @return
+     */
+    public List<ValueDateBean> findSharpeIndex(String code);
+
+    /**
+     * 基金特雷诺指标
+     * @param code
+     * @return
+     */
+    public List<ValueDateBean> findTreynorIndex(String code);
+
+    /**
+     * 基金业绩持续性指标
+     * @param code
+     * @return
+     */
+    public PerformanceIndexBean findPerformanceIndex(String code);
+
+    /**
+     * 基金品种归因
+     * @param code
+     * @return
+     */
+    public List<FieldValueBean> findVarietyAttribution(String code);
+
+    /**
+     * 基金Brison归因-基于股票持仓
+     * @param code
+     * @return
+     */
+    public List<FieldValueBean> findBrisonAttributionStock(String code);
+
+    /**
+     * 基金Brison归因-基于债券持仓
+     * @param code
+     * @return
+     */
+    public List<FieldValueBean> findBrisonAttributionBond(String code);
+
+    /**
+     * 基金择时能力
+     * @param code
+     * @return
+     */
+    public ChooseBean findChooseTime(String code);
+
+    /**
+     * 基金择股能力
+     * @param code
+     * @return
+     */
+    public ChooseBean findChooseStock(String code);
+
+    /**
+     * 当前基金经理历任基金表现
+     * @param code
+     * @return
+     */
+    public FundPerformanceBean findFundPerformance(String code);
+
+    /**
+     * 当前基金经理表现
+     * @param code
+     * @return
+     */
+    public ManagerPerformanceBean findManagerPerformance(String code);
+
+    /**
+     * 基金舆情分析
+     * @param code
+     * @return
+     */
+    public List<PublicOpinionBean> findPublicOpinion(String code);
+
+    /**
+     * 基金持仓关联网络图
+     * @param code
+     * @return
+     */
+    public List<NetworkBean> findPositionNetwork(String code);
 }

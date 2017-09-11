@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reaper.model.FundHoldBond;
-import reaper.repository.FundHoldBondRepository;
-import reaper.repository.FundHoldStockRepository;
-import reaper.repository.FundRepository;
-import reaper.repository.ManagerRepository;
+import reaper.repository.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest()
@@ -25,6 +22,9 @@ public class CrawlTest {
 
     @Autowired
     ManagerRepository managerRepository;
+
+    @Autowired
+    TotalPortionRepository totalPortionRepository;
 
     @Test
     public void fundHoldStockCrawl(){
@@ -66,5 +66,12 @@ public class CrawlTest {
         for(String id:code.getManagerCode()){
             crawler.crawlManager(id,managerRepository);
         }
+    }
+
+    @Test
+    public void totalPortionCrawl(){
+        Crawler crawler = new Crawler();
+        for(int i=1;i<=123;i++)
+            crawler.crawlTotalPortion(String.valueOf(i),totalPortionRepository);
     }
 }
