@@ -95,12 +95,15 @@ public class Crawler {
         }
     }
 
-    public void crawlFundDetail(String fundCode, FundRepository fundRepository) {
+    public Fund crawlFundDetail(String fundCode, FundRepository fundRepository) {
         System.out.println(fundCode);
         Fund fund = new Fund();
         fund.setCode(fundCode);
 
         String res = getHtml("http://fund.eastmoney.com/" + fundCode + ".html?spm=search");
+        if(res.length()==0){
+            return null;
+        }
 
         //name
         Pattern pattern = Pattern.compile("<div style=\"float: left\">(.+?)<span>");
@@ -134,6 +137,8 @@ public class Crawler {
 
 //        System.out.println(fund);
         fundRepository.save(fund);
+        System.out.println(fundCode+" 保存成功");
+        return fund;
     }
 
     public void crawlManager(String managerId, ManagerRepository managerRepository){

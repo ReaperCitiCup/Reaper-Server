@@ -118,7 +118,7 @@ public class FundServiceImpl implements FundService {
         for(FundManager fundManager:fundManagerRepository.findByFundCode(code)){
             managers.add(new MiniBean(fundManager.getManagerId(), managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
         }
-        String id = fundCompanyRepository.findByFundId(code).getcompanyId();
+        String id = fundCompanyRepository.findByFundId(code).getCompanyId();
         MiniBean company = new MiniBean(id, companyRepository.findByCompanyId(id).getName());
         return fundModelToBean.modelToBean(fund, fundNetValue, rateBean, managers, company);
     }
@@ -233,29 +233,33 @@ public class FundServiceImpl implements FundService {
         if(fundCompany==null){
             return null;
         }
-        String companyId = fundCompany.getcompanyId();
+        String companyId = fundCompany.getCompanyId();
         String companyName = companyRepository.findByCompanyId(companyId).getName();
         return new MiniBean(companyId,companyName);
     }
 
     @Override
     public List<FieldValueBean> findIndustryAttributionProfit(String code) {
-        return new ToFieldBean().factorResultToIndustryAttribution(factorResultRepository.findByCodeAndFactorType(fillCode(code),'N'));
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(fillCode(code),'N');
+        return factorResult==null?null:new ToFieldBean().factorResultToIndustryAttribution(factorResult);
     }
 
     @Override
     public List<FieldValueBean> findIndustryAttributionRisk(String code) {
-        return new ToFieldBean().factorResultToIndustryAttribution(factorResultRepository.findByCodeAndFactorType(fillCode(code),'R'));
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(fillCode(code),'R');
+        return factorResult==null?null:new ToFieldBean().factorResultToIndustryAttribution(factorResult);
     }
 
     @Override
     public List<FieldValueBean> findStyleAttributionProfit(String code) {
-        return new ToFieldBean().factorResultToStyleAttribution(factorResultRepository.findByCodeAndFactorType(fillCode(code),'N'));
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(fillCode(code),'N');
+        return factorResult==null?null:new ToFieldBean().factorResultToStyleAttribution(factorResult);
     }
 
     @Override
     public List<FieldValueBean> findStyleAttributionRisk(String code) {
-        return new ToFieldBean().factorResultToStyleAttribution(factorResultRepository.findByCodeAndFactorType(fillCode(code),'R'));
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(fillCode(code),'R');
+        return factorResult==null?null:new ToFieldBean().factorResultToStyleAttribution(factorResult);
     }
 
     /**

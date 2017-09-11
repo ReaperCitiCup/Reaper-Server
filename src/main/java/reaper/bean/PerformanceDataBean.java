@@ -1,5 +1,9 @@
 package reaper.bean;
 
+import reaper.model.Fund;
+import reaper.model.Manager;
+import reaper.util.FormatData;
+
 /**
  * Created by Feng on 2017/9/10.
  */
@@ -29,5 +33,34 @@ public class PerformanceDataBean {
         this.name = name;
         this.rate = rate;
         this.risk = risk;
+    }
+
+    public PerformanceDataBean(Fund fund) {
+        id = fund.getCode();
+        name = fund.getName();
+        rate = FormatData.fixToTwo(fund.getAnnualProfit());
+        risk = FormatData.fixToTwo(fund.getVolatility());
+    }
+
+    public PerformanceDataBean(Manager manager) {
+        id = manager.getManagerId();
+        name = manager.getName();
+        rate = FormatData.fixToTwoAndPercent(manager.getBestReturns());
+        risk = FormatData.fixToTwoAndPercent(manager.getRisk());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PerformanceDataBean that = (PerformanceDataBean) o;
+
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

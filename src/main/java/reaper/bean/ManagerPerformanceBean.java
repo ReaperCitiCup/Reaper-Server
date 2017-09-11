@@ -13,12 +13,12 @@ public class ManagerPerformanceBean {
     /**
      * 经理自己
      */
-    List<PerformanceDataBean> managers;
+    public List<PerformanceDataBean> managers;
 
     /**
      * 其他的经理
      */
-    List<PerformanceDataBean> others;
+    public List<PerformanceDataBean> others;
 
     public ManagerPerformanceBean(List<PerformanceDataBean> managers, List<PerformanceDataBean> others) {
         this.managers = managers;
