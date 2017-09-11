@@ -25,6 +25,16 @@ public class Manager {
 
     private Double bestReturns;
 
+    /**
+     * 收益率
+     */
+    private Double returnRate;
+
+    /**
+     * 风险率
+     */
+    private Double risk;
+
     public Manager(){
 
     }
@@ -75,6 +85,22 @@ public class Manager {
 
     public void setBestReturns(Double bestReturns) {
         this.bestReturns = bestReturns;
+    }
+
+    public Double getReturnRate() {
+        return returnRate;
+    }
+
+    public void setReturnRate(Double returnRate) {
+        this.returnRate = returnRate;
+    }
+
+    public Double getRisk() {
+        return risk;
+    }
+
+    public void setRisk(Double risk) {
+        this.risk = risk;
     }
 
     @Override

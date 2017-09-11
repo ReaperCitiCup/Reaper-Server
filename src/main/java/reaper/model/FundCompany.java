@@ -28,11 +28,11 @@ public class FundCompany {
         this.fundId = fundId;
     }
 
-    public String getcompanyId() {
+    public String getCompanyId() {
         return companyId;
     }
 
-    public void setcompanyId(String companyId) {
+    public void setCompanyId(String companyId) {
         this.companyId = companyId;
     }
 }

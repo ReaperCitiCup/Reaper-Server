@@ -1,11 +1,14 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# !/usr/bin/env python
 # @author: xiexian
+# 获得基金的全部数据计算结果，传递的第一个参数为0
+# 获得基金的一段时间数据计算结果，传递的第一个参数为1
 import csv
 import math
 import numpy
 import pandas as pd
 import pymysql
+import sys
 import xlrd
 from datetime import datetime
 from sklearn.cross_validation import train_test_split  # 引用交叉验证
@@ -15,12 +18,12 @@ from xlrd import xldate_as_tuple
 Number_Of_Trading_Days = 245  # 一年的交易日个数
 
 
-# 计算标准差
+# 计算标准差,参数类型：列表
 def standardDeviation(rate):
     return numpy.std(rate)
 
 
-# 计算下行标准差
+# 计算下行标准差，参数类型：列表
 def downsideStdDev(rate, rf):  # rf:risk-free rate
     rateLen = len(rate)
     smallerRate = []
@@ -37,7 +40,7 @@ def downsideStdDev(rate, rf):  # rf:risk-free rate
         return math.sqrt(squareSum / (float)(smallerLen - 1))
 
 
-# 计算协方差
+# 计算协方差，参数类型：列表
 def countCovariance(x, y):
     xy = []
     xyLen = min(len(x), len(y))
@@ -51,16 +54,19 @@ def countCovariance(x, y):
     return cov
 
 
-# 计算Beta值
+# 计算Beta值，参数类型：列表
 def countBeta(resultRate, marketRate):
     x = resultRate
     y = marketRate
     cov = countCovariance(x, y)
-    beta = (float)(cov) / numpy.var(marketRate)
+    var = numpy.var(marketRate)
+    if (0 == var):
+        return 0
+    beta = (float)(cov) / var
     return beta
 
 
-# 计算Alpha
+# 计算Alpha，参数类型：前三个为列表，beta为数值
 def countAlpha(resultRate, marketRate, rf, beta):
     alpha = []
     alphaLen = min(len(resultRate), len(marketRate))
@@ -69,29 +75,34 @@ def countAlpha(resultRate, marketRate, rf, beta):
     return alpha
 
 
-# 计算夏普比
+# 计算夏普比，参数类型：列表
 def countSharpeRatio(resultRate, rf):
     Erp = sum(resultRate) / len(resultRate)
     Erf = sum(rf) / len(rf)
-    return (Erp - Erf) / standardDeviation(resultRate)
+    std = standardDeviation(resultRate)
+    if (0 == std):
+        return 0
+    else:
+        return (Erp - Erf) / std
 
 
-# 计算两个序列的相关系数
+# TODO unused
+# 计算两个序列的相关系数，参数类型：列表
 def countCorrelation(r1, r2):
     return countCovariance(r1, r2) / (numpy.std(r1) * numpy.std(r2))
 
 
-# 计算在险价值
+# 计算在险价值，参数类型：数值
 def countValue_at_risk(yearlySigam):
-    return 2.33 * yearlySigam / sqrt(52)
+    return 2.33 * yearlySigam / math.sqrt(52)
 
 
-# 计算年化波动率
+# 计算年化波动率，参数类型：列表
 def annualizedVolatility(r):
-    return standardDeviation(r) * sqrt(Number_Of_Trading_Days)
+    return standardDeviation(r) * math.sqrt(Number_Of_Trading_Days)
 
 
-# 计算年化收益率
+# 计算年化收益率，参数类型：列表
 def annualizedRate(dailyRate):
     result = 0
     countLen = 0
@@ -101,7 +112,7 @@ def annualizedRate(dailyRate):
     return result / countLen * Number_Of_Trading_Days
 
 
-# 计算特雷诺比率
+# 计算特雷诺比率，参数类型：前两个为列表，beta为数值
 def TreynorRatio(resultRate, rf, beta):
     Erp = sum(resultRate) / len(resultRate)
     Erf = sum(rf) / len(rf)
@@ -125,6 +136,7 @@ def ListSubSqare(l1, l2):
     return rtn
 
 
+# TODO unsed
 # 获取数据库里基金的所有代码
 def getCode():
     try:
@@ -322,7 +334,6 @@ class Rf:
             rm = []
             r = 1
             date = datetime(*xldate_as_tuple(table.row_values(r, 0)[0], 0)).strftime('%Y-%m-%d')
-            print date
             while (date > '2016-12-30'):  # 用国债数据计算2016/12/30以后的无风险收益率（因为Fund_RiskFree.csv里没有）
                 self.date.append(date)
                 self.rfDaily.append(table.row_values(r, 4)[0])
@@ -366,75 +377,119 @@ class Rf:
                 self.rfMonthly.append(((float)(filter(lambda ch: ch in '-0123456789.', rfMonthly))) / 100)
 
 
+# TODO unused
+# 构造基金组合，待续
+def fundGroup():
+    fundDict = {}
+    codeList = []  # 前端应该传来的用于构造基金组合的数据
+    pencentage = []  # codeList为用户所选的组合中所用基金的代码（列表类型），pencentage为组合中所用基金占组合的百分比（也为列表类型，与codeList通过下标对应，如pencentage[i]表示基金代码为codeList[i]的基金占组合的百分比）
+    for code in codeList:
+        fundDict[code] = getFund(code)  # 获取组合中各个基金的信息
+
+    myFundGroup = Fund("myFundGroup")  # 创建一个空的基金组合对象，加权平均后的数据可放到这个对象中
+    # 。。。
+
+
 # 测试函数
 def test():
     rm = Rm('000001.csv')  # 读取市场数据
     # print rm.monthRate
     rf = Rf('Fund_RiskFree.csv', 'Treasury.xlsx')
-    # print rf.rfDaily
     # print rf.date
     fundDict = {}  # 基金字典，用于查询或管理基金，key为基金代码，value为Fund对象
     # codeList=getCode()
     # for code in codeList:
     #    fundDict[code]=getFund(code)
+    if int(sys.argv[1]) == 0:
+        lists = [[]] * (len(sys.argv) - 2)
+        for i in range(2, len(sys.argv)):
+            code = str(sys.argv[i])  # 前端点击查看某只基金的信息后，传来该基金的代码，赋值到这里，便可获取该基金的信息并计算各种风险因子
+            fundDict[code] = getFund(code)
 
-    code = '000254'  # 前端点击查看某只基金的信息后，传来该基金的代码，赋值到这里，便可获取该基金的信息并计算各种风险因子
-    fundDict[code] = getFund(code)
+            temp = corrDate(fundDict[code].date, fundDict[code].dailyRate, rm.date, rm.dayRate, rf.date, rf.rfMonthly)
+            # 统一日期，并返回统一后的日期序列和该日期序列对应的基金收益率序列/市场收益率序列/无风险利率序列,市场数据用的是日收益率，无风险利率用的是月收益率
 
-    temp = corrDate(fundDict[code].date, fundDict[code].dailyRate, rm.date, rm.dayRate, rf.date, rf.rfMonthly)
-    # 统一日期，并返回统一后的日期序列和该日期序列对应的基金收益率序列/市场收益率序列/无风险利率序列,市场数据用的是日收益率，无风险利率用的是月收益率
+            beta = countBeta(temp.fundRate, temp.rm)
+            alpha = countAlpha(temp.fundRate, temp.rm, temp.rf, beta)
 
+            print "*", code, "年化收益率=", annualizedRate(fundDict[code].dailyRate)
+            print "*", code, "年化波动率=", annualizedVolatility(temp.fundRate)
+            print "*", code, "在险价值=", countValue_at_risk(annualizedVolatility(temp.fundRate))
+            print "*", code, "收益率序列的下行标准差=", downsideStdDev(temp.fundRate, temp.rf)
+            print "*", code, "夏普比=", countSharpeRatio(temp.fundRate, temp.rf)
+            print "*", code, "beta=", beta
+            # for i in range(len(alpha)):
+            # print temp.date[i]+"对应的alpha值为",alpha[i]
+            print "*", code, "特雷诺指数=", TreynorRatio(temp.fundRate, temp.rf, beta)
 
-    beta = countBeta(temp.fundRate, temp.rm)
-    alpha = countAlpha(temp.fundRate, temp.rm, temp.rf, beta)
-    print "beta=", beta
-    # for i in range(len(alpha)):
-    #    print temp.date[i]+"对应的alpha值为",alpha[i]
-    print "目标基金净值序列的标准差=", standardDeviation(fundDict[code].nav)
-    print "目标基金收益率序列的下行标准差=", downsideStdDev(temp.fundRate, temp.rf)
-    print "目标基金的夏普比=", countSharpeRatio(temp.fundRate, temp.rf)
+            # T-M回归模型（详情见指标数据归纳.pdf)
+            y = ListSub(temp.fundRate, temp.rf)
+            x1 = ListSub(temp.rm, temp.rf)
+            x2 = ListSubSqare(temp.rm, temp.rf)
+            obj_dict = {'y': y, 'x1': x1, 'x2': x2}
+            data = pd.DataFrame(obj_dict)  # 通过字典创建dataframe
+            # data.to_csv("testfoo.csv")
+            x = data[['x1', 'x2']]
+            y = data['y']
+            X_train, X_test, y_train, y_test = train_test_split(x, y, random_state=1)
+            linreg = LinearRegression()
+            model = linreg.fit(X_train, y_train)
+            # print model
+            print "*", code, "择股系数=", linreg.intercept_
+            print "*", code, "择时系数=", linreg.coef_[1]
+            # for j in range(0, len(lists)):
+            #     for k in range(j + 1, len(lists)):
+            #         print "##", str(sys.argv[j + 2]), str(sys.argv[k + 2]), countCorrelation(lists[j], lists[k])
 
-    # T-M回归模型（详情见指标数据归纳.pdf)
-    y = ListSub(temp.fundRate, temp.rf)
-    x1 = ListSub(temp.rm, temp.rf)
-    x2 = ListSubSqare(temp.rm, temp.rf)
-    obj_dict = {'y': y, 'x1': x1, 'x2': x2}
-    data = pd.DataFrame(obj_dict)  # 通过字典创建dataframe
-    # data.to_csv("testfoo.csv")
-    x = data[['x1', 'x2']]
-    y = data['y']
-    X_train, X_test, y_train, y_test = train_test_split(x, y, random_state=1)
-    linreg = LinearRegression()
-    model = linreg.fit(X_train, y_train)
-    # print model
-    print '截距：', linreg.intercept_
-    print '回归系数：', linreg.coef_
+    if int(sys.argv[1]) == 1:
+        # 计算某段时间内的各种基金指标
+        lists = [[]] * (len(sys.argv) - 4)
+        before = str(sys.argv[2])
+        after = str(sys.argv[3])
+        for i in range(4, len(sys.argv)):
+            code = str(sys.argv[i])
 
-    # 计算某段时间内的波动率
-    code = '000003'  # 前端点击查看某只基金的信息后，传来该基金的代码，赋值到这里，便可获取该基金的信息并计算各种风险因子
-    fundDict[code] = getFund(code)
-    temp = corrDate(fundDict[code].date, fundDict[code].dailyRate, rm.date, rm.dayRate, rf.date, rf.rfMonthly)
-    temp.countByDate('2016-05-06',
-                     '2017-08-01')  # 若要计算 某段时间内 的波动率，则要先调用这个函数，参数为开始和截至日期，类型为字符串，格式为'yyyy-mm-dd'(五月六号的5和6前的0不能省略）
-    # 然后用temp的属性计算出来的波动率就是这段时间内的了（前提是目标基金/市场收益率/无风险利率有这段时间内的数据）
-    # 计算方法同上
-    print "\n目标基金净值序列2016-05-06至2017-08-01的标准差=", standardDeviation(fundDict[code].nav)
-    print "目标基金收益率序列2016-05-06至2017-08-01的下行标准差=", downsideStdDev(temp.fundRate, temp.rf)
-    print "目标基金2016-05-06至2017-08-01的夏普比=", countSharpeRatio(temp.fundRate, temp.rf)
+            # code = '000003'  # 前端点击查看某只基金的信息后，传来该基金的代码，赋值到这里，便可获取该基金的信息并计算各种风险因子
+            fundDict[code] = getFund(code)
+            # -----------------------------------------------------------------------------------
+            lists[i - 4] = fundDict[code].dailyRate
+            # -----------------------------------------------------------------------------------
+            temp = corrDate(fundDict[code].date, fundDict[code].dailyRate, rm.date, rm.dayRate, rf.date, rf.rfMonthly)
+            temp.countByDate(before,
+                             after)  # 若要计算 某段时间内 的波动率，则要先调用这个函数，参数为开始和截至日期，类型为字符串，格式为'yyyy-mm-dd'(五月六号的5和6前的0不能省略）
+            # 然后用temp的属性计算出来的波动率就是这段时间内的了（前提是目标基金/市场收益率/无风险利率有这段时间内的数据）
+            # 计算方法同上
+            beta = countBeta(temp.fundRate, temp.rm)
+            alpha = countAlpha(temp.fundRate, temp.rm, temp.rf, beta)
+            # -----------------------------------------------------------------------------------
+            print "#", code, "年化收益率=", annualizedRate(fundDict[code].dailyRate)
+            print "#", code, "年化波动率=", annualizedVolatility(temp.fundRate)
+            print "#", code, "在险价值=", countValue_at_risk(annualizedVolatility(temp.fundRate))
+            print "#", code, "收益率序列的下行标准差=", downsideStdDev(temp.fundRate, temp.rf)
+            print "#", code, "夏普比=", countSharpeRatio(temp.fundRate, temp.rf)
+            print "#", code, "beta=", beta
+            print "#", code, "特雷诺指数=", TreynorRatio(temp.fundRate, temp.rf, beta)
+            # -----------------------------------------------------------------------------------
 
-    beta = countBeta(temp.fundRate, temp.rm)
-    alpha = countAlpha(temp.fundRate, temp.rm, temp.rf, beta)
-    print "目标基金2016-05-06至2017-08-01的beta值为：", beta
-    # for i in range(len(alpha)):
-    #    print temp.date[i]+"对应的alpha值为",alpha[i]
-    print "目标基金2016-05-06至2017-08-01的在险价值为：", countValue_at_risk(annualizedVolatility(temp.fundRate))
+            # T-M回归模型的计算也同上
+            y = ListSub(temp.fundRate, temp.rf)
+            x1 = ListSub(temp.rm, temp.rf)
+            x2 = ListSubSqare(temp.rm, temp.rf)
+            obj_dict = {'y': y, 'x1': x1, 'x2': x2}
+            data = pd.DataFrame(obj_dict)  # 通过字典创建dataframe
+            # data.to_csv("testfoo.csv")
+            x = data[['x1', 'x2']]
+            y = data['y']
+            X_train, X_test, y_train, y_test = train_test_split(x, y, random_state=1)
+            linreg = LinearRegression()
+            model = linreg.fit(X_train, y_train)
+            # print model
+            print "#", code, "择股系数=", linreg.intercept_
+            print "#", code, "择时系数=", linreg.coef_[1]
 
-    # T-M回归模型的计算也同上
-
-    codeList = []
-    pencentage = []  # 前端应该传来的用于构造基金组合的数据
-    # codeList为用户所选的组合中所用基金的代码（列表类型），pencentage为组合中所用基金占组合的百分比（也为列表类型，与codeList通过下标对应，如pencentage[i]表示基金代码为codeList[i]的基金占组合的百分比）
-    myFundGroup = fundGroup(codeList, pencentage)
+        for j in range(0, len(lists)):
+            for k in range(j + 1, len(lists)):
+                print "#", str(sys.argv[j + 4]), str(sys.argv[k + 4]), countCorrelation(lists[j], lists[k])
 
 
 test()

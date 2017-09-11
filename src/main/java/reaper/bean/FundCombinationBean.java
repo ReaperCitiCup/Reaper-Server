@@ -15,9 +15,12 @@ public class FundCombinationBean {
      */
     public List<String> funds;
 
-    public FundCombinationBean(String name, List<String> funds) {
+    public int method;
+
+    public FundCombinationBean(String name, List<String> funds, int method) {
         this.name = name;
         this.funds = funds;
+        this.method = method;
     }
 
     public FundCombinationBean() {
