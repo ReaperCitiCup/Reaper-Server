@@ -44,6 +44,8 @@ public class ManagerBean {
      */
     public String introduction;
 
+    public String managerImageUrl;
+
     public ManagerBean(String id, String name, String appointedDate, String cumulativeDays, CompanyMiniBean company, Double totalScope, Double bestReturns, String introduction) {
         this.id = id;
         this.name = name;
@@ -53,5 +55,6 @@ public class ManagerBean {
         this.totalScope = totalScope;
         this.bestReturns = bestReturns;
         this.introduction = introduction;
+        this.managerImageUrl="https://pdf.dfcfw.com/pdf/H8_JPG"+id+"_1.jpg";
     }
 }

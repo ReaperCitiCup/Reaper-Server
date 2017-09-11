@@ -14,12 +14,12 @@ public class FundRatioBean {
     /**
      * 占比
      */
-    public double ratio;
+    public Double ratio;
 
     public FundRatioBean() {
     }
 
-    public FundRatioBean(String id, double ratio) {
+    public FundRatioBean(String id, Double ratio) {
         this.id = id;
         this.ratio = ratio;
     }

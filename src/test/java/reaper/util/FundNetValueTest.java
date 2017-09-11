@@ -38,14 +38,18 @@ public class FundNetValueTest {
         ArrayList<String> codes=code.getStockCode();
 
 
-        int i=0;
-        for (i=10;i<codes.size();i++){
-
-                System.out.println(codes.get(i));
-            getSingleFoundMessage(codes.get(i));
-        }
-       // getSingleFoundMessage("000001");
-        //getSingleFoundMessage("000005");
+//        int i=0;
+//        for (i=10;i<codes.size();i++){
+//
+//                System.out.println(codes.get(i));
+//            getSingleFoundMessage(codes.get(i));
+//        }
+        getSingleFoundMessage("000335");
+        getSingleFoundMessage("000310");
+        getSingleFoundMessage("003273");
+        getSingleFoundMessage("003274");
+        getSingleFoundMessage("003637");
+        getSingleFoundMessage("003638");
 
 
     }
