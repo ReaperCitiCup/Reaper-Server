@@ -1,12 +1,8 @@
 package reaper.service;
 
-import reaper.bean.AssetTargetPathBean;
-import reaper.bean.CategoryFundBean;
-import reaper.bean.CombinationMiniBean;
-import reaper.bean.FundRatioBean;
+import reaper.bean.*;
 import reaper.util.ResultMessage;
 
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -39,17 +35,15 @@ public interface CombinationService {
      * @param id 组合id
      * @return
      */
-    public ResultMessage deleteCombination(String id);
+    public ResultMessage deleteCombination(Integer id);
 
     /**
      * 回测组合
      *
-     * @param id        组合id
-     * @param startDate 开始日期
-     * @param endDate   结束日期
+     * @param backtestInput 回测输入
      * @return
      */
-    public ResultMessage backtestCombination(String id, LocalDate startDate, LocalDate endDate);
+    public BacktestReportBean backtestCombination(BacktestInputBean backtestInput);
 
     /**
      * 资产配置-选择目标及路径
@@ -62,9 +56,8 @@ public interface CombinationService {
     /**
      * 资产配置-选择基金生成组合
      *
-     * @param name  组合名
-     * @param codes 基金代码
+     * @param fundCombination 组合
      * @return
      */
-    public ResultMessage createCombinationByAssetAllocation(String name, List<String> codes);
+    public ResultMessage createCombinationByAssetAllocation(FundCombinationBean fundCombination);
 }

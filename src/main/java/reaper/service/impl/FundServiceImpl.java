@@ -20,6 +20,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static reaper.util.CodeFormatUtil.fillCode;
+
 /**
  * Created by Sorumi on 17/8/21.
  */
@@ -309,15 +311,5 @@ public class FundServiceImpl implements FundService {
         return new RateBean(rates);
     }
 
-    /**
-     * 不足6为则在前面补0
-     * @param code 代码
-     * @return
-     */
-    private String fillCode(String code){
-        while (code.length()<6){
-            code = "0"+code;
-        }
-        return code;
-    }
+
 }

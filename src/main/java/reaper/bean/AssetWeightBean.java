@@ -9,19 +9,19 @@ public class AssetWeightBean {
     /**
      * 股票型基金
      */
-    public int stock;
+    public Integer stock;
 
     /**
      * 债券型基金
      */
-    public int bond;
+    public Integer bond;
 
     /**
      * 混合型基金
      */
-    public int hybrid;
+    public Integer hybrid;
 
-    public AssetWeightBean(int stock, int bond, int hybrid) {
+    public AssetWeightBean(Integer stock, Integer bond, Integer hybrid) {
         this.stock = stock;
         this.bond = bond;
         this.hybrid = hybrid;

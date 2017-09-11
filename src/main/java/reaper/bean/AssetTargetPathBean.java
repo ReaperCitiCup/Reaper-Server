@@ -1,5 +1,7 @@
 package reaper.bean;
 
+import java.util.List;
+
 /**
  * 资产配置-目标+路径
  *
@@ -7,9 +9,9 @@ package reaper.bean;
  */
 public class AssetTargetPathBean {
     /**
-     * 1=低 2=中 3=高
+     * 1-10
      */
-    public AssetTargetBean target;
+    public Integer profitRiskTarget;
 
     /**
      * 1=资产间分散, 2=策略间分散 , 3=因子间分散
@@ -26,11 +28,17 @@ public class AssetTargetPathBean {
      */
     public AssetCategoryBean category;
 
-    public AssetTargetPathBean(AssetTargetBean target, int path, AssetWeightBean weight, AssetCategoryBean category) {
-        this.target = target;
+    /**
+     * 如果选择因子间分散，则factor有效
+     */
+    public List<String> factor;
+
+    public AssetTargetPathBean(Integer profitRiskTarget, int path, AssetWeightBean weight, AssetCategoryBean category, List<String> factor) {
+        this.profitRiskTarget = profitRiskTarget;
         this.path = path;
         this.weight = weight;
         this.category = category;
+        this.factor = factor;
     }
 
     public AssetTargetPathBean() {

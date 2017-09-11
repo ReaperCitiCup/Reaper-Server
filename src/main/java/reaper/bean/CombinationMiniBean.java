@@ -7,7 +7,7 @@ public class CombinationMiniBean {
     /**
      * 组合id
      */
-    public String id;
+    public Integer id;
 
     /**
      * 组合名字
@@ -15,9 +15,9 @@ public class CombinationMiniBean {
     public String name;
 
     /**
-     * 累计收益
+     * 最新收益率
      */
-    public double cumulativeProfit;
+    public double newProfit;
 
     /**
      * 年化收益
@@ -25,15 +25,18 @@ public class CombinationMiniBean {
     public double annualProfit;
 
     /**
-     * 最大回撤
+     * 平均相关系数
      */
-    public double maxRetracement;
+    public double correlationCoefficient;
 
-    public CombinationMiniBean(String id, String name, double cumulativeProfit, double annualProfit, double maxRetracement) {
+    public CombinationMiniBean(Integer id, String name, double newProfit, double annualProfit, double correlationCoefficient) {
         this.id = id;
         this.name = name;
-        this.cumulativeProfit = cumulativeProfit;
+        this.newProfit = newProfit;
         this.annualProfit = annualProfit;
-        this.maxRetracement = maxRetracement;
+        this.correlationCoefficient = correlationCoefficient;
+    }
+
+    public CombinationMiniBean() {
     }
 }
