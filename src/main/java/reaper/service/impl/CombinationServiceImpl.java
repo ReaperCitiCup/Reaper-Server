@@ -195,15 +195,16 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public ResultMessage createCombinationByAssetAllocation(FundCombinationBean fundCombination) {
-        Map<String, Double> weight = calComponentWeight(fundCombination.funds, fundCombination.method);
-        if (weight == null || weight.isEmpty()) {
-            return ResultMessage.FAILED;
-        }
-        List<FundRatioBean> beans = new ArrayList<>();
-        for (Map.Entry<String, Double> entry : weight.entrySet()) {
-            beans.add(new FundRatioBean(entry.getKey(), entry.getValue()));
-        }
-        return createCombinationByUser(fundCombination.name, beans);
+//        Map<String, Double> weight = calComponentWeight(fundCombination.funds, fundCombination.method);
+//        if (weight == null || weight.isEmpty()) {
+//            return ResultMessage.FAILED;
+//        }
+//        List<FundRatioBean> beans = new ArrayList<>();
+//        for (Map.Entry<String, Double> entry : weight.entrySet()) {
+//            beans.add(new FundRatioBean(entry.getKey(), entry.getValue()));
+//        }
+//        return createCombinationByUser(fundCombination.name, beans);
+        return ResultMessage.FAILED;
     }
 
     /**
