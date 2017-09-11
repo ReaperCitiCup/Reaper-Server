@@ -56,6 +56,9 @@ public class FundServiceImpl implements FundService {
     @Autowired
     FactorResultRepository factorResultRepository;
 
+    @Autowired
+    BrisonResultRepository brisonResultRepository;
+
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     private DecimalFormat decimalFormat = new DecimalFormat("#.00");
@@ -195,6 +198,23 @@ public class FundServiceImpl implements FundService {
     }
 
     @Override
+    public List<MiniBean> findCurrentManagers(String code) {
+        List<MiniBean> res = new ArrayList<>();
+
+        for(FundManager fundManager:fundManagerRepository.findByFundCode(fillCode(code))){
+            try {
+                Manager manager = managerRepository.findByManagerId(fundManager.getManagerId());
+                res.add(new MiniBean(manager.getManagerId(),manager.getName()));
+            }catch (NullPointerException e){
+                System.out.println(fundManager.getManagerId());
+                //TODO
+            }
+        }
+
+        return res;
+    }
+
+    @Override
     public List<ManagerHistoryBean> findHistoryManagerByCode(String code) {
         List<ManagerHistoryBean> res = new ArrayList<>();
 
@@ -241,25 +261,25 @@ public class FundServiceImpl implements FundService {
     @Override
     public List<FieldValueBean> findIndustryAttributionProfit(String code) {
         FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(fillCode(code),'N');
-        return factorResult==null?null:new ToFieldBean().factorResultToIndustryAttribution(factorResult);
+        return ToFieldBean.factorResultToIndustryAttribution(factorResult);
     }
 
     @Override
     public List<FieldValueBean> findIndustryAttributionRisk(String code) {
         FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(fillCode(code),'R');
-        return factorResult==null?null:new ToFieldBean().factorResultToIndustryAttribution(factorResult);
+        return ToFieldBean.factorResultToIndustryAttribution(factorResult);
     }
 
     @Override
     public List<FieldValueBean> findStyleAttributionProfit(String code) {
         FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(fillCode(code),'N');
-        return factorResult==null?null:new ToFieldBean().factorResultToStyleAttribution(factorResult);
+        return ToFieldBean.factorResultToStyleAttribution(factorResult);
     }
 
     @Override
     public List<FieldValueBean> findStyleAttributionRisk(String code) {
         FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(fillCode(code),'R');
-        return factorResult==null?null:new ToFieldBean().factorResultToStyleAttribution(factorResult);
+        return ToFieldBean.factorResultToStyleAttribution(factorResult);
     }
 
     /**
@@ -412,7 +432,7 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public List<FieldValueBean> findVarietyAttribution(String code) {
-        return null;
+        return ToFieldBean.brisonResultToVarietyAttribution(brisonResultRepository.findByCode(code));
     }
 
     /**
@@ -432,7 +452,8 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public List<FieldValueBean> findBrisonAttributionBond(String code) {
-        return null;
+        BrisonResult brisonResult = brisonResultRepository.findByCode(code);
+        return ToFieldBean.brisonResultToFieldValue(brisonResult);
     }
 
     /**
@@ -462,7 +483,32 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public FundPerformanceBean findFundPerformance(String code) {
-        return null;
+        List<PerformanceDataBean> funds = new ArrayList<>();
+        List<PerformanceDataBean> others = new ArrayList<>();
+        //现任基金经理
+        for(FundManager fundManager:fundManagerRepository.findByFundCode(code)){
+            try{
+                funds = addFundPerformOfManager(funds,fundManager.getManagerId());
+            }catch (NullPointerException e){
+                System.out.println(fundManager.getManagerId());
+            }
+        }
+        //历史基金经理
+        for(FundHistory fundHistory:fundHistoryRepository.findAllByFundCode(code)){
+            try{
+                funds = addFundPerformOfManager(funds,fundHistory.getManagerId());
+            }catch (NullPointerException e){
+                System.out.println(fundHistory.getManagerId());
+            }
+        }
+        //其他基金
+        for(Fund fund:fundRepository.findAll()){
+            PerformanceDataBean res = new PerformanceDataBean(fund);
+            if(!funds.contains(res)){
+                others.add(res);
+            }
+        }
+        return new FundPerformanceBean(funds,others);
     }
 
     /**
@@ -472,7 +518,20 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public ManagerPerformanceBean findManagerPerformance(String code) {
-        return null;
+        List<PerformanceDataBean> managers = new ArrayList<>();
+        List<PerformanceDataBean> others = new ArrayList<>();
+        for(FundManager fundManager:fundManagerRepository.findByFundCode(code)){
+            Manager manager = managerRepository.findByManagerId(fundManager.getManagerId());
+            if(manager!=null)
+                managers.add(new PerformanceDataBean(manager));
+        }
+        for(Manager manager:managerRepository.findAll()){
+            PerformanceDataBean res = new PerformanceDataBean(manager);
+            if(!managers.contains(res)){
+                others.add(res);
+            }
+        }
+        return new ManagerPerformanceBean(managers,others);
     }
 
     /**
@@ -493,5 +552,16 @@ public class FundServiceImpl implements FundService {
     @Override
     public List<NetworkBean> findPositionNetwork(String code) {
         return null;
+    }
+
+    private List<PerformanceDataBean> addFundPerformOfManager(List<PerformanceDataBean> list,String managerId){
+        for(FundManager fundManager:fundManagerRepository.findByManagerId(managerId)){
+            Fund fund = fundRepository.findByCode(fundManager.getFundCode());
+            PerformanceDataBean res = new PerformanceDataBean(fund);
+            if(fund!=null&&fund.getAnnualProfit()!=null&&!list.contains(res)) {
+                list.add(res);
+            }
+        }
+        return list;
     }
 }

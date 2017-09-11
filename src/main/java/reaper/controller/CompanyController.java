@@ -52,20 +52,6 @@ public class CompanyController {
     }
 
     /**
-     * 根据公司id获得公司产品分布策略
-     * @param companyId 公司id
-     * @return 公司产品分布策略
-     */
-    @ResponseBody
-    @RequestMapping(
-            value = "/{companyId}/product-strategy",
-            method = RequestMethod.GET,
-            produces = {"application/json; charset=UTF-8"})
-    public List<FieldValueBean> findProductStrategyByCompanyId(@PathVariable String companyId){
-        return companyService.findProductStrategyByCompanyId(companyId);
-    }
-
-    /**
      * 根据公司id获得公司资产配置行业占比
      * @param companyId 公司id
      * @return 公司资产配置行业占比

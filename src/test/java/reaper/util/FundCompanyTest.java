@@ -69,7 +69,7 @@ public class FundCompanyTest {
 
                 System.out.println(code+" "+ biaozhuncha1+" "+biaozhuncha2);
                 FundCompany fundCompany=new FundCompany();
-                fundCompany.setcompanyId(code);
+                fundCompany.setCompanyId(code);
                 fundCompany.setFundId(biaozhuncha1);
                 fundCompanyRepository.save(fundCompany);
 

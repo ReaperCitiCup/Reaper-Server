@@ -137,6 +137,20 @@ public class FundController {
     }
 
     /**
+     * @param code 基金代码
+     * @return 对应基金现任经理
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/{code}/manager",
+            method = RequestMethod.GET,
+            produces = {"application/json; charset=UTF-8"}
+    )
+    public List<MiniBean> findCurrentManagers(@PathVariable String code){
+        return fundService.findCurrentManagers(code);
+    }
+
+    /**
      * 基金历史经理
      *
      * @param code 基金代码

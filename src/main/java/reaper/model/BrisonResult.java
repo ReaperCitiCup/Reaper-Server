@@ -337,4 +337,40 @@ public class BrisonResult {
                 ", otherReturn=" + otherReturn +
                 '}';
     }
+
+    public void initWithZero(){
+        gzExposure = 0.0;
+        dfzfzExposure = 0.0;
+        jrzExposure = 0.0;
+        qyzExposure = 0.0;
+        gszExposure = 0.0;
+        zqpjExposure = 0.0;
+        dqrzqExposure = 0.0;
+        dxgjExposure = 0.0;
+        otherExposure = 0.0;
+    }
+
+    public void addResult(BrisonResult brisonResult,double portion){
+        gzExposure += brisonResult.gzExposure * portion;
+        dfzfzExposure += brisonResult.dfzfzExposure * portion;
+        jrzExposure += brisonResult.jrzExposure * portion;
+        qyzExposure += brisonResult.qyzExposure * portion;
+        gszExposure += brisonResult.gszExposure * portion;
+        zqpjExposure += brisonResult.zqpjExposure * portion;
+        dqrzqExposure += brisonResult.dqrzqExposure * portion;
+        dxgjExposure += brisonResult.dxgjExposure * portion;
+        otherExposure += brisonResult.otherExposure * portion;
+    }
+
+    public void toResult(double sum){
+        gzExposure /= sum;
+        dfzfzExposure /= sum;
+        jrzExposure /= sum;
+        qyzExposure /= sum;
+        gszExposure /= sum;
+        zqpjExposure /= sum;
+        dqrzqExposure /= sum;
+        dxgjExposure /= sum;
+        otherExposure /= sum;
+    }
 }

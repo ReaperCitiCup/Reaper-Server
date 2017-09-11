@@ -12,7 +12,7 @@ public class FormatData {
      */
     public static Double fixToTwo(Double data){
 //        return data;
-        return Double.valueOf(decimalFormat.format(data));
+        return data==null?null:Double.valueOf(decimalFormat.format(data));
     }
 
     /**
@@ -21,6 +21,6 @@ public class FormatData {
      * @return
      */
     public static Double fixToTwoAndPercent(Double data){
-        return Double.valueOf(decimalFormat.format(data*100));
+        return data==null?null:Double.valueOf(decimalFormat.format(data*100));
     }
 }
