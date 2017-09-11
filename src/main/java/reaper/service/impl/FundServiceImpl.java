@@ -120,7 +120,7 @@ public class FundServiceImpl implements FundService {
         for (FundManager fundManager : fundManagerRepository.findByFundCode(code)) {
             managers.add(new MiniBean(fundManager.getManagerId(), managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
         }
-        String id = fundCompanyRepository.findByFundId(code).getcompanyId();
+        String id = fundCompanyRepository.findByFundId(code).getCompanyId();
         MiniBean company = new MiniBean(id, companyRepository.findByCompanyId(id).getName());
         return fundModelToBean.modelToBean(fund, fundNetValue, rateBean, managers, company);
     }
@@ -235,7 +235,7 @@ public class FundServiceImpl implements FundService {
         if (fundCompany == null) {
             return null;
         }
-        String companyId = fundCompany.getcompanyId();
+        String companyId = fundCompany.getCompanyId();
         String companyName = companyRepository.findByCompanyId(companyId).getName();
         return new MiniBean(companyId, companyName);
     }
@@ -309,5 +309,192 @@ public class FundServiceImpl implements FundService {
         rates[5] = Double.parseDouble(decimalFormat.format(rate));
 
         return new RateBean(rates);
+    }
+
+    /**
+     * 基金风险走势
+     *
+     * @param code 代码
+     * @return
+     */
+    @Override
+    public List<ValueDateBean> findRiskTrend(String code) {
+        return null;
+    }
+
+    /**
+     * 基金每日回撤
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public List<ValueDateBean> findDailyRetracement(String code) {
+        return null;
+    }
+
+    /**
+     * 基金波动率
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public List<ValueDateBean> findVolatility(String code) {
+        return null;
+    }
+
+    /**
+     * 基金在险价值
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public List<ValueDateBean> findValueAtRisk(String code) {
+        return null;
+    }
+
+    /**
+     * 基金下行波动率
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public List<ValueDateBean> findDownsideVolatility(String code) {
+        return null;
+    }
+
+    /**
+     * 基金夏普指标
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public List<ValueDateBean> findSharpeIndex(String code) {
+        return null;
+    }
+
+    /**
+     * 基金特雷诺指标
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public List<ValueDateBean> findTreynorIndex(String code) {
+        return null;
+    }
+
+    /**
+     * 基金业绩持续性指标
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public PerformanceIndexBean findPerformanceIndex(String code) {
+        return null;
+    }
+
+    /**
+     * 基金品种归因
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public List<FieldValueBean> findVarietyAttribution(String code) {
+        return null;
+    }
+
+    /**
+     * 基金Brison归因-基于股票持仓
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public List<FieldValueBean> findBrisonAttributionStock(String code) {
+        return null;
+    }
+
+    /**
+     * 基金Brison归因-基于债券持仓
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public List<FieldValueBean> findBrisonAttributionBond(String code) {
+        return null;
+    }
+
+    /**
+     * 基金择时能力
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public ChooseBean findChooseTime(String code) {
+        return null;
+    }
+
+    /**
+     * 基金择股能力
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public ChooseBean findChooseStock(String code) {
+        return null;
+    }
+
+    /**
+     * 当前基金经理历任基金表现
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public FundPerformanceBean findFundPerformance(String code) {
+        return null;
+    }
+
+    /**
+     * 当前基金经理表现
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public ManagerPerformanceBean findManagerPerformance(String code) {
+        return null;
+    }
+
+    /**
+     * 基金舆情分析
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public List<PublicOpinionBean> findPublicOpinion(String code) {
+        return null;
+    }
+
+    /**
+     * 基金持仓关联网络图
+     *
+     * @param code
+     * @return
+     */
+    @Override
+    public List<NetworkBean> findPositionNetwork(String code) {
+        return null;
     }
 }
