@@ -39,11 +39,13 @@ public interface CombinationService {
 
     /**
      * 回测组合
-     *
-     * @param backtestInput 回测输入
+     * @param combinationId
+     * @param startDate
+     * @param endDate
+     * @param baseIndex 基准指标
      * @return
      */
-    public BacktestReportBean backtestCombination(BacktestInputBean backtestInput);
+    public BacktestReportBean backtestCombination(Integer combinationId, String startDate, String endDate, String baseIndex);
 
     /**
      * 资产配置-选择目标及路径
