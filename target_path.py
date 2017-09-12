@@ -27,7 +27,7 @@ def sqlByType(type_kind):
         cur.execute('SELECT  code FROM reaper.fund WHERE ' + fund_type)
         data = cur.fetchall()
 
-        data_code = []
+        data_code = [];
 
         for d in data:
             data_code.append(int(d[0]))
@@ -59,7 +59,7 @@ def sqlOrder(data_code, lamda=5, count=8):
     conn = pymysql.connect(host='106.15.203.173', user='reaper', passwd='reaper112233', db='reaper', port=3306,
                            charset='utf8')
     cur = conn.cursor()  # 获取一个游标
-    cur.execute('SELECT code,beta FROM reaper.fund_score WHERE 1')
+    cur.execute('SELECT code,rank' + str(int(lamda)) + ' FROM reaper.fund_score WHERE 1')
     data = cur.fetchall()
     data_score = []
     for d in data:
@@ -77,7 +77,7 @@ def sqlOrder(data_code, lamda=5, count=8):
 # count资产间分散为10，因子间分散为3
 # sqlkind 1为资产减分散，2为因子间分散
 # typekind只在资产减分散的时候要用，1债券型，2股票型，3混合型 要分三次调用
-# factorkind只在因子间分散时要用，对应关系暂时不确定 要分10次调用
+# factorkind只在因子间分散时要用，要分10次调用
 def sqlCode(lamda=5, count=8, sqlkind=1, type_kind=1, factor_kind=1):
     # count 输出基金的数量
     # lamda 风险偏好 范围 整数1-10

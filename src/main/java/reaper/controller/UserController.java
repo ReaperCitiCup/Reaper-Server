@@ -25,6 +25,13 @@ public class UserController {
     private UserService userService;
 
 
+    @RequestMapping("/test")
+    @ResponseBody
+    public ResultMessageBean test() {
+        return new ResultMessageBean(true, "Success");
+
+    }
+
     /**
      * 注册
      *
