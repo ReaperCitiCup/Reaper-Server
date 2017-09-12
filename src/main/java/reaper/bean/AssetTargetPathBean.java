@@ -14,7 +14,7 @@ public class AssetTargetPathBean {
     public Integer profitRiskTarget;
 
     /**
-     * 1=资产间分散, 2=策略间分散 , 3=因子间分散
+     * 1=资产间分散, 2=因子间分散
      */
     public int path;
 
