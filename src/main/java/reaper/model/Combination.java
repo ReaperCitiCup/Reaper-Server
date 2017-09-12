@@ -16,6 +16,11 @@ public class Combination {
     private Integer id;
 
     /**
+     * 风险和收益 1-10
+     */
+    private Integer risk_profit;
+
+    /**
      * 用户名
      */
     private Integer userid;
@@ -78,7 +83,16 @@ public class Combination {
         this.name = name;
     }
 
-    public Combination(Integer userid, String name, String funds, String weights) {
+    public Integer getRisk_profit() {
+        return risk_profit;
+    }
+
+    public void setRisk_profit(Integer risk_profit) {
+        this.risk_profit = risk_profit;
+    }
+
+    public Combination(Integer risk_profit, Integer userid, String name, String funds, String weights) {
+        this.risk_profit = risk_profit;
         this.userid = userid;
         this.name = name;
         this.funds = funds;
@@ -89,6 +103,7 @@ public class Combination {
     public String toString() {
         return "Combination{" +
                 "id=" + id +
+                ", risk_profit=" + risk_profit +
                 ", userid=" + userid +
                 ", name='" + name + '\'' +
                 ", funds='" + funds + '\'' +
