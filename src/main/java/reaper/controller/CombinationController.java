@@ -7,6 +7,7 @@ import reaper.bean.*;
 import reaper.service.CombinationService;
 import reaper.util.ResultMessage;
 
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -101,7 +102,11 @@ public class CombinationController {
                                                   @RequestParam(value = "startDate") String startDate,
                                                   @RequestParam(value = "endDate") String endDate,
                                                   @RequestParam(value = "baseIndex") String baseIndex) {
-        return combinationService.backtestCombination(combinationId, startDate, endDate, baseIndex);
+        try {
+            return combinationService.backtestCombination(combinationId, startDate, endDate, baseIndex);
+        } catch (ParseException exception) {
+            return null;
+        }
     }
 
     /**

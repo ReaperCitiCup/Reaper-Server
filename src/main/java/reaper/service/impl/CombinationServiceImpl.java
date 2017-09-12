@@ -9,20 +9,18 @@ import com.mathworks.toolbox.javabuilder.MWNumericArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reaper.bean.*;
+import reaper.model.BasicStockIndex;
 import reaper.model.Combination;
 import reaper.model.User;
+import reaper.repository.BasicStockIndexRepository;
 import reaper.repository.CombinationRepository;
 import reaper.repository.FundNetValueRepository;
 import reaper.service.CombinationService;
 import reaper.service.FundService;
 import reaper.service.UserService;
-import reaper.util.FactorNumberMapping;
-import reaper.util.PyAnalysisResult;
-import reaper.util.PythonUser;
-import reaper.util.ResultMessage;
+import reaper.util.*;
 
 import java.text.SimpleDateFormat;
-
 import java.util.*;
 
 import static reaper.util.CodeFormatUtil.fillBlank;
@@ -42,7 +40,6 @@ public class CombinationServiceImpl implements CombinationService {
     private FundNetValueRepository fundNetValueRepository;
     @Autowired
     private BasicStockIndexRepository basicStockIndexRepository;
-
 
     @Autowired
     private FundService fundService;
@@ -95,7 +92,6 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     //TODO 考虑每天存起来
-    //TODO 所有百分比都乘以100，保留两位小数   FormatData.fixToTwoAndPercent
     public List<CombinationMiniBean> findCombinations() {
         User user = userService.getCurrentUser();
         if (user == null) {
@@ -119,7 +115,7 @@ public class CombinationServiceImpl implements CombinationService {
             int day = calendar.get(Calendar.DAY_OF_MONTH);
             calendar.set(year - 1, month, day);
             Date newday = calendar.getTime();
-            PyAnalysisResult result_withRange = getBasicFactors(Arrays.asList(funds), simpleDateFormat.format(date), simpleDateFormat.format(newday));
+            PyAnalysisResult result_withRange = getBasicFactors(Arrays.asList(funds), simpleDateFormat.format(newday), simpleDateFormat.format(date));
 
             // 年化收益率
             double annualProfit = 0.0;
@@ -127,7 +123,7 @@ public class CombinationServiceImpl implements CombinationService {
                 String code = funds[i];
                 annualProfit += (result_withoutRange.nhsyl.get(code) * Double.valueOf(weights[i]));
             }
-            miniBean.annualProfit = annualProfit;
+            miniBean.annualProfit = FormatData.fixToTwoAndPercent(annualProfit);
 
             // 平均相关系数
             double sum = 0.0;
@@ -135,14 +131,14 @@ public class CombinationServiceImpl implements CombinationService {
                 sum += c.getCc();
             }
             double correlationCoefficient = sum / result_withRange.pjxgxs.size();
-            miniBean.correlationCoefficient = correlationCoefficient;
+            miniBean.correlationCoefficient = FormatData.fixToTwoAndPercent(correlationCoefficient);
 
             // 最新收益率
             double newProfit = 0.0;
             for (int i = 0; i < funds.length; i++) {
                 newProfit += (fundNetValueRepository.findFirstByCodeOrderByDateDesc(funds[i]).getDailyRate() * Double.valueOf(weights[i]));
             }
-            miniBean.newProfit = newProfit;
+            miniBean.newProfit = FormatData.fixToTwoAndPercent(newProfit);
 
             combinationMiniBeans.add(miniBean);
         }
@@ -197,6 +193,7 @@ public class CombinationServiceImpl implements CombinationService {
         backtestReportBean.baseIndex = baseIndex;
 
         //排名信息
+        //TODO 商业组的代码
         backtestReportBean.score = 0;
         backtestReportBean.transcendQuantity = 0;
         backtestReportBean.rank = 0;

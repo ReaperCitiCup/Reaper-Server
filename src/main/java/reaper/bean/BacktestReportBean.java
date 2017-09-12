@@ -117,11 +117,6 @@ public class BacktestReportBean {
     public BacktestComparisonBean dailyRetracementTrend;
 
     /**
-     * 【图】波动率
-     */
-    public BacktestComparisonBean volatilityTrend;
-
-    /**
      * 【表】相关系数
      */
     public BacktestCorrelationTable correlationCoefficientTrend;
@@ -134,7 +129,7 @@ public class BacktestReportBean {
     /**
      * 最大连跌天数
      */
-    public Double maxDownDays;
+    public Integer maxDownDays;
 
     /**
      * 年化波动率
@@ -191,16 +186,7 @@ public class BacktestReportBean {
      */
     public List<FieldValueBean> brisonAttributionBond;
 
-    public BacktestReportBean(String startDate, String endDate, String baseIndex, Integer score, Integer transcendQuantity,
-                              Integer rank, List<FundRatioNameBean> combination, String investmentGoal, Double intervalAnnualProfit,
-                              Double cumulativeProfit, Double finalNetValue, Double maxRetracement, Double sharpeRatio, Double volatility,
-                              List<String> mainFactors, BacktestComparisonBean cumulativeNetValueTrend, BacktestComparisonBean profitRateTrend,
-                              BacktestValueComparisonBean totalProfitRate, BacktestValueComparisonBean overProfitRate, BacktestValueComparisonBean annualProfit,
-                              BacktestValueComparisonBean maxMonthProfit, BacktestValueComparisonBean profitDaysRatio, BacktestComparisonBean dailyRetracementTrend,
-                              BacktestComparisonBean volatilityTrend, BacktestCorrelationTable correlationCoefficientTrend, Double maxDayDown, Double maxDownDays,
-                              Double annualVolatility, Double beta, Double var, Double averageCorrelationCoefficient, List<FieldValueBean> styleAttributionProfit,
-                              List<FieldValueBean> styleAttributionRisk, List<FieldValueBean> industryAttributionProfit, List<FieldValueBean> industryAttributionRisk,
-                              List<FieldValueBean> varietyAttribution, List<FieldValueBean> brisonAttributionStock, List<FieldValueBean> brisonAttributionBond) {
+    public BacktestReportBean(String startDate, String endDate, String baseIndex, Integer score, Integer transcendQuantity, Integer rank, List<FundRatioNameBean> combination, String investmentGoal, Double intervalAnnualProfit, Double cumulativeProfit, Double finalNetValue, Double maxRetracement, Double sharpeRatio, Double volatility, List<String> mainFactors, BacktestComparisonBean cumulativeNetValueTrend, BacktestComparisonBean profitRateTrend, BacktestValueComparisonBean totalProfitRate, BacktestValueComparisonBean overProfitRate, BacktestValueComparisonBean annualProfit, BacktestValueComparisonBean maxMonthProfit, BacktestValueComparisonBean profitDaysRatio, BacktestComparisonBean dailyRetracementTrend, BacktestCorrelationTable correlationCoefficientTrend, Double maxDayDown, Integer maxDownDays, Double annualVolatility, Double beta, Double var, Double averageCorrelationCoefficient, List<FieldValueBean> styleAttributionProfit, List<FieldValueBean> styleAttributionRisk, List<FieldValueBean> industryAttributionProfit, List<FieldValueBean> industryAttributionRisk, List<FieldValueBean> varietyAttribution, List<FieldValueBean> brisonAttributionStock, List<FieldValueBean> brisonAttributionBond) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.baseIndex = baseIndex;
@@ -224,7 +210,6 @@ public class BacktestReportBean {
         this.maxMonthProfit = maxMonthProfit;
         this.profitDaysRatio = profitDaysRatio;
         this.dailyRetracementTrend = dailyRetracementTrend;
-        this.volatilityTrend = volatilityTrend;
         this.correlationCoefficientTrend = correlationCoefficientTrend;
         this.maxDayDown = maxDayDown;
         this.maxDownDays = maxDownDays;
