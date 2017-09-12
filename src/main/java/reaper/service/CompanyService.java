@@ -27,13 +27,6 @@ public interface CompanyService {
     public ManagerPerformanceBean findManagerPerformanceByCompanyId(String companyId);
 
     /**
-     * 根据公司id获得公司产品分布策略
-     * @param companyId 公司id
-     * @return 公司产品分布策略
-     */
-    public List<FieldValueBean> findProductStrategyByCompanyId(String companyId);
-
-    /**
      * 根据公司id获得公司资产配置行业占比
      * @param companyId 公司id
      * @return 公司资产配置行业占比

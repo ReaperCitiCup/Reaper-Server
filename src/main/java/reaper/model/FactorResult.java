@@ -9,7 +9,7 @@ public class FactorResult {
     @GeneratedValue
     private Integer id;
 
-    @Column(length = 6)
+    @Column(length = 8)
     private String code;
 
     /**
@@ -541,6 +541,147 @@ public class FactorResult {
 
     public void setMax2(Double max2) {
         this.max2 = max2;
+    }
+
+    /**
+     * 除max1，max2以外的属性置为零
+     */
+    public void initWithZero(){
+        beta = 0.0;
+        btop = 0.0;
+        cm = 0.0;
+        cyly = 0.0;
+        dljgysy = 0.0;
+        dlsb = 0.0;
+        dzyqj = 0.0;
+        earningsYield = 0.0;
+        fdc = 0.0;
+        fyhjr = 0.0;
+        fzfz = 0.0;
+        gfjg = 0.0;
+        growth = 0.0;
+        gt = 0.0;
+        hyyzhj = 0.0;
+        jc = 0.0;
+        jchg = 0.0;
+        jd = 0.0;
+        jsj = 0.0;
+        jtys = 0.0;
+        jx = 0.0;
+        jz = 0.0;
+        leverage = 0.0;
+        liquidity = 0.0;
+        momentum = 0.0;
+        mt = 0.0;
+        nlmy = 0.0;
+        nlsize = 0.0;
+        qc = 0.0;
+        qgzz = 0.0;
+        residualvolatility = 0.0;
+        size = 0.0;
+        smls = 0.0;
+        spyl = 0.0;
+        sysh = 0.0;
+        tx = 0.0;
+        yh = 0.0;
+        ysjs = 0.0;
+        yy = 0.0;
+        zh = 0.0;
+    }
+
+    /**
+     * 将传入的数据相加
+     * @param factorResult
+     */
+    public void addFactorResult(FactorResult factorResult,double portion){
+        beta += factorResult.getBeta() * portion;
+        btop += factorResult.getBtop() * portion;
+        cm += factorResult.getCm() * portion;
+        cyly += factorResult.getCyly() * portion;
+        dljgysy += factorResult.getDljgysy() * portion;
+        dlsb += factorResult.getDlsb() * portion;
+        dzyqj += factorResult.getDzyqj() * portion;
+        earningsYield += factorResult.getEarningsYield() * portion;
+        fdc += factorResult.getFdc() * portion;
+        fyhjr += factorResult.getFyhjr() * portion;
+        fzfz += factorResult.getFzfz() * portion;
+        gfjg += factorResult.getGfjg() * portion;
+        growth += factorResult.getGrowth() * portion;
+        gt += factorResult.getGt() * portion;
+        hyyzhj += factorResult.getHyyzhj() * portion;
+        jc += factorResult.getJc() * portion;
+        jchg += factorResult.getJchg() * portion;
+        jd += factorResult.getJd() * portion;
+        jsj += factorResult.getJsj() * portion;
+        jtys += factorResult.getJtys() * portion;
+        jx += factorResult.getJx() * portion;
+        jz += factorResult.getJz() * portion;
+        leverage += factorResult.getLeverage() * portion;
+        liquidity += factorResult.getLiquidity() * portion;
+        momentum += factorResult.getMomentum() * portion;
+        mt += factorResult.getMt() * portion;
+        nlmy += factorResult.getNlmy() * portion;
+        nlsize += factorResult.getNlsize() * portion;
+        qc += factorResult.getQc() * portion;
+        qgzz += factorResult.getQgzz() * portion;
+        residualvolatility += factorResult.getResidualvolatility() * portion;
+        size += factorResult.getSize() * portion;
+        smls += factorResult.getSmls() * portion;
+        spyl += factorResult.getSpyl() * portion;
+        sysh += factorResult.getSysh() * portion;
+        tx += factorResult.getTx() * portion;
+        yh += factorResult.getYh() * portion;
+        ysjs += factorResult.getYsjs() * portion;
+        yy += factorResult.getYy() * portion;
+        zh += factorResult.getZh() * portion;
+
+    }
+
+    /**
+     * 除以总份额得到最终结果
+     * @param sum 总份额
+     */
+    public void toResult(double sum){
+        beta /= sum;
+        btop /= sum;
+        cm /= sum;
+        cyly /= sum;
+        dljgysy /= sum;
+        dlsb /= sum;
+        dzyqj /= sum;
+        earningsYield /= sum;
+        fdc /= sum;
+        fyhjr /= sum;
+        fzfz /= sum;
+        gfjg /= sum;
+        growth /= sum;
+        gt /= sum;
+        hyyzhj /= sum;
+        jc /= sum;
+        jchg /= sum;
+        jd /= sum;
+        jsj /= sum;
+        jtys /= sum;
+        jx /= sum;
+        jz /= sum;
+        leverage /= sum;
+        liquidity /= sum;
+        momentum /= sum;
+        mt /= sum;
+        nlmy /= sum;
+        nlsize /= sum;
+        qc /= sum;
+        qgzz /= sum;
+        residualvolatility /= sum;
+        size /= sum;
+        smls /= sum;
+        spyl /= sum;
+        sysh /= sum;
+        tx /= sum;
+        yh /= sum;
+        ysjs /= sum;
+        yy /= sum;
+        zh /= sum;
     }
 
     @Override

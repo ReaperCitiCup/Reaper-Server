@@ -1,13 +1,17 @@
 package reaper.util;
 
 import reaper.bean.FieldValueBean;
+import reaper.model.BrisonResult;
 import reaper.model.FactorResult;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ToFieldBean {
-    public List<FieldValueBean> factorResultToIndustryAttribution(FactorResult factorResult){
+    public static List<FieldValueBean> factorResultToIndustryAttribution(FactorResult factorResult){
+        if(factorResult==null){
+            return null;
+        }
         List<FieldValueBean> res = new ArrayList<>();
         res.add(new FieldValueBean("综合",factorResult.getZh()));
         res.add(new FieldValueBean("机械",factorResult.getJx()));
@@ -42,7 +46,10 @@ public class ToFieldBean {
         return res;
     }
 
-    public List<FieldValueBean> factorResultToStyleAttribution(FactorResult factorResult){
+    public static List<FieldValueBean> factorResultToStyleAttribution(FactorResult factorResult){
+        if(factorResult==null){
+            return null;
+        }
         List<FieldValueBean> res = new ArrayList<>();
         res.add(new FieldValueBean("beta",factorResult.getBeta()));
         res.add(new FieldValueBean("价值",factorResult.getBtop()));
@@ -54,6 +61,35 @@ public class ToFieldBean {
         res.add(new FieldValueBean("非线性市值",factorResult.getNlsize()));
         res.add(new FieldValueBean("波动率",factorResult.getResidualvolatility()));
         res.add(new FieldValueBean("市值",factorResult.getNlsize()));
+        return res;
+    }
+
+    public static List<FieldValueBean> brisonResultToFieldValue(BrisonResult brisonResult){
+        if(brisonResult==null){
+            return null;
+        }
+        List<FieldValueBean> res = new ArrayList<>();
+        res.add(new FieldValueBean("资产配置效益", brisonResult.getAllocationEffect()));
+        res.add(new FieldValueBean("债券选择效益", brisonResult.getSelectionEffect()));
+        res.add(new FieldValueBean("交叉效益", brisonResult.getInteractionEffect()));
+        res.add(new FieldValueBean("总超额效益", brisonResult.getActiveReturn()));
+        return res;
+    }
+
+    public static List<FieldValueBean> brisonResultToVarietyAttribution(BrisonResult brisonResult){
+        if(brisonResult==null){
+            return null;
+        }
+        List<FieldValueBean> res = new ArrayList<>();
+        res.add(new FieldValueBean("国债", brisonResult.getGzExposure()));
+        res.add(new FieldValueBean("地方政府债", brisonResult.getDfzfzExposure()));
+        res.add(new FieldValueBean("金融债", brisonResult.getJrzExposure()));
+        res.add(new FieldValueBean("企业债", brisonResult.getQyzExposure()));
+        res.add(new FieldValueBean("公司债", brisonResult.getGszExposure()));
+        res.add(new FieldValueBean("中期票据", brisonResult.getZqpjExposure()));
+        res.add(new FieldValueBean("短期融资券", brisonResult.getDqrzqExposure()));
+        res.add(new FieldValueBean("定向工具", brisonResult.getDxgjExposure()));
+        res.add(new FieldValueBean("其他", brisonResult.getOtherExposure()));
         return res;
     }
 }

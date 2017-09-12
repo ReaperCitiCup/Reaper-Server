@@ -58,6 +58,9 @@ public class FundServiceImpl implements FundService {
     @Autowired
     FactorResultRepository factorResultRepository;
 
+    @Autowired
+    BrisonResultRepository brisonResultRepository;
+
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     private DecimalFormat decimalFormat = new DecimalFormat("#.00");
@@ -69,15 +72,15 @@ public class FundServiceImpl implements FundService {
         res.setSize(size);
         res.setPage(page);
         //默认以升序进行排列
-        org.springframework.data.domain.Page<Fund> fundPage = fundRepository.findAllByNameLike("%" + keyword + "%", new PageRequest(page - 1, size, new Sort(Sort.Direction.ASC, order == null ? "code" : order)));
+        org.springframework.data.domain.Page<Fund> fundPage = fundRepository.findAllByNameLike("%" + keyword + "%", new PageRequest(page - 1, size, new Sort(Sort.Direction.ASC, order==null?"code":order)));
         List<FundMiniBean> miniBeans = new ArrayList<>();
         for (Fund fund : fundPage.getContent()) {
             //根据基金代码找到经理代码
             List<FundManager> fundManagers = fundManagerRepository.findByFundCode(fund.getCode());
             //根据经理代码找到经理名
             List<MiniBean> managerList = new ArrayList<>();
-            for (FundManager fundManager : fundManagers) {
-                managerList.add(new MiniBean(fundManager.getManagerId(), managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
+            for(FundManager fundManager:fundManagers){
+                managerList.add(new MiniBean(fundManager.getManagerId(),managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
             }
             miniBeans.add(new FundMiniBean(fund.getCode(), fund.getName(), fund.getAnnualProfit(), fund.getVolatility(), managerList));
         }
@@ -94,13 +97,13 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public boolean checkCodeExist(String code) {
-        return !(fundRepository.findByCode(code) == null);
+        return !(fundRepository.findByCode(code)==null);
     }
 
     @Override
     public MiniBean findFundNameByCode(String code) {
         Fund fund = fundRepository.findByCode(fillCode(code));
-        return fund == null ? null : new MiniBean(code, fund.getName());
+        return fund==null?null:new MiniBean(code,fund.getName());
     }
 
     @Override
@@ -108,7 +111,7 @@ public class FundServiceImpl implements FundService {
         code = fillCode(code);
 
         Fund fund = fundRepository.findByCode(code);
-        if (fund == null) {
+        if(fund==null){
             return null;
         }
         FundModelToBean fundModelToBean = new FundModelToBean();
@@ -117,7 +120,7 @@ public class FundServiceImpl implements FundService {
         RateBean rateBean = getFundRate(code);
 
         List<MiniBean> managers = new ArrayList<>();
-        for (FundManager fundManager : fundManagerRepository.findByFundCode(code)) {
+        for(FundManager fundManager:fundManagerRepository.findByFundCode(code)){
             managers.add(new MiniBean(fundManager.getManagerId(), managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
         }
         String id = fundCompanyRepository.findByFundId(code).getCompanyId();
@@ -163,7 +166,7 @@ public class FundServiceImpl implements FundService {
             //若不是数字，则返回空串
             try {
                 calendar.add(Calendar.MONTH, -Integer.valueOf(month));
-            } catch (NumberFormatException e) {
+            }catch (NumberFormatException e){
                 return res;
             }
 
@@ -184,7 +187,7 @@ public class FundServiceImpl implements FundService {
 
         for (FundHistory fundHistory : fundHistoryRepository.findAllByFundCodeOrderByStartDateAsc(fillCode(code))) {
             //计算相差的天数
-            int difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(), fundHistory.getEndDate());
+            int difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(),fundHistory.getEndDate());
             res.add(new HistoryManagerBean(fundHistory.getManagerId(), managerRepository.findByManagerId(fundHistory.getManagerId()).getName(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()), difDays, fundHistory.getPayback()));
         }
         return res;
@@ -193,23 +196,40 @@ public class FundServiceImpl implements FundService {
     @Override
     public CurrentAssetBean findCurrentAssetByCode(String code) {
         AssetAllocation assetAllocation = assetAllocationRepository.findByCode(fillCode(code));
-        return assetAllocation == null ? null : new CurrentAssetBean(Double.valueOf(decimalFormat.format(assetAllocation.bond)), Double.valueOf(decimalFormat.format(assetAllocation.stock)), Double.valueOf(decimalFormat.format(assetAllocation.bank)));
+        return assetAllocation==null?null:new CurrentAssetBean(Double.valueOf(decimalFormat.format(assetAllocation.bond)),Double.valueOf(decimalFormat.format(assetAllocation.stock)),Double.valueOf(decimalFormat.format(assetAllocation.bank)));
+    }
+
+    @Override
+    public List<MiniBean> findCurrentManagers(String code) {
+        List<MiniBean> res = new ArrayList<>();
+
+        for(FundManager fundManager:fundManagerRepository.findByFundCode(fillCode(code))){
+            try {
+                Manager manager = managerRepository.findByManagerId(fundManager.getManagerId());
+                res.add(new MiniBean(manager.getManagerId(),manager.getName()));
+            }catch (NullPointerException e){
+                System.out.println(fundManager.getManagerId());
+                //TODO
+            }
+        }
+
+        return res;
     }
 
     @Override
     public List<ManagerHistoryBean> findHistoryManagerByCode(String code) {
         List<ManagerHistoryBean> res = new ArrayList<>();
 
-        for (FundHistory fundHistory : fundHistoryRepository.findAllByFundCode(fillCode(code))) {
+        for(FundHistory fundHistory:fundHistoryRepository.findAllByFundCode(fillCode(code))){
             //找到对应经理名字
             Manager manager = managerRepository.findByManagerId(fundHistory.getManagerId());
             int difDays;
-            if (fundHistory.getEndDate() != null) {
-                difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(), fundHistory.getEndDate());
-            } else {
+            if(fundHistory.getEndDate()!=null){
+                difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(),fundHistory.getEndDate());
+            }else {
                 difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(), new Date());
             }
-            res.add(new ManagerHistoryBean(fundHistory.getManagerId(), manager.getName(), sdf.format(fundHistory.getStartDate()), fundHistory.getEndDate() == null ? null : sdf.format(fundHistory.getEndDate()), difDays, fundHistory.getPayback()));
+            res.add(new ManagerHistoryBean(fundHistory.getManagerId(), manager.getName(), sdf.format(fundHistory.getStartDate()), fundHistory.getEndDate()==null?null:sdf.format(fundHistory.getEndDate()), difDays,fundHistory.getPayback()));
         }
         return res;
     }
@@ -218,11 +238,11 @@ public class FundServiceImpl implements FundService {
     public List<ValueDateBean> findJensenByCode(String code) {
         List<ValueDateBean> res = new ArrayList<>();
         String pyRes = PythonUser.usePy("alpha.py", fillCode(code));
-        for (String line : pyRes.split("\n")) {
+        for(String line:pyRes.split("\n")){
             //处理每行
             String attrs[] = line.split(" ");
             //判断是否是日期行
-            if (attrs[0].startsWith("2")) {
+            if(attrs[0].startsWith("2")) {
                 res.add(new ValueDateBean(attrs[0], Double.valueOf(attrs[1])));
             }
         }
@@ -232,32 +252,36 @@ public class FundServiceImpl implements FundService {
     @Override
     public MiniBean findFundCompanyByCode(String code) {
         FundCompany fundCompany = fundCompanyRepository.findByFundId(fillCode(code));
-        if (fundCompany == null) {
+        if(fundCompany==null){
             return null;
         }
         String companyId = fundCompany.getCompanyId();
         String companyName = companyRepository.findByCompanyId(companyId).getName();
-        return new MiniBean(companyId, companyName);
+        return new MiniBean(companyId,companyName);
     }
 
     @Override
     public List<FieldValueBean> findIndustryAttributionProfit(String code) {
-        return new ToFieldBean().factorResultToIndustryAttribution(factorResultRepository.findByCodeAndFactorType(fillCode(code), 'N'));
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(fillCode(code),'N');
+        return ToFieldBean.factorResultToIndustryAttribution(factorResult);
     }
 
     @Override
     public List<FieldValueBean> findIndustryAttributionRisk(String code) {
-        return new ToFieldBean().factorResultToIndustryAttribution(factorResultRepository.findByCodeAndFactorType(fillCode(code), 'R'));
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(fillCode(code),'R');
+        return ToFieldBean.factorResultToIndustryAttribution(factorResult);
     }
 
     @Override
     public List<FieldValueBean> findStyleAttributionProfit(String code) {
-        return new ToFieldBean().factorResultToStyleAttribution(factorResultRepository.findByCodeAndFactorType(fillCode(code), 'N'));
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(fillCode(code),'N');
+        return ToFieldBean.factorResultToStyleAttribution(factorResult);
     }
 
     @Override
     public List<FieldValueBean> findStyleAttributionRisk(String code) {
-        return new ToFieldBean().factorResultToStyleAttribution(factorResultRepository.findByCodeAndFactorType(fillCode(code), 'R'));
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(fillCode(code),'R');
+        return ToFieldBean.factorResultToStyleAttribution(factorResult);
     }
 
     /**
@@ -301,7 +325,7 @@ public class FundServiceImpl implements FundService {
                 rates[countDate] = Double.parseDouble(decimalFormat.format(rate));
                 countDate++;
             }
-            if (netValue.getDailyRate() != null) {
+            if(netValue.getDailyRate()!=null) {
                 rate += netValue.getDailyRate();
             }
         }
@@ -312,8 +336,19 @@ public class FundServiceImpl implements FundService {
     }
 
     /**
+     * 不足6为则在前面补0
+     * @param code 代码
+     * @return
+     */
+    private String fillCode(String code){
+        while (code.length()<6){
+            code = "0"+code;
+        }
+        return code;
+    }
+
+    /**
      * 基金风险走势
-     *
      * @param code 代码
      * @return
      */
@@ -324,7 +359,6 @@ public class FundServiceImpl implements FundService {
 
     /**
      * 基金每日回撤
-     *
      * @param code
      * @return
      */
@@ -335,7 +369,6 @@ public class FundServiceImpl implements FundService {
 
     /**
      * 基金波动率
-     *
      * @param code
      * @return
      */
@@ -346,7 +379,6 @@ public class FundServiceImpl implements FundService {
 
     /**
      * 基金在险价值
-     *
      * @param code
      * @return
      */
@@ -357,7 +389,6 @@ public class FundServiceImpl implements FundService {
 
     /**
      * 基金下行波动率
-     *
      * @param code
      * @return
      */
@@ -368,7 +399,6 @@ public class FundServiceImpl implements FundService {
 
     /**
      * 基金夏普指标
-     *
      * @param code
      * @return
      */
@@ -379,7 +409,6 @@ public class FundServiceImpl implements FundService {
 
     /**
      * 基金特雷诺指标
-     *
      * @param code
      * @return
      */
@@ -390,7 +419,6 @@ public class FundServiceImpl implements FundService {
 
     /**
      * 基金业绩持续性指标
-     *
      * @param code
      * @return
      */
@@ -401,18 +429,16 @@ public class FundServiceImpl implements FundService {
 
     /**
      * 基金品种归因
-     *
      * @param code
      * @return
      */
     @Override
     public List<FieldValueBean> findVarietyAttribution(String code) {
-        return null;
+        return ToFieldBean.brisonResultToVarietyAttribution(brisonResultRepository.findByCode(code));
     }
 
     /**
      * 基金Brison归因-基于股票持仓
-     *
      * @param code
      * @return
      */
@@ -423,18 +449,17 @@ public class FundServiceImpl implements FundService {
 
     /**
      * 基金Brison归因-基于债券持仓
-     *
      * @param code
      * @return
      */
     @Override
     public List<FieldValueBean> findBrisonAttributionBond(String code) {
-        return null;
+        BrisonResult brisonResult = brisonResultRepository.findByCode(code);
+        return ToFieldBean.brisonResultToFieldValue(brisonResult);
     }
 
     /**
      * 基金择时能力
-     *
      * @param code
      * @return
      */
@@ -445,7 +470,6 @@ public class FundServiceImpl implements FundService {
 
     /**
      * 基金择股能力
-     *
      * @param code
      * @return
      */
@@ -456,29 +480,64 @@ public class FundServiceImpl implements FundService {
 
     /**
      * 当前基金经理历任基金表现
-     *
      * @param code
      * @return
      */
     @Override
     public FundPerformanceBean findFundPerformance(String code) {
-        return null;
+        List<PerformanceDataBean> funds = new ArrayList<>();
+        List<PerformanceDataBean> others = new ArrayList<>();
+        //现任基金经理
+        for(FundManager fundManager:fundManagerRepository.findByFundCode(code)){
+            try{
+                funds = addFundPerformOfManager(funds,fundManager.getManagerId());
+            }catch (NullPointerException e){
+                System.out.println(fundManager.getManagerId());
+            }
+        }
+        //历史基金经理
+        for(FundHistory fundHistory:fundHistoryRepository.findAllByFundCode(code)){
+            try{
+                funds = addFundPerformOfManager(funds,fundHistory.getManagerId());
+            }catch (NullPointerException e){
+                System.out.println(fundHistory.getManagerId());
+            }
+        }
+        //其他基金
+        for(Fund fund:fundRepository.findAll()){
+            PerformanceDataBean res = new PerformanceDataBean(fund);
+            if(!funds.contains(res)){
+                others.add(res);
+            }
+        }
+        return new FundPerformanceBean(funds,others);
     }
 
     /**
      * 当前基金经理表现
-     *
      * @param code
      * @return
      */
     @Override
     public ManagerPerformanceBean findManagerPerformance(String code) {
-        return null;
+        List<PerformanceDataBean> managers = new ArrayList<>();
+        List<PerformanceDataBean> others = new ArrayList<>();
+        for(FundManager fundManager:fundManagerRepository.findByFundCode(code)){
+            Manager manager = managerRepository.findByManagerId(fundManager.getManagerId());
+            if(manager!=null)
+                managers.add(new PerformanceDataBean(manager));
+        }
+        for(Manager manager:managerRepository.findAll()){
+            PerformanceDataBean res = new PerformanceDataBean(manager);
+            if(!managers.contains(res)){
+                others.add(res);
+            }
+        }
+        return new ManagerPerformanceBean(managers,others);
     }
 
     /**
      * 基金舆情分析
-     *
      * @param code
      * @return
      */
@@ -489,12 +548,22 @@ public class FundServiceImpl implements FundService {
 
     /**
      * 基金持仓关联网络图
-     *
      * @param code
      * @return
      */
     @Override
     public List<NetworkBean> findPositionNetwork(String code) {
         return null;
+    }
+
+    private List<PerformanceDataBean> addFundPerformOfManager(List<PerformanceDataBean> list,String managerId){
+        for(FundManager fundManager:fundManagerRepository.findByManagerId(managerId)){
+            Fund fund = fundRepository.findByCode(fundManager.getFundCode());
+            PerformanceDataBean res = new PerformanceDataBean(fund);
+            if(fund!=null&&fund.getAnnualProfit()!=null&&!list.contains(res)) {
+                list.add(res);
+            }
+        }
+        return list;
     }
 }

@@ -35,4 +35,12 @@ public class FundCompany {
     public void setCompanyId(String companyId) {
         this.companyId = companyId;
     }
+
+    @Override
+    public String toString() {
+        return "FundCompany{" +
+                "fundId='" + fundId + '\'' +
+                ", companyId='" + companyId + '\'' +
+                '}';
+    }
 }

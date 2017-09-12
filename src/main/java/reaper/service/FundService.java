@@ -78,6 +78,13 @@ public interface FundService {
     public CurrentAssetBean findCurrentAssetByCode(String code);
 
     /**
+     * 对应基金现任经理
+     * @param code 基金代码
+     * @return
+     */
+    public List<MiniBean> findCurrentManagers(String code);
+
+    /**
      * 基金历史经理
      * @param code 基金代码
      * @return
