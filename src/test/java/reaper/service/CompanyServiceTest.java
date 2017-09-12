@@ -5,9 +5,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import reaper.bean.FieldValueBean;
 import reaper.bean.FundPerformanceBean;
 import reaper.bean.PerformanceDataBean;
 
+import java.lang.reflect.Field;
 import java.util.Comparator;
 import java.util.List;
 
@@ -64,32 +66,98 @@ public class CompanyServiceTest {
         });
     }
 
+    //根据公司id获得公司旗下经理表现
+
+    //不存在companyId=0，abc
     @Test
-    public void findManagerPerformanceByCompanyId() throws Exception {
+    public void findManagerPerformanceByCompanyId1() throws Exception {
+        assertArrayEquals(new int[]{0,0,1392,1392},new int[]{
+                companyService.findManagerPerformanceByCompanyId("0").managers.size(),
+                companyService.findManagerPerformanceByCompanyId("abc").managers.size(),
+                companyService.findManagerPerformanceByCompanyId("0").others.size(),
+                companyService.findManagerPerformanceByCompanyId("abc").others.size()
+        });
     }
 
+    //存在的companyId=80036797，managers部分，结合白盒测试
     @Test
-    public void findProductStrategyByCompanyId() throws Exception {
+    public void findManagerPerformanceByCompanyId2() throws Exception{
+        List<PerformanceDataBean> performanceDataBeans=companyService.findManagerPerformanceByCompanyId("80036797").managers;
+        performanceDataBeans.sort(Comparator.comparing((x)->x.id));
+        assertArrayEquals(new String[]{"9","30047657","施同亮","6.56","0.01"},new String[]{
+            performanceDataBeans.size()+"",
+            performanceDataBeans.get(0).id,
+            performanceDataBeans.get(1).name,
+            performanceDataBeans.get(2).rate+"",
+            performanceDataBeans.get(3).risk+""
+        });
     }
 
+    //TODO rate有问题
+    //存在的companyId=80000245，others部分，结合白盒测试
     @Test
-    public void findAssetAllocationByCompanyId() throws Exception {
+    public void findManagerPerformanceByCompanyId3() throws Exception{
+        List<PerformanceDataBean> performanceDataBeans=companyService.findManagerPerformanceByCompanyId("80000245").others;
+        performanceDataBeans.sort(Comparator.comparing((x)->x.id));
+        assertArrayEquals(new String[]{"1381","30036308","韩会永","","11.78"},new String[]{
+                performanceDataBeans.size()+"",
+                performanceDataBeans.get(0).id,
+                performanceDataBeans.get(1).name,
+                performanceDataBeans.get(2).rate+"",
+                performanceDataBeans.get(3).risk+""
+        });
     }
 
+    //根据公司id获得公司资产配置行业占比
+
+    //TODO 抛出异常
+    //不存在companyId=0，abc
     @Test
-    public void findStyleAttributionProfitByCompanyId() throws Exception {
+    public void findAssetAllocationByCompanyId1() throws Exception {
+        companyService.findAssetAllocationByCompanyId("0");
     }
 
+    //根据公司id获得公司风格归因-主动收益
+
+    //不存在companyId=0，abc
     @Test
-    public void findStyleAttributionRiskByCompanyId() throws Exception {
+    public void findStyleAttributionProfitByCompanyId1() throws Exception {
+        assertEquals(null,companyService.findStyleAttributionProfitByCompanyId("0"));
+        assertEquals(null,companyService.findStyleAttributionProfitByCompanyId("abc"));
     }
 
+    //存在的companyId=80041198，结合白盒测试
     @Test
-    public void findIndustryAttributionProfitByCompanyId() throws Exception {
+    public void findStyleAttributionProfitByCompanyId2() throws Exception{
+        List<FieldValueBean> fieldValueBeans=companyService.findStyleAttributionProfitByCompanyId("80041198");
+        assertEquals(10,companyService);
     }
 
+    //根据公司id获得公司风格归因-主动风险
+
+    //不存在companyId=0，abc
     @Test
-    public void findIndustryAttributionRiskByCompanyId() throws Exception {
+    public void findStyleAttributionRiskByCompanyId1() throws Exception {
+        assertEquals(null,companyService.findStyleAttributionRiskByCompanyId("0"));
+        assertEquals(null,companyService.findStyleAttributionRiskByCompanyId("abc"));
+    }
+
+    //根据公司id获得公司行业归因-主动收益
+
+    //不存在companyId=0，abc
+    @Test
+    public void findIndustryAttributionProfitByCompanyId1() throws Exception {
+        assertEquals(null,companyService.findIndustryAttributionProfitByCompanyId("0"));
+        assertEquals(null,companyService.findIndustryAttributionProfitByCompanyId("abc"));
+    }
+
+    //根据公司id获得公司行业归因-主动风险
+
+    //不存在companyId=0，abc
+    @Test
+    public void findIndustryAttributionRiskByCompanyId1() throws Exception {
+        assertEquals(null,companyService.findIndustryAttributionRiskByCompanyId("0"));
+        assertEquals(null,companyService.findIndustryAttributionRiskByCompanyId("abc"));
     }
 
 }

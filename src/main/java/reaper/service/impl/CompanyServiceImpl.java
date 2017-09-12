@@ -105,7 +105,7 @@ public class CompanyServiceImpl implements CompanyService {
         }
 
         for (Manager manager : managerRepository.findAll()) {
-            if(manager.getRisk()!=null&&manager.getBestReturns()!=null) {
+            if(manager.getRisk()!=null&&manager.getReturnRate()!=null) {
                 PerformanceDataBean data = new PerformanceDataBean(manager);
                 if (!managers.contains(data)) {
                     others.add(data);
