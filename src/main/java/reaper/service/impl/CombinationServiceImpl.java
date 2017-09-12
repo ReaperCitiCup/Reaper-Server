@@ -40,6 +40,9 @@ public class CombinationServiceImpl implements CombinationService {
     private CombinationRepository combinationRepository;
     @Autowired
     private FundNetValueRepository fundNetValueRepository;
+    @Autowired
+    private BasicStockIndexRepository basicStockIndexRepository;
+
 
     @Autowired
     private FundService fundService;
