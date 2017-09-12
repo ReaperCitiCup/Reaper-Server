@@ -15,4 +15,5 @@ public interface FundNetValueRepository extends JpaRepository<FundNetValue,Integ
 
     public List<FundNetValue> findAllByCodeOrderByDateDesc(String code);
 
+    public FundNetValue findByCodeAndDate(String code,Date date);
 }
