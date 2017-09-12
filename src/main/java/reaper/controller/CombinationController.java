@@ -88,17 +88,20 @@ public class CombinationController {
      * 回测组合
      *
      * @param combinationId
-     * @param backtestInput
      * @return
      */
     @ResponseBody
     @RequestMapping(
             value = "/combination/{combinationId}/backtest",
-            method = RequestMethod.POST,
+            params = {"startDate", "endDate", "baseIndex"},
+            method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"}
     )
-    public BacktestReportBean backtestCombination(@PathVariable Integer combinationId, @RequestBody BacktestInputBean backtestInput) {
-        return null;
+    public BacktestReportBean backtestCombination(@PathVariable Integer combinationId,
+                                                  @RequestParam(value = "startDate") String startDate,
+                                                  @RequestParam(value = "endDate") String endDate,
+                                                  @RequestParam(value = "baseIndex") String baseIndex) {
+        return combinationService.backtestCombination(combinationId, startDate, endDate, baseIndex);
     }
 
     /**

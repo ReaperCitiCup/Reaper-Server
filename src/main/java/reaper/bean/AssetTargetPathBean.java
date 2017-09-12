@@ -24,20 +24,14 @@ public class AssetTargetPathBean {
     public AssetWeightBean weight;
 
     /**
-     * 如果选择策略间分散 则 category 有效
-     */
-    public AssetCategoryBean category;
-
-    /**
      * 如果选择因子间分散，则factor有效
      */
     public List<String> factor;
 
-    public AssetTargetPathBean(Integer profitRiskTarget, int path, AssetWeightBean weight, AssetCategoryBean category, List<String> factor) {
+    public AssetTargetPathBean(Integer profitRiskTarget, int path, AssetWeightBean weight, List<String> factor) {
         this.profitRiskTarget = profitRiskTarget;
         this.path = path;
         this.weight = weight;
-        this.category = category;
         this.factor = factor;
     }
 

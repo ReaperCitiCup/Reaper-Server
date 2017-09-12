@@ -6,17 +6,12 @@ import reaper.bean.FieldValueBean;
 import reaper.bean.FundPerformanceBean;
 import reaper.bean.ManagerPerformanceBean;
 import reaper.bean.PerformanceDataBean;
-import reaper.model.Fund;
-import reaper.model.FundCompany;
-import reaper.model.Manager;
-import reaper.model.ManagerCompany;
-import reaper.repository.FundCompanyRepository;
-import reaper.repository.FundRepository;
-import reaper.repository.ManagerCompanyRespository;
-import reaper.repository.ManagerRepository;
+import reaper.model.*;
+import reaper.repository.*;
 import reaper.service.CompanyService;
 import reaper.util.Crawler;
 import reaper.util.FormatData;
+import reaper.util.ToFieldBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +33,12 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Autowired
     ManagerCompanyRespository managerCompanyRespository;
+
+    @Autowired
+    AssetAllocationRepository assetAllocationRepository;
+
+    @Autowired
+    FactorResultRepository factorResultRepository;
 
     /**
      * 根据公司id获得公司旗下基金表现
@@ -116,17 +117,6 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     /**
-     * 根据公司id获得公司产品分布策略
-     *
-     * @param companyId 公司id
-     * @return 公司产品分布策略
-     */
-    @Override
-    public List<FieldValueBean> findProductStrategyByCompanyId(String companyId) {
-        return null;
-    }
-
-    /**
      * 根据公司id获得公司资产配置行业占比
      *
      * @param companyId 公司id
@@ -134,7 +124,28 @@ public class CompanyServiceImpl implements CompanyService {
      */
     @Override
     public List<FieldValueBean> findAssetAllocationByCompanyId(String companyId) {
-        return null;
+        List<FundCompany> fundCompanies = fundCompanyRepository.findAllByCompanyId(companyId);
+        //计数，非null数值
+        int count = 0;
+        double stock = 0;
+        double bond = 0;
+        double bank = 0;
+        for(FundCompany fundCompany:fundCompanies){
+            AssetAllocation assetAllocation = assetAllocationRepository.findByCode(fundCompany.getFundId());
+            if(assetAllocation==null||assetAllocation.getBank() == null){
+                continue;
+            }
+            stock += assetAllocation.stock;
+            bond += assetAllocation.bond;
+            bank += assetAllocation.bank;
+            count++;
+        }
+        List<FieldValueBean> res = new ArrayList<>();
+        res.add(new FieldValueBean("股票",FormatData.fixToTwo(stock/count)));
+        res.add(new FieldValueBean("银行",FormatData.fixToTwo(bank/count)));
+        res.add(new FieldValueBean("债券",FormatData.fixToTwo(bond/count)));
+        res.add(new FieldValueBean("其他",FormatData.fixToTwo(100-stock/count-bank/count-bond/count)));
+        return res;
     }
 
     /**
@@ -145,7 +156,8 @@ public class CompanyServiceImpl implements CompanyService {
      */
     @Override
     public List<FieldValueBean> findStyleAttributionProfitByCompanyId(String companyId) {
-        return null;
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(companyId,'N');
+        return ToFieldBean.factorResultToStyleAttribution(factorResult);
     }
 
     /**
@@ -156,7 +168,8 @@ public class CompanyServiceImpl implements CompanyService {
      */
     @Override
     public List<FieldValueBean> findStyleAttributionRiskByCompanyId(String companyId) {
-        return null;
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(companyId,'R');
+        return ToFieldBean.factorResultToStyleAttribution(factorResult);
     }
 
     /**
@@ -167,7 +180,8 @@ public class CompanyServiceImpl implements CompanyService {
      */
     @Override
     public List<FieldValueBean> findIndustryAttributionProfitByCompanyId(String companyId) {
-        return null;
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(companyId,'N');
+        return ToFieldBean.factorResultToIndustryAttribution(factorResult);
     }
 
     /**
@@ -178,6 +192,7 @@ public class CompanyServiceImpl implements CompanyService {
      */
     @Override
     public List<FieldValueBean> findIndustryAttributionRiskByCompanyId(String companyId) {
-        return null;
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(companyId,'R');
+        return ToFieldBean.factorResultToIndustryAttribution(factorResult);
     }
 }

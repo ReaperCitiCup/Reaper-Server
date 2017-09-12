@@ -1,28 +1,28 @@
-//package reaper.util;
-//
-//import org.junit.*;
-//import org.junit.runner.RunWith;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-//import reaper.bean.CompanyMiniBean;
-//import reaper.bean.FundHistoryBean;
-//import reaper.bean.ManagerBean;
-//import reaper.model.*;
-//import reaper.repository.*;
-//
-//import java.text.SimpleDateFormat;
-//import java.util.ArrayList;
-//import java.util.Date;
-//import java.util.List;
-//
-///**
-// * Created by Feng on 2017/8/24.
-// */
-//
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@SpringBootTest()
-//public class ManagerTest {
+package reaper.util;
+
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import reaper.bean.CompanyMiniBean;
+import reaper.bean.FundHistoryBean;
+import reaper.bean.ManagerBean;
+import reaper.model.*;
+import reaper.repository.*;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by Feng on 2017/8/24.
+ */
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest()
+public class ManagerTest {
 //    @Autowired
 //    ManagerRepository managerRepository;
 //
@@ -174,4 +174,4 @@
 ////        fundHistoryRepository.deleteAll();
 //        fundRepository.deleteAll();
 //    }
-//}
+}
