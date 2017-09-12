@@ -125,32 +125,51 @@
       <version>0.1.53</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-math3</artifactId>
-      <version>3.6.1</version>
-    </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.6.1</version>
+        </dependency>
 
-  </dependencies>
+        <!--matlab组合代码-->
+        <dependency>
+            <groupId>Asset_Allocation</groupId>
+            <artifactId>Asset_Allocation</artifactId>
+            <version>1.0</version>
+        </dependency>
 
-  <build>
-    <finalName>Reaper</finalName>
+        <dependency>
+            <groupId>javabuilder</groupId>
+            <artifactId>javabuilder</artifactId>
+            <version>1.0</version>
+        </dependency>
 
-    <plugins>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
+        <dependency>
+            <groupId>Asset_Allocation_Factor</groupId>
+            <artifactId>Asset_Allocation_Factor</artifactId>
+            <version>1.0</version>
+        </dependency>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+    </dependencies>
+
+    <build>
+        <finalName>Reaper</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
