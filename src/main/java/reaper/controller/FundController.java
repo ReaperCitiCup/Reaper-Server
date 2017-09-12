@@ -146,7 +146,7 @@ public class FundController {
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"}
     )
-    public List<MiniBean> findCurrentManagers(@PathVariable String code){
+    public List<IdNameBean> findCurrentManagers(@PathVariable String code){
         return fundService.findCurrentManagers(code);
     }
 
@@ -209,7 +209,7 @@ public class FundController {
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"}
     )
-    public MiniBean findFundCompanyByCode(@PathVariable String code){
+    public IdNameBean findFundCompanyByCode(@PathVariable String code){
         return fundService.findFundCompanyByCode(code);
     }
 
@@ -493,7 +493,7 @@ public class FundController {
             value = "/{code}/position-network",
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"})
-    public List<NetworkBean> findPositionNetwork(String code){
+    public NetworkBean findPositionNetwork(@PathVariable String code){
         return fundService.findPositionNetwork(code);
     }
 

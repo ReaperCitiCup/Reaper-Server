@@ -40,6 +40,9 @@ public class CsvSaver {
     @Autowired
     FundRankRepository fundRankRepository;
 
+    @Autowired
+    CPRRepository cprRepository;
+
     SaveFactorResult saveFactorResult = new SaveFactorResult();
 
     @Test
@@ -161,6 +164,16 @@ public class CsvSaver {
     public void saveFundRank() throws IOException {
         for(FundRank fundRank:saveFactorResult.saveFundRank()){
             fundRankRepository.save(fundRank);
+        }
+    }
+
+    @Test
+    public void fillCPRCode()throws Exception{
+        for(CPR cpr:cprRepository.findAll()){
+            while (cpr.getFundId().length()<6){
+                cpr.setFundId("0"+cpr.getFundId());
+            }
+            cprRepository.save(cpr);
         }
     }
 

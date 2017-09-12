@@ -135,7 +135,7 @@ public class FundHistoryTest {
 
 
                 System.out.println("经理代号"+managerId+" "+fundCode+" "+fundName+" "+fundType1+" "+size+" "+startDate+" "+endDate+" "+time+" "+payback+"\n");
-                //  bufferedWriter.write("经理代号"+mycode+"\t"+code+"\t"+name+"\t"+name1+"\t"+name2+"\t"+name3+"\t"+name4+"\t"+name5+"\n"
+                //  bufferedWriter.write("经理代号"+mycode+"\t"+id+"\t"+name+"\t"+name1+"\t"+name2+"\t"+name3+"\t"+name4+"\t"+name5+"\n"
                 //  );
 
 

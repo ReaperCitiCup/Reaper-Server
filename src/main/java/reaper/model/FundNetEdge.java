@@ -49,4 +49,36 @@ public class FundNetEdge {
     public void setWeight(double weight) {
         this.weight = weight;
     }
+
+    @Override
+    public String toString() {
+        return "FundNetEdge{" +
+                "codeIdA='" + codeIdA + '\'' +
+                ", codeIdB='" + codeIdB + '\'' +
+                ", weight=" + weight +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FundNetEdge that = (FundNetEdge) o;
+
+        if (Double.compare(that.weight, weight) != 0) return false;
+        if (!codeIdA.equals(that.codeIdA)) return false;
+        return codeIdB.equals(that.codeIdB);
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = codeIdA.hashCode();
+        result = 31 * result + codeIdB.hashCode();
+        temp = Double.doubleToLongBits(weight);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
 }

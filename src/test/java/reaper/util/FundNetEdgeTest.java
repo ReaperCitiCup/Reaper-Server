@@ -5,12 +5,15 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import reaper.model.Fund;
 import reaper.model.FundNetEdge;
 import reaper.model.ManagerRelation;
 import reaper.repository.FundNetEdgeRepository;
 import reaper.repository.ManagerRelationRepository;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by max on 2017/9/11.
@@ -62,6 +65,33 @@ public class FundNetEdgeTest {
         }
 
 
+    }
+
+    @Test
+    public void getAllCodeRelated(){
+        List<FundNetEdge> res = new ArrayList<>();
+        for(FundNetEdge fundNetEdge:getInterfacingCode("000017",res)){
+            System.out.println(fundNetEdge);
+        }
+
+    }
+
+    private List<FundNetEdge> getInterfacingCode(String code,List<FundNetEdge> fundNetEdges){
+        //作为左端点
+        for(FundNetEdge fundNetEdge:fundNetEdgeRepository.findAllByCodeIdA(code)){
+            if(!fundNetEdges.contains(fundNetEdge)) {
+                fundNetEdges.add(fundNetEdge);
+                fundNetEdges = getInterfacingCode(fundNetEdge.getCodeIdB(),fundNetEdges);
+            }
+        }
+        //作为右端点
+        for(FundNetEdge fundNetEdge:fundNetEdgeRepository.findAllByCodeIdB(code)){
+            if(!fundNetEdges.contains(fundNetEdge)) {
+                fundNetEdges.add(fundNetEdge);
+                fundNetEdges = getInterfacingCode(fundNetEdge.getCodeIdB(),fundNetEdges);
+            }
+        }
+        return fundNetEdges;
     }
 
 

@@ -25,7 +25,7 @@ public class FundShortMessageTest {
     public  void getFundShortMessageTest() {
 
 
-        File file = new File("code.txt");
+        File file = new File("id.txt");
 
 
         try {
