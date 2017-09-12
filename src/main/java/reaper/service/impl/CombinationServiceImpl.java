@@ -117,7 +117,9 @@ public class CombinationServiceImpl implements CombinationService {
             Date newday = calendar.getTime();
             PyAnalysisResult result_withRange = getBasicFactors(Arrays.asList(funds), simpleDateFormat.format(newday), simpleDateFormat.format(date));
 
-            // 年化收益率
+            /**
+             * 年化收益率
+             */
             double annualProfit = 0.0;
             for (int i = 0; i < funds.length; i++) {
                 String code = funds[i];
@@ -125,7 +127,9 @@ public class CombinationServiceImpl implements CombinationService {
             }
             miniBean.annualProfit = FormatData.fixToTwoAndPercent(annualProfit);
 
-            // 平均相关系数
+            /**
+             * 平均相关系数
+             */
             double sum = 0.0;
             for (PyAnalysisResult.CorrelationCoefficient c : result_withRange.pjxgxs) {
                 sum += c.getCc();
@@ -133,7 +137,9 @@ public class CombinationServiceImpl implements CombinationService {
             double correlationCoefficient = sum / result_withRange.pjxgxs.size();
             miniBean.correlationCoefficient = FormatData.fixToTwoAndPercent(correlationCoefficient);
 
-            // 最新收益率
+            /**
+             * 最新收益率
+             */
             double newProfit = 0.0;
             for (int i = 0; i < funds.length; i++) {
                 newProfit += (fundNetValueRepository.findFirstByCodeOrderByDateDesc(funds[i]).getDailyRate() * Double.valueOf(weights[i]));
@@ -170,7 +176,6 @@ public class CombinationServiceImpl implements CombinationService {
         }
     }
 
-
     /**
      * 回测组合
      *
@@ -182,60 +187,69 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     //TODO 所有百分比都乘以100，保留两位小数   FormatData.fixToTwoAndPercent
-
-    public BacktestReportBean backtestCombination(Integer combinationId, String startDate, String endDate, String baseIndex) throws java.text.ParseException{
+    public BacktestReportBean backtestCombination(Integer combinationId, String startDate, String endDate, String baseIndex) throws java.text.ParseException {
         BacktestReportBean backtestReportBean = new BacktestReportBean();
         int days = DaysBetween.daysOfTwo(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
 
-        //基本信息
+        /**
+         * 基本信息
+         */
         backtestReportBean.startDate = startDate;
         backtestReportBean.endDate = endDate;
         backtestReportBean.baseIndex = baseIndex;
 
-        //排名信息
+        /**
+         * 排名信息
+         */
         //TODO 商业组的代码
         backtestReportBean.score = 0;
         backtestReportBean.transcendQuantity = 0;
         backtestReportBean.rank = 0;
 
-        //基金组成
+        /**
+         * 基金组成
+         */
         Combination combination = combinationRepository.findOne(combinationId);
         List<String> codes = new ArrayList<>();
         List<Double> weights = new ArrayList<>();
-        for(int i = 0; i < combination.getFunds().split("|").length; i++){
+        for (int i = 0; i < combination.getFunds().split("\\|").length; i++) {
             FundRatioNameBean fundRatioNameBean = new FundRatioNameBean();
-            fundRatioNameBean.code = combination.getFunds().split("|")[i];
+            fundRatioNameBean.code = combination.getFunds().split("\\|")[i];
             codes.add(fundRatioNameBean.code);
             //name
-            fundRatioNameBean.weight = FormatData.fixToTwoAndPercent(Double.parseDouble(combination.getFunds().split("|")[i]));
+            fundRatioNameBean.weight = FormatData.fixToTwoAndPercent(Double.parseDouble(combination.getFunds().split("\\|")[i]));
             weights.add(fundRatioNameBean.weight);
             //positionRatio
             backtestReportBean.combination.add(fundRatioNameBean);
         }
 
-        //投资目标
+        /**
+         * 投资目标
+         */
         int chosenGoal = combination.getRisk_profit();
-        if(chosenGoal >= 1 && chosenGoal <= 3){
+        if (chosenGoal >= 1 && chosenGoal <= 3) {
             backtestReportBean.investmentGoal = "低风险低收益";
-        } else if(chosenGoal >=4 && chosenGoal <= 6){
+        } else if (chosenGoal >= 4 && chosenGoal <= 6) {
             backtestReportBean.investmentGoal = "中风险中收益";
-        } else if(chosenGoal >=7 && chosenGoal <= 10){
+        } else if (chosenGoal >= 7 && chosenGoal <= 10) {
             backtestReportBean.investmentGoal = "高风险高收益";
-        } else{
+        } else {
             backtestReportBean.investmentGoal = "无";
         }
 
 
-        //组合期末净值、期初净值、夏普比率
+        /**
+         * 组合期末净值、期初净值、夏普比率
+         */
         double finalNetValue = 0.0;
         double startNetValue = 0.0;
         double[] netValues = new double[days];
         double[] dailyRates = new double[days];
 
-        for(int i = 0; i < codes.size(); i++){
+        for (int i = 0; i < codes.size(); i++) {
             backtestReportBean.sharpeRatio += FormatData.fixToTwo(getBasicFactors(codes, startDate, endDate).sharpe.get(codes.get(i)) * weights.get(i));
 
-            for(int j = 0; j < days; j++){
+            for (int j = 0; j < days; j++) {
                 netValues[j] += fundNetValueRepository.findAllByCodeAndDateBetween(codes.get(i), simpleDateFormat.parse(startDate), simpleDateFormat.parse((endDate))).get(j).getUnitNetValue() * weights.get(i);
                 dailyRates[j] += fundNetValueRepository.findAllByCodeAndDateBetween(codes.get(i), simpleDateFormat.parse(startDate), simpleDateFormat.parse((endDate))).get(j).getDailyRate() * weights.get(i);
             }
@@ -244,32 +258,38 @@ public class CombinationServiceImpl implements CombinationService {
         finalNetValue = netValues[codes.size() - 1];
         startNetValue = netValues[0];
 
-        //区间年化收益、累积收益、最终净值
+        /**
+         * 区间年化收益、累积收益、最终净值
+         */
         double fundAnnualProfit = 0.0;
-        if(days < 365) {
-            fundAnnualProfit = (finalNetValue - startNetValue) / days * 365;
+        if (days < 365) {
+            fundAnnualProfit = (finalNetValue - startNetValue) / days * 365.0;
         } else {
             int years = days / 365;
-            fundAnnualProfit = Math.pow(finalNetValue / startNetValue, 1 / years) - 1;
+            fundAnnualProfit = Math.pow(finalNetValue / startNetValue, 1.0 / years) - 1;
         }
 
         backtestReportBean.intervalAnnualProfit = FormatData.fixToTwoAndPercent(fundAnnualProfit);
-        backtestReportBean.cumulativeProfit =FormatData.fixToTwoAndPercent((finalNetValue - startNetValue) / startNetValue);
+        backtestReportBean.cumulativeProfit = FormatData.fixToTwoAndPercent((finalNetValue - startNetValue) / startNetValue);
         backtestReportBean.finalNetValue = finalNetValue;
 
-        //波动率：收益率的标准差
-        backtestReportBean.volatility = StandardDeviation.calStandardDeviation(dailyRates);
+        /**
+         * 波动率：收益率的标准差
+         */
+        backtestReportBean.volatility = Calculator.calStandardDeviation(dailyRates);
 
         //TODO 主要的3个因子
         backtestReportBean.mainFactors.add("周沁涵你来写吧");
 
-        //【图】累计净值
+        /**
+         * 【图】累计净值
+         */
         List<ValueDateBean> baseNetValueList = new ArrayList<>();
         List<ValueDateBean> fundNetValueList = new ArrayList<>();
         int check = 0;
 
         List<BasicStockIndex> basicStockIndexList = basicStockIndexRepository.findAllByStockNameAndDateBetweenOrderByDateAsc(baseIndex, simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
-        for(BasicStockIndex basicStockIndex:basicStockIndexList){
+        for (BasicStockIndex basicStockIndex : basicStockIndexList) {
             ValueDateBean baseValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndex.getDate()), FormatData.fixToTwo(basicStockIndex.getClosePrice()));
             baseNetValueList.add(baseValueDateBean);
 
@@ -280,11 +300,13 @@ public class CombinationServiceImpl implements CombinationService {
 
         backtestReportBean.cumulativeNetValueTrend = new BacktestComparisonBean(fundNetValueList, baseNetValueList);
 
-        //【图】收益率
+        /**
+         * 【图】收益率
+         */
         List<ValueDateBean> baseProfitList = new ArrayList<>();
         List<ValueDateBean> fundProfitList = new ArrayList<>();
 
-        for(int i = 0; i < basicStockIndexList.size() - 1; i++){
+        for (int i = 0; i < basicStockIndexList.size() - 1; i++) {
             ValueDateBean baseValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndexList.get(i + 1).getDate()),
                     FormatData.fixToTwoAndPercent((basicStockIndexList.get(i + 1).getClosePrice() - basicStockIndexList.get(i).getClosePrice()) / basicStockIndexList.get(i).getClosePrice()));
             baseProfitList.add(baseValueDateBean);
@@ -296,7 +318,9 @@ public class CombinationServiceImpl implements CombinationService {
 
         backtestReportBean.profitRateTrend = new BacktestComparisonBean(fundProfitList, baseNetValueList);
 
-        //总收益率 比较
+        /**
+         * 总收益率 比较
+         */
         double finalBaseValue = basicStockIndexList.get(basicStockIndexList.size() - 1).getClosePrice();
         double startBaseValue = basicStockIndexList.get(0).getClosePrice();
         double baseProfit = FormatData.fixToTwoAndPercent((finalBaseValue - startBaseValue) / startBaseValue);
@@ -304,46 +328,54 @@ public class CombinationServiceImpl implements CombinationService {
         double fundProfit = FormatData.fixToTwoAndPercent((finalNetValue - startNetValue) / startNetValue);
         backtestReportBean.totalProfitRate = new BacktestValueComparisonBean(FormatData.fixToTwoAndPercent(fundProfit), FormatData.fixToTwoAndPercent(baseProfit));
 
-        //超额收益率 比较
+        /**
+         * 超额收益率 比较
+         */
         backtestReportBean.overProfitRate = new BacktestValueComparisonBean(FormatData.fixToTwoAndPercent(fundProfit - baseProfit), FormatData.fixToTwoAndPercent(0.0));
 
-        //年化收益率 比较
+        /**
+         * 年化收益率 比较
+         */
         double baseAnnualProfit = 0.0;
-        if(days < 365) {
-            baseAnnualProfit = (finalBaseValue - startBaseValue) / days * 365;
+        if (days < 365) {
+            baseAnnualProfit = (finalBaseValue - startBaseValue) / days * 365.0;
         } else {
             int years = days / 365;
-            baseAnnualProfit = Math.pow(finalBaseValue / startBaseValue, 1 / years) - 1;
+            baseAnnualProfit = Math.pow(finalBaseValue / startBaseValue, 1.0 / years) - 1;
         }
         backtestReportBean.annualProfit = new BacktestValueComparisonBean(fundAnnualProfit, FormatData.fixToTwoAndPercent(baseAnnualProfit));
 
         //TODO 最大月度收益
 
 
-        //盈利天占比
-        double baseProfitDays = 0;
-        double fundProfitDays = 0;
+        /**
+         * 盈利天占比
+         */
+        double baseProfitDays = 0.0;
+        double fundProfitDays = 0.0;
 
-        for(int i = 0; i < basicStockIndexList.size() - 1; i++){
-            if(basicStockIndexList.get(i + 1).getClosePrice() > basicStockIndexList.get(i).getClosePrice()){
+        for (int i = 0; i < basicStockIndexList.size() - 1; i++) {
+            if (basicStockIndexList.get(i + 1).getClosePrice() > basicStockIndexList.get(i).getClosePrice()) {
                 baseProfitDays++;
             }
-            if(netValues[i + 1] > netValues[i]) {
+            if (netValues[i + 1] > netValues[i]) {
                 fundProfitDays++;
             }
         }
         backtestReportBean.profitDaysRatio = new BacktestValueComparisonBean(FormatData.fixToTwoAndPercent(fundProfitDays / days), FormatData.fixToTwoAndPercent(baseProfitDays / days));
 
-        //【图】每日回撤、最大回撤
+        /**
+         * 【图】每日回撤、最大回撤
+         */
         List<ValueDateBean> baseRetracementList = new ArrayList<>();
         List<ValueDateBean> fundRetracementList = new ArrayList<>();
         double maxRetracement = 0.0;
 
-        for(int i = basicStockIndexList.size() - 1; i > 1 ; i--){
+        for (int i = basicStockIndexList.size() - 1; i > 1; i--) {
             double lastLargerPrice = basicStockIndexList.get(i).getClosePrice();
 
-            for(int j = i - 1; j > 0; j--){
-                if(basicStockIndexList.get(j).getClosePrice() > basicStockIndexList.get(i).getClosePrice()){
+            for (int j = i - 1; j > 0; j--) {
+                if (basicStockIndexList.get(j).getClosePrice() > basicStockIndexList.get(i).getClosePrice()) {
                     lastLargerPrice = basicStockIndexList.get(j).getClosePrice();
                     break;
                 }
@@ -354,15 +386,15 @@ public class CombinationServiceImpl implements CombinationService {
 
             double lastLargerNetValue = netValues[i];
 
-            for(int j = i - 1; j > 0; j--){
-                if(netValues[j] > netValues[i]){
+            for (int j = i - 1; j > 0; j--) {
+                if (netValues[j] > netValues[i]) {
                     lastLargerNetValue = netValues[j];
                     break;
                 }
             }
 
             double retracement = (netValues[i] - lastLargerNetValue) / netValues[i];
-            maxRetracement =  (retracement > maxRetracement) ? retracement : maxRetracement;
+            maxRetracement = (retracement > maxRetracement) ? retracement : maxRetracement;
             ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndexList.get(i).getDate()),
                     FormatData.fixToTwoAndPercent(retracement));
             fundRetracementList.add(fundValueDateBean);
@@ -373,16 +405,18 @@ public class CombinationServiceImpl implements CombinationService {
 
         //TODO【表】相关系数
 
-        //最大单日跌幅、最大连跌天数
-        double maxDayDown = 0;
+        /**
+         * 最大单日跌幅、最大连跌天数
+         */
+        double maxDayDown = 0.0;
         int downDays = 0;
-        for(int i = 0; i < netValues.length - 2; i++){
+        for (int i = 0; i < netValues.length - 2; i++) {
             maxDayDown = (netValues[i + 1] - netValues[i]) < maxDayDown ? (netValues[i + 1] - netValues[i]) : maxDayDown;
-            if(netValues[i + 1] < netValues[i]){
+            if (netValues[i + 1] < netValues[i]) {
                 downDays++;
             }
         }
-        backtestReportBean.maxDayDown = FormatData.fixToTwo(0 - maxDayDown);
+        backtestReportBean.maxDayDown = FormatData.fixToTwo(0.0 - maxDayDown);
         backtestReportBean.maxDownDays = downDays;
 
         //TODO 年化波动率及后面
