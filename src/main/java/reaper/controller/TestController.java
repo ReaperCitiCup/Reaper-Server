@@ -1,5 +1,6 @@
 package reaper.controller;
 
+import reaper.bean.ResultMessageBean;
 import reaper.model.User;
 import reaper.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +35,4 @@ public class TestController {
 
     }
 
-//    @RequestMapping("/add")
-//    @ResponseBody
-//    public String addUser(String name,String password){
-//        return userService.addUser(name,password);
-//    }
 }
