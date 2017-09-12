@@ -28,9 +28,28 @@ public class FundServiceTest {
     //TODO
     @Test
     public void findFundByKeywordTest() throws Exception {
-        reaper.util.Page<FundMiniBean> fundMiniBeanPage=
-        fundService.findFundByKeyword("000005", "id", 5, 3);
-        System.out.println();
+        reaper.util.Page<FundMiniBean> fundMiniBeanPage1=
+                fundService.findFundByKeyword("成长", "code", 10, 2);
+        reaper.util.Page<FundMiniBean> fundMiniBeanPage2=
+                fundService.findFundByKeyword("成长", "name", 10, 2);
+        reaper.util.Page<FundMiniBean> fundMiniBeanPage3=
+                fundService.findFundByKeyword("成长", "code", 10, 10);
+        reaper.util.Page<FundMiniBean> fundMiniBeanPage4=
+                fundService.findFundByKeyword("成长", "code", 15, 2);
+        reaper.util.Page<FundMiniBean> fundMiniBeanPage5=
+                fundService.findFundByKeyword("成长", "code", 15, 10);
+        int expectedSize=149;
+        assertArrayEquals(
+                new Integer[]{
+                        expectedSize, expectedSize, expectedSize, expectedSize, expectedSize
+                },
+                new Integer[]{
+                        fundMiniBeanPage1.getTotalCount(), fundMiniBeanPage2.getTotalCount(), fundMiniBeanPage3.getTotalCount(), fundMiniBeanPage4.getTotalCount(), fundMiniBeanPage5.getTotalCount()
+                }
+        );
+        for (int i = 0; i < fundMiniBeanPage1.getResult().size() - 1; i++) {
+            Assert.assertTrue(Integer.parseInt(fundMiniBeanPage1.getResult().get(i).code) < Integer.parseInt(fundMiniBeanPage1.getResult().get(i+1).code));
+        }
     }
 
     @Test
@@ -102,12 +121,6 @@ public class FundServiceTest {
                         miniBean.id, miniBean.name
                 }
         );
-    }
-
-    @Test
-    public void findFundNameByCodeTest7() throws Exception {
-        MiniBean miniBean=fundService.findFundNameByCode("0000005");
-        Assert.assertNull(miniBean);
     }
 
     @Test
@@ -465,18 +478,94 @@ public class FundServiceTest {
         Assert.assertEquals(0, valueDateBeans.size());
     }
 
-    //TODO
     @Test
-    public void findCurrentAssetByCodeTest() throws Exception {
+    public void findCurrentAssetByCodeTest1() throws Exception {
         CurrentAssetBean currentAssetBean=fundService.findCurrentAssetByCode("000005");
-//        assertArrayEquals(
-//                new Double[]{
-//                        1.0, 2.0 ,3.0
-//                },
-//                new Double[]{
-//                        currentAssetBean.bond, currentAssetBean.stock, currentAssetBean.bank
-//                }
-//        );
+        assertArrayEquals(
+                new Double[]{
+                        100.0, 0.0, 0.0, 0.0
+                },
+                new Double[]{
+                        currentAssetBean.bond, currentAssetBean.stock, currentAssetBean.bank, currentAssetBean.other
+                }
+        );
+    }
+
+    @Test
+    public void findCurrentAssetByCodeTest2() throws Exception {
+        CurrentAssetBean currentAssetBean=fundService.findCurrentAssetByCode("000006");
+        Assert.assertNull(currentAssetBean);
+    }
+
+    @Test
+    public void findCurrentAssetByCodeTest3() throws Exception {
+        CurrentAssetBean currentAssetBean=fundService.findCurrentAssetByCode("000007");
+        assertArrayEquals(
+                new Double[]{
+                        100.0, 0.0, 0.0, 0.0
+                },
+                new Double[]{
+                        currentAssetBean.bond, currentAssetBean.stock, currentAssetBean.bank, currentAssetBean.other
+                }
+        );
+    }
+
+    @Test
+    public void findCurrentAssetByCodeTest4() throws Exception {
+        CurrentAssetBean currentAssetBean=fundService.findCurrentAssetByCode("000948");
+        assertArrayEquals(
+                new Double[]{
+                        0.0, 1.28, 0.0, 98.72
+                },
+                new Double[]{
+                        currentAssetBean.bond, currentAssetBean.stock, currentAssetBean.bank, currentAssetBean.other
+                }
+        );
+    }
+
+    @Test
+    public void findCurrentAssetByCodeTest5() throws Exception {
+        CurrentAssetBean currentAssetBean=fundService.findCurrentAssetByCode("000950");
+        assertArrayEquals(
+                new Double[]{
+                        0.0, 3.85, 0.0, 96.15
+                },
+                new Double[]{
+                        currentAssetBean.bond, currentAssetBean.stock, currentAssetBean.bank, currentAssetBean.other
+                }
+        );
+    }
+
+    @Test
+    public void findCurrentAssetByCodeTest6() throws Exception {
+        CurrentAssetBean currentAssetBean=fundService.findCurrentAssetByCode("5");
+        assertArrayEquals(
+                new Double[]{
+                        100.0, 0.0, 0.0, 0.0
+                },
+                new Double[]{
+                        currentAssetBean.bond, currentAssetBean.stock, currentAssetBean.bank, currentAssetBean.other
+                }
+        );
+    }
+
+    @Test
+    public void findCurrentAssetByCodeTest7() throws Exception {
+        CurrentAssetBean currentAssetBean=fundService.findCurrentAssetByCode("005");
+        assertArrayEquals(
+                new Double[]{
+                        100.0, 0.0, 0.0, 0.0
+                },
+                new Double[]{
+                        currentAssetBean.bond, currentAssetBean.stock, currentAssetBean.bank, currentAssetBean.other
+                }
+        );
+    }
+
+    @Test
+    public void findCurrentAssetByCodeTest8() throws Exception {
+        CurrentAssetBean currentAssetBean=fundService.findCurrentAssetByCode(null);
+        Assert.assertNull(currentAssetBean);
     }
 
     @Test
@@ -697,61 +786,61 @@ public class FundServiceTest {
 
     @Test
     public void findFundCompanyByCodeTest1() throws Exception {
-        MiniBean miniBean=fundService.findFundCompanyByCode("000005");
+        IdNameBean miniBean=fundService.findFundCompanyByCode("000005");
         Assert.assertEquals("80000223", miniBean.id);
         Assert.assertEquals("嘉实", miniBean.name);
     }
 
     @Test
     public void findFundCompanyByCodeTest2() throws Exception {
-        MiniBean miniBean=fundService.findFundCompanyByCode("000006");
+        IdNameBean miniBean=fundService.findFundCompanyByCode("000006");
         Assert.assertNull(miniBean);
     }
 
     @Test
     public void findFundCompanyByCodeTest3() throws Exception {
-        MiniBean miniBean=fundService.findFundCompanyByCode("000007");
+        IdNameBean miniBean=fundService.findFundCompanyByCode("000007");
         Assert.assertEquals("80000230", miniBean.id);
         Assert.assertEquals("鹏华", miniBean.name);
     }
 
     @Test
     public void findFundCompanyByCodeTest4() throws Exception {
-        MiniBean miniBean=fundService.findFundCompanyByCode("000948");
+        IdNameBean miniBean=fundService.findFundCompanyByCode("000948");
         Assert.assertEquals("80000222", miniBean.id);
         Assert.assertEquals("华夏", miniBean.name);
     }
 
     @Test
     public void findFundCompanyByCodeTest5() throws Exception {
-        MiniBean miniBean=fundService.findFundCompanyByCode("000950");
+        IdNameBean miniBean=fundService.findFundCompanyByCode("000950");
         Assert.assertEquals("80000229", miniBean.id);
         Assert.assertEquals("易方达", miniBean.name);
     }
 
     @Test
     public void findFundCompanyByCodeTest6() throws Exception {
-        MiniBean miniBean=fundService.findFundCompanyByCode("5");
+        IdNameBean miniBean=fundService.findFundCompanyByCode("5");
         Assert.assertEquals("80000223", miniBean.id);
         Assert.assertEquals("嘉实", miniBean.name);
     }
 
     @Test
     public void findFundCompanyByCodeTest7() throws Exception {
-        MiniBean miniBean=fundService.findFundCompanyByCode("005");
+        IdNameBean miniBean=fundService.findFundCompanyByCode("005");
         Assert.assertEquals("80000223", miniBean.id);
         Assert.assertEquals("嘉实", miniBean.name);
     }
 
     @Test
     public void findFundCompanyByCodeTest8() throws Exception {
-        MiniBean miniBean=fundService.findFundCompanyByCode("0");
+        IdNameBean miniBean=fundService.findFundCompanyByCode("0");
         Assert.assertNull(miniBean);
     }
 
     @Test
     public void findFundCompanyByCodeTest9() throws Exception {
-        MiniBean miniBean=fundService.findFundCompanyByCode(null);
+        IdNameBean miniBean=fundService.findFundCompanyByCode(null);
         Assert.assertNull(miniBean);
     }
 
@@ -834,12 +923,6 @@ public class FundServiceTest {
     @Test
     public void findIndustryAttributionProfitTest7() throws Exception {
         List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionProfit("0");
-        Assert.assertEquals(0, fieldValueBeans.size());
-    }
-
-    @Test
-    public void findIndustryAttributionProfitTest8() throws Exception {
-        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionProfit("0000005");
         Assert.assertEquals(0, fieldValueBeans.size());
     }
 
@@ -928,12 +1011,6 @@ public class FundServiceTest {
     @Test
     public void findIndustryAttributionRiskTest7() throws Exception {
         List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionRisk("0");
-        Assert.assertEquals(0, fieldValueBeans.size());
-    }
-
-    @Test
-    public void findIndustryAttributionRiskTest8() throws Exception {
-        List<FieldValueBean> fieldValueBeans=fundService.findIndustryAttributionRisk("0000005");
         Assert.assertEquals(0, fieldValueBeans.size());
     }
 
@@ -1077,12 +1154,6 @@ public class FundServiceTest {
                         fieldValueBeans.get(5).value, fieldValueBeans.get(6).value, fieldValueBeans.get(7).value, fieldValueBeans.get(8).value, fieldValueBeans.get(9).value
                 }
         );
-    }
-
-    @Test
-    public void findStyleAttributionProfitTest7() throws Exception {
-        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionProfit("0000005");
-        Assert.assertEquals(0, fieldValueBeans.size());
     }
 
     @Test
@@ -1234,12 +1305,6 @@ public class FundServiceTest {
     }
 
     @Test
-    public void findStyleAttributionRiskTest7() throws Exception {
-        List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionRisk("0000005");
-        Assert.assertEquals(0, fieldValueBeans.size());
-    }
-
-    @Test
     public void findStyleAttributionRiskTest8() throws Exception {
         List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionRisk("0");
         Assert.assertEquals(0, fieldValueBeans.size());
@@ -1250,4 +1315,98 @@ public class FundServiceTest {
         List<FieldValueBean> fieldValueBeans=fundService.findStyleAttributionRisk(null);
         Assert.assertEquals(0, fieldValueBeans.size());
     }
+
+    //TODO
+    @Test
+    public void findRiskTrendTest() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findRiskTrend("000005");
+    }
+
+    //TODO
+    @Test
+    public void findDailyRetracementTest() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findDailyRetracement("000005");
+    }
+
+    @Test
+    public void findVolatilityTest() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findVolatility("000005");
+    }
+
+    @Test
+    public void findValueAtRiskTest() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findValueAtRisk("000005");
+    }
+
+    @Test
+    public void findDownsideVolatilityTest() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findDownsideVolatility("000005");
+    }
+
+    @Test
+    public void findSharpeIndexTest() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findSharpeIndex("000005");
+    }
+
+    @Test
+    public void findTreynorIndexTest() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findTreynorIndex("000005");
+    }
+
+    //TODO
+    @Test
+    public void findPerformanceIndexTest() throws Exception {
+        PerformanceIndexBean performanceIndexBean=fundService.findPerformanceIndex("000005");
+    }
+
+    @Test
+    public void findVarietyAttributionTest() throws Exception {
+        List<FieldValueBean>fieldValueBeans=fundService.findVarietyAttribution("000005");
+    }
+
+    //TODO
+    @Test
+    public void findBrisonAttributionStockTest() throws Exception {
+        List<FieldValueBean>fieldValueBeans=fundService.findBrisonAttributionStock("000005");
+    }
+
+    @Test
+    public void findBrisonAttributionBondTest() throws Exception {
+        List<FieldValueBean>fieldValueBeans=fundService.findBrisonAttributionBond("000005");
+    }
+
+    //TODO
+    @Test
+    public void findChooseTimeTest() throws Exception {
+        ChooseBean chooseBean=fundService.findChooseTime("000005");
+    }
+
+    //TODO
+    @Test
+    public void findChooseStockTest() throws Exception {
+        ChooseBean chooseBean=fundService.findChooseStock("000005");
+    }
+
+    @Test
+    public void findFundPerformanceTest() throws Exception {
+        FundPerformanceBean fundPerformanceBean=fundService.findFundPerformance("000005");
+    }
+
+    @Test
+    public void findManagerPerformanceTest() throws Exception {
+        ManagerPerformanceBean managerPerformanceBean=fundService.findManagerPerformance("000005");
+    }
+
+    //TODO
+    @Test
+    public void findPublicOpinionTest() throws Exception {
+        List<PublicOpinionBean> publicOpinionBean=fundService.findPublicOpinion("000005");
+    }
+
+    //TODO
+    @Test
+    public void findPositionNetworkTest() throws Exception {
+        NetworkBean networkBean=fundService.findPositionNetwork("000005");
+    }
+
 }
