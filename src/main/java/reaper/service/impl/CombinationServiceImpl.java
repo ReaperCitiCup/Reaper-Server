@@ -14,7 +14,9 @@ import reaper.model.User;
 import reaper.repository.CombinationRepository;
 import reaper.repository.FundNetValueRepository;
 import reaper.service.CombinationService;
+import reaper.service.FundService;
 import reaper.service.UserService;
+import reaper.util.FactorNumberMapping;
 import reaper.util.PyAnalysisResult;
 import reaper.util.PythonUser;
 import reaper.util.ResultMessage;
@@ -38,6 +40,8 @@ public class CombinationServiceImpl implements CombinationService {
     @Autowired
     private FundNetValueRepository fundNetValueRepository;
 
+    @Autowired
+    private FundService fundService;
     @Autowired
     private UserService userService;
 
@@ -190,9 +194,49 @@ public class CombinationServiceImpl implements CombinationService {
      * @return
      */
     @Override
-    public CategoryFundBean findFundsByTargetAndPath(AssetTargetPathBean targetPath) {
+    public List<CategoryFundBean> findFundsByTargetAndPath(AssetTargetPathBean targetPath) {
+        if (userService.getCurrentUser() == null) {
+            return Collections.EMPTY_LIST;
+        }
 
-        return null;
+        Integer lamda = targetPath.profitRiskTarget;
+        Integer path = targetPath.path;
+
+        List<CategoryFundBean> result = new ArrayList<>();
+
+        /**
+         * 资产间分散
+         */
+        if (path == 1) {
+            Integer count = 10;
+            for (double i = 1.0; i <= 3.0; i += 1.0) {
+                List<String> tmp = getTargetPathCodes(lamda, count, path, (int) i, 0);
+                String cname = FactorNumberMapping.no2FundType(i);
+                List<MiniBean> miniBeans = new ArrayList<>();
+                for (String code : tmp) {
+                    miniBeans.add(fundService.findFundNameByCode(code));
+                }
+                result.add(new CategoryFundBean(cname, miniBeans));
+            }
+            return result;
+        }
+        /**
+         * 因子间分散
+         */
+        else if (path == 2) {
+            Integer count = 3;
+            for (String s : targetPath.factor) {
+                List<String> tmp = getTargetPathCodes(lamda, count, path, 0, FactorNumberMapping.factorName2No(s).intValue());
+                String fname = s;
+                List<MiniBean> miniBeans = new ArrayList<>();
+                for (String code : tmp) {
+                    miniBeans.add(fundService.findFundNameByCode(code));
+                }
+                result.add(new CategoryFundBean(fname, miniBeans));
+            }
+            return result;
+        }
+        return Collections.EMPTY_LIST;
     }
 
     /**
@@ -202,26 +246,57 @@ public class CombinationServiceImpl implements CombinationService {
      * @return
      */
     @Override
-    //TODO 先改完calComponentWeight再来写这个
     public ResultMessage createCombinationByAssetAllocation(FundCombinationBean fundCombination) {
+        User user = userService.getCurrentUser();
+        if (user == null) {
+            return ResultMessage.WRONG;
+        }
+
         Map<String, Double> result = new HashMap<>();
         int uncentralize_type = fundCombination.path;
+        int portfolioType = fundCombination.method;
+        List<String> codes = new ArrayList<>();
+        List<Double> input_kind = new ArrayList<>();
+        List<Double> input_weight = new ArrayList<>();
 
+        /**
+         * 资产间分散
+         */
+        if (uncentralize_type == 1) {
+            AssetWeightBean weightBean = fundCombination.weight;
+            input_weight.add(weightBean.bond / 100.00);
+            input_weight.add(weightBean.stock / 100.00);
+            input_weight.add(weightBean.hybrid / 100.00);
 
+            for (FundCategoryBean categoryBean : fundCombination.funds) {
+                Double category = FactorNumberMapping.fundType2No(categoryBean.category);
+                for (String code : categoryBean.codes) {
+                    codes.add(code);
+                    input_kind.add(category);
+                }
+            }
 
+            result = calComponentWeight(codes, portfolioType, input_kind, input_weight, uncentralize_type);
+        } else if (uncentralize_type == 2) {
+            for (FundCategoryBean categoryBean : fundCombination.funds) {
+                Double category = FactorNumberMapping.factorName2No(categoryBean.category);
+                for (String code : categoryBean.codes) {
+                    codes.add(code);
+                    input_kind.add(category);
+                }
+            }
 
+            result = calComponentWeight(codes, portfolioType, input_kind, null, uncentralize_type);
+        } else return ResultMessage.INVALID;
 
-
-//        Map<String, Double> weight = calComponentWeight(fundCombination.funds, fundCombination.method);
-//        if (weight == null || weight.isEmpty()) {
-//            return ResultMessage.FAILED;
-//        }
-//        List<FundRatioBean> beans = new ArrayList<>();
-//        for (Map.Entry<String, Double> entry : weight.entrySet()) {
-//            beans.add(new FundRatioBean(entry.getKey(), entry.getValue()));
-//        }
-//        return createCombinationByUser(fundCombination.name, beans);
-        return ResultMessage.FAILED;
+        if (result == null || result.isEmpty()) {
+            return ResultMessage.FAILED;
+        }
+        List<FundRatioBean> beans = new ArrayList<>();
+        for (Map.Entry<String, Double> entry : result.entrySet()) {
+            beans.add(new FundRatioBean(entry.getKey(), entry.getValue()));
+        }
+        return createCombinationByUser(fundCombination.name, beans);
     }
 
     /**
@@ -454,14 +529,12 @@ public class CombinationServiceImpl implements CombinationService {
 
     /**
      * 根据参数调取python获得基金代码
-     * <p>
-     * 用法写在target_path.py
      *
-     * @param lamda
-     * @param count
-     * @param sqlkind
-     * @param type_kind
-     * @param factor_kind
+     * @param lamda       是彩虹条的那个选择
+     * @param count       资产间分散为10，因子间分散为3
+     * @param sqlkind     1为资产减分散，2为因子间分散
+     * @param type_kind   只在资产间分散的时候要用，1债券型，2股票型，3混合型 要分三次调用
+     * @param factor_kind 只在因子间分散时要用 要分10次调用
      * @return
      */
     private List<String> getTargetPathCodes(Integer lamda, Integer count, Integer sqlkind, Integer type_kind, Integer factor_kind) {

@@ -7,26 +7,17 @@ import java.util.List;
  */
 public class CategoryFundBean {
     /**
-     * 股票型
+     * 分类的名称 如:股票型、混合型、或因子名称
      */
-    public List<MiniBean> stock;
+    public String name;
 
-    /**
-     * 债券型
-     */
-    public List<MiniBean> bond;
+    public List<MiniBean> funds;
 
-    /**
-     * 混合型
-     */
-    public List<MiniBean> hybrid;
-
-    public CategoryFundBean() {
+    public CategoryFundBean(String name, List<MiniBean> funds) {
+        this.name = name;
+        this.funds = funds;
     }
 
-    public CategoryFundBean(List<MiniBean> stock, List<MiniBean> bond, List<MiniBean> hybrid) {
-        this.stock = stock;
-        this.bond = bond;
-        this.hybrid = hybrid;
+    public CategoryFundBean() {
     }
 }

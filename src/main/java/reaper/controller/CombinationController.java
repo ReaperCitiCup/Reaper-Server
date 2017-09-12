@@ -58,7 +58,7 @@ public class CombinationController {
             produces = {"application/json; charset=UTF-8"}
     )
     public List<CombinationMiniBean> findCombinations() {
-        return null;
+        return combinationService.findCombinations();
     }
 
     /**
@@ -116,9 +116,8 @@ public class CombinationController {
             method = RequestMethod.POST,
             produces = {"application/json; charset=UTF-8"}
     )
-    public CategoryFundBean getTargetPath(@RequestBody AssetTargetPathBean assetTargetPathBean) {
-        //TODO 已有商业组python代码，待调用
-        return null;
+    public List<CategoryFundBean> getTargetPath(@RequestBody AssetTargetPathBean assetTargetPathBean) {
+        return combinationService.findFundsByTargetAndPath(assetTargetPathBean);
     }
 
     /**
@@ -145,6 +144,9 @@ public class CombinationController {
         } else if (resultMessage.equals(ResultMessage.WRONG)) {
             result.result = false;
             result.message = "用户未登录";
+        } else if (resultMessage.equals(ResultMessage.INVALID)) {
+            result.result = false;
+            result.message = "无效的分散化方法";
         }
         return result;
     }

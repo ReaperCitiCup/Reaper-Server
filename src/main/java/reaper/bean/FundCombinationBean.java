@@ -36,14 +36,14 @@ public class FundCombinationBean {
     /**
      * 选择的基金，需要分类
      */
-    public FundCategoryBean funds;
+    public List<FundCategoryBean> funds;
 
     /**
      * 分散化方法 1 2 3
      */
     public int method;
 
-    public FundCombinationBean(Integer profitRiskTarget, int path, AssetWeightBean weight, List<String> factor, String name, FundCategoryBean funds, int method) {
+    public FundCombinationBean(Integer profitRiskTarget, int path, AssetWeightBean weight, List<String> factor, String name, List<FundCategoryBean> funds, int method) {
         this.profitRiskTarget = profitRiskTarget;
         this.path = path;
         this.weight = weight;

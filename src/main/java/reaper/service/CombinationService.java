@@ -53,7 +53,7 @@ public interface CombinationService {
      * @param targetPath 目标及路径
      * @return
      */
-    public CategoryFundBean findFundsByTargetAndPath(AssetTargetPathBean targetPath);
+    public List<CategoryFundBean> findFundsByTargetAndPath(AssetTargetPathBean targetPath);
 
     /**
      * 资产配置-选择基金生成组合
