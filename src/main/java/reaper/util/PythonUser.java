@@ -27,7 +27,6 @@ public class PythonUser {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(res);
         return res;
 
     }

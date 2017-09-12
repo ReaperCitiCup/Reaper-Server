@@ -28,6 +28,7 @@ public class FundServiceTest {
     //TODO
     @Test
     public void findFundByKeywordTest() throws Exception {
+<<<<<<< HEAD
         reaper.util.Page<FundMiniBean> fundMiniBeanPage1=
                 fundService.findFundByKeyword("成长", "code", 10, 2);
         reaper.util.Page<FundMiniBean> fundMiniBeanPage2=
@@ -50,6 +51,11 @@ public class FundServiceTest {
         for (int i = 0; i < fundMiniBeanPage1.getResult().size() - 1; i++) {
             Assert.assertTrue(Integer.parseInt(fundMiniBeanPage1.getResult().get(i).code) < Integer.parseInt(fundMiniBeanPage1.getResult().get(i+1).code));
         }
+=======
+        reaper.util.Page<FundMiniBean> fundMiniBeanPage=
+        fundService.findFundByKeyword("000005", "id", 5, 3);
+        System.out.println();
+>>>>>>> 158686d1f7be7fbccbe1b2dbb73ee71c5100fb70
     }
 
     @Test
@@ -60,7 +66,7 @@ public class FundServiceTest {
                         "000005", "嘉实增强信用定期债券"
                 },
                 new String[]{
-                        miniBean.code, miniBean.name
+                        miniBean.id, miniBean.name
                 }
         );
     }
@@ -79,7 +85,7 @@ public class FundServiceTest {
                         "000007", "鹏华国企债债券"
                 },
                 new String[]{
-                        miniBean.code, miniBean.name
+                        miniBean.id, miniBean.name
                 }
         );
     }
@@ -92,7 +98,7 @@ public class FundServiceTest {
                         "000950", "易方达沪深300非银ETF联接"
                 },
                 new String[]{
-                        miniBean.code, miniBean.name
+                        miniBean.id, miniBean.name
                 }
         );
     }
@@ -105,7 +111,7 @@ public class FundServiceTest {
                         "000005", "嘉实增强信用定期债券"
                 },
                 new String[]{
-                        miniBean.code, miniBean.name
+                        miniBean.id, miniBean.name
                 }
         );
     }
@@ -118,7 +124,7 @@ public class FundServiceTest {
                         "000005", "嘉实增强信用定期债券"
                 },
                 new String[]{
-                        miniBean.code, miniBean.name
+                        miniBean.id, miniBean.name
                 }
         );
     }
@@ -146,7 +152,7 @@ public class FundServiceTest {
                 },
                 new String[]{
                         fundBean.code, fundBean.name, fundBean.type[0], fundBean.type[1],fundBean.establishmentDate,
-                        fundBean.manager.size()+"", fundBean.manager.get(0).code, fundBean.manager.get(0).name, fundBean.company.code, fundBean.company.name
+                        fundBean.manager.size()+"", fundBean.manager.get(0).id, fundBean.manager.get(0).name, fundBean.company.id, fundBean.company.name
                 }
                 );
         assertArrayEquals(
@@ -787,7 +793,7 @@ public class FundServiceTest {
     @Test
     public void findFundCompanyByCodeTest1() throws Exception {
         MiniBean miniBean=fundService.findFundCompanyByCode("000005");
-        Assert.assertEquals("80000223", miniBean.code);
+        Assert.assertEquals("80000223", miniBean.id);
         Assert.assertEquals("嘉实", miniBean.name);
     }
 
@@ -800,35 +806,35 @@ public class FundServiceTest {
     @Test
     public void findFundCompanyByCodeTest3() throws Exception {
         MiniBean miniBean=fundService.findFundCompanyByCode("000007");
-        Assert.assertEquals("80000230", miniBean.code);
+        Assert.assertEquals("80000230", miniBean.id);
         Assert.assertEquals("鹏华", miniBean.name);
     }
 
     @Test
     public void findFundCompanyByCodeTest4() throws Exception {
         MiniBean miniBean=fundService.findFundCompanyByCode("000948");
-        Assert.assertEquals("80000222", miniBean.code);
+        Assert.assertEquals("80000222", miniBean.id);
         Assert.assertEquals("华夏", miniBean.name);
     }
 
     @Test
     public void findFundCompanyByCodeTest5() throws Exception {
         MiniBean miniBean=fundService.findFundCompanyByCode("000950");
-        Assert.assertEquals("80000229", miniBean.code);
+        Assert.assertEquals("80000229", miniBean.id);
         Assert.assertEquals("易方达", miniBean.name);
     }
 
     @Test
     public void findFundCompanyByCodeTest6() throws Exception {
         MiniBean miniBean=fundService.findFundCompanyByCode("5");
-        Assert.assertEquals("80000223", miniBean.code);
+        Assert.assertEquals("80000223", miniBean.id);
         Assert.assertEquals("嘉实", miniBean.name);
     }
 
     @Test
     public void findFundCompanyByCodeTest7() throws Exception {
         MiniBean miniBean=fundService.findFundCompanyByCode("005");
-        Assert.assertEquals("80000223", miniBean.code);
+        Assert.assertEquals("80000223", miniBean.id);
         Assert.assertEquals("嘉实", miniBean.name);
     }
 

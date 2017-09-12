@@ -20,8 +20,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static reaper.util.CodeFormatUtil.fillCode;
-
 /**
  * Created by Sorumi on 17/8/21.
  */
@@ -61,6 +59,12 @@ public class FundServiceImpl implements FundService {
     @Autowired
     BrisonResultRepository brisonResultRepository;
 
+    @Autowired
+    CPRRepository cprRepository;
+
+    @Autowired
+    FundNetEdgeRepository fundNetEdgeRepository;
+
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     private DecimalFormat decimalFormat = new DecimalFormat("#.00");
@@ -72,7 +76,7 @@ public class FundServiceImpl implements FundService {
         res.setSize(size);
         res.setPage(page);
         //默认以升序进行排列
-        org.springframework.data.domain.Page<Fund> fundPage = fundRepository.findAllByNameLike("%" + keyword + "%", new PageRequest(page - 1, size, new Sort(Sort.Direction.ASC, order==null?"code":order)));
+        org.springframework.data.domain.Page<Fund> fundPage = fundRepository.findAllByNameLike("%" + keyword + "%", new PageRequest(page - 1, size, new Sort(Sort.Direction.ASC, order==null?"id":order)));
         List<FundMiniBean> miniBeans = new ArrayList<>();
         for (Fund fund : fundPage.getContent()) {
             //根据基金代码找到经理代码
@@ -174,7 +178,9 @@ public class FundServiceImpl implements FundService {
         }
 
         for (FundNetValue fundNetValue : fundNetValues) {
-            cumulativeValue += fundNetValue.getDailyRate();
+            if(fundNetValue.getDailyRate()!=null) {
+                cumulativeValue += fundNetValue.getDailyRate();
+            }
             res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), cumulativeValue));
         }
 
@@ -200,13 +206,13 @@ public class FundServiceImpl implements FundService {
     }
 
     @Override
-    public List<MiniBean> findCurrentManagers(String code) {
-        List<MiniBean> res = new ArrayList<>();
+    public List<IdNameBean> findCurrentManagers(String code) {
+        List<IdNameBean> res = new ArrayList<>();
 
         for(FundManager fundManager:fundManagerRepository.findByFundCode(fillCode(code))){
             try {
                 Manager manager = managerRepository.findByManagerId(fundManager.getManagerId());
-                res.add(new MiniBean(manager.getManagerId(),manager.getName()));
+                res.add(new IdNameBean(manager.getManagerId(),manager.getName()));
             }catch (NullPointerException e){
                 System.out.println(fundManager.getManagerId());
                 //TODO
@@ -240,14 +246,14 @@ public class FundServiceImpl implements FundService {
     }
 
     @Override
-    public MiniBean findFundCompanyByCode(String code) {
+    public IdNameBean findFundCompanyByCode(String code) {
         FundCompany fundCompany = fundCompanyRepository.findByFundId(fillCode(code));
         if(fundCompany==null){
             return null;
         }
         String companyId = fundCompany.getCompanyId();
         String companyName = companyRepository.findByCompanyId(companyId).getName();
-        return new MiniBean(companyId,companyName);
+        return new IdNameBean(companyId,companyName);
     }
 
     @Override
@@ -414,7 +420,7 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public PerformanceIndexBean findPerformanceIndex(String code) {
-        return null;
+        return new PerformanceIndexBean(cprRepository.findByFundId(code));
     }
 
     /**
@@ -542,8 +548,37 @@ public class FundServiceImpl implements FundService {
      * @return
      */
     @Override
-    public List<NetworkBean> findPositionNetwork(String code) {
-        return null;
+    public NetworkBean findPositionNetwork(String code) {
+        List<NodeDataBean> nodes = new ArrayList<>();
+        List<FundLinkDataBean> links = new ArrayList<>();
+
+        for(FundNetEdge fundNetEdge:getInterfacingCode(code, new ArrayList<>())){
+            //记录两个点在node数组中的位置
+            int indexA;
+            int indexB;
+
+            //先用id作为name，方便判断是否已经包含，最后一起转化为name
+            NodeDataBean node = new NodeDataBean(fundNetEdge.getCodeIdA());
+            int i = nodes.indexOf(node);
+            if(i<0){
+                nodes.add(node);
+                indexA = nodes.size()-1;
+            }else {
+                indexA = i;
+            }
+
+            node = new NodeDataBean(fundNetEdge.getCodeIdB());
+            i = nodes.indexOf(node);
+            if(i<0){
+                nodes.add(node);
+                indexB = nodes.size()-1;
+            }else {
+                indexB = i;
+            }
+            links.add(new FundLinkDataBean(indexA,indexB,fundNetEdge.getWeight()));
+        }
+        //把id转化成name
+        return new NetworkBean(nodes,links);
     }
 
     private List<PerformanceDataBean> addFundPerformOfManager(List<PerformanceDataBean> list,String managerId){
@@ -570,5 +605,29 @@ public class FundServiceImpl implements FundService {
             res.add(new ValueDateBean(attrs[0], Double.valueOf(attrs[1])));
         }
         return res;
+    }
+
+    /**
+     * 递归查找所有关系
+     * @param code 代码
+     * @param fundNetEdges 保存结果的数组
+     * @return
+     */
+    private List<FundNetEdge> getInterfacingCode(String code,List<FundNetEdge> fundNetEdges){
+        //作为左端点
+        for(FundNetEdge fundNetEdge:fundNetEdgeRepository.findAllByCodeIdA(code)){
+            if(!fundNetEdges.contains(fundNetEdge)) {
+                fundNetEdges.add(fundNetEdge);
+                fundNetEdges = getInterfacingCode(fundNetEdge.getCodeIdB(),fundNetEdges);
+            }
+        }
+        //作为右端点
+        for(FundNetEdge fundNetEdge:fundNetEdgeRepository.findAllByCodeIdB(code)){
+            if(!fundNetEdges.contains(fundNetEdge)) {
+                fundNetEdges.add(fundNetEdge);
+                fundNetEdges = getInterfacingCode(fundNetEdge.getCodeIdB(),fundNetEdges);
+            }
+        }
+        return fundNetEdges;
     }
 }

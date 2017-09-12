@@ -58,7 +58,7 @@ public class FundNetValueTest {
 
 
         MyBug myBug = new MyBug();
-        String allmessage = myBug.sendPost("http://fund.eastmoney.com/f10/F10DataApi.aspx" , "type=lsjz&code="+code+"&page=1&per=100000");
+        String allmessage = myBug.sendPost("http://fund.eastmoney.com/f10/F10DataApi.aspx" , "type=lsjz&id="+code+"&page=1&per=100000");
 
 
         //System.out.println(allmessage);

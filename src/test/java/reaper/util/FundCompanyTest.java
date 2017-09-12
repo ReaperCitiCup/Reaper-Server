@@ -73,7 +73,7 @@ public class FundCompanyTest {
                 fundCompany.setFundId(biaozhuncha1);
                 fundCompanyRepository.save(fundCompany);
 
-               // bufferedWriter.write(code+" "+ biaozhuncha1+" "+biaozhuncha2+"\n");
+               // bufferedWriter.write(id+" "+ biaozhuncha1+" "+biaozhuncha2+"\n");
 
 
             }

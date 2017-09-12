@@ -12,20 +12,20 @@ from xlutils.copy import copy
 import numpy
 import pandas as pd
 import math
-from sklearn.cross_validation import train_test_split  #ÒıÓÃ½»²æÑéÖ¤
+from sklearn.cross_validation import train_test_split  #å¼•ç”¨äº¤å‰éªŒè¯
 from sklearn.linear_model import LinearRegression
 import sys
 
 
-Number_Of_Trading_Days=245#Ò»ÄêµÄ½»Ò×ÈÕ¸öÊı
+Number_Of_Trading_Days=245#ä¸€å¹´çš„äº¤æ˜“æ—¥ä¸ªæ•°
 
 
 
-#¼ÆËã±ê×¼²î,²ÎÊıÀàĞÍ£ºÁĞ±í
+#è®¡ç®—æ ‡å‡†å·®,å‚æ•°ç±»å‹ï¼šåˆ—è¡¨
 def standardDeviation(rate):
      return numpy.std(rate)
 
-#¼ÆËãÏÂĞĞ±ê×¼²î£¬²ÎÊıÀàĞÍ£ºÁĞ±í
+#è®¡ç®—ä¸‹è¡Œæ ‡å‡†å·®ï¼Œå‚æ•°ç±»å‹ï¼šåˆ—è¡¨
 def downsideStdDev(rate,rf):   #rf:risk-free rate
      rateLen=len(rate)
      smallerRate=[]
@@ -43,7 +43,7 @@ def downsideStdDev(rate,rf):   #rf:risk-free rate
 
 
 
-#¼ÆËãĞ­·½²î£¬²ÎÊıÀàĞÍ£ºÁĞ±í
+#è®¡ç®—åæ–¹å·®ï¼Œå‚æ•°ç±»å‹ï¼šåˆ—è¡¨
 def countCovariance(x,y):
      xy=[]
      xyLen=min(len(x),len(y))
@@ -59,7 +59,7 @@ def countCovariance(x,y):
 
 
 
-#¼ÆËãBetaÖµ£¬²ÎÊıÀàĞÍ£ºÁĞ±í
+#è®¡ç®—Betaå€¼ï¼Œå‚æ•°ç±»å‹ï¼šåˆ—è¡¨
 def countBeta(resultRate,marketRate):
      x=resultRate
      y=marketRate   
@@ -71,7 +71,7 @@ def countBeta(resultRate,marketRate):
      return beta
 
 
-#¼ÆËãAlpha£¬²ÎÊıÀàĞÍ£ºÇ°Èı¸öÎªÁĞ±í£¬betaÎªÊıÖµ
+#è®¡ç®—Alphaï¼Œå‚æ•°ç±»å‹ï¼šå‰ä¸‰ä¸ªä¸ºåˆ—è¡¨ï¼Œbetaä¸ºæ•°å€¼
 def countAlpha(resultRate,marketRate,rf,beta):
      alpha=[]
      alphaLen=min(len(resultRate),len(marketRate))
@@ -81,7 +81,7 @@ def countAlpha(resultRate,marketRate,rf,beta):
 
 
 
-#¼ÆËãÏÄÆÕ±È£¬²ÎÊıÀàĞÍ£ºÁĞ±í
+#è®¡ç®—å¤æ™®æ¯”ï¼Œå‚æ•°ç±»å‹ï¼šåˆ—è¡¨
 def countSharpeRatio(resultRate,rf):
      Erp=sum(resultRate)/len(resultRate)
      Erf=sum(rf)/len(rf)
@@ -93,27 +93,27 @@ def countSharpeRatio(resultRate,rf):
      
 
 
-#¼ÆËãÁ½¸öĞòÁĞµÄÏà¹ØÏµÊı£¬²ÎÊıÀàĞÍ£ºÁĞ±í
+#è®¡ç®—ä¸¤ä¸ªåºåˆ—çš„ç›¸å…³ç³»æ•°ï¼Œå‚æ•°ç±»å‹ï¼šåˆ—è¡¨
 def countCorrelation(r1,r2):
      return countCovariance(r1,r2)/(numpy.std(r1)*numpy.std(r2))
 
 
 
 
-#¼ÆËãÔÚÏÕ¼ÛÖµ£¬²ÎÊıÀàĞÍ£ºÊıÖµ
+#è®¡ç®—åœ¨é™©ä»·å€¼ï¼Œå‚æ•°ç±»å‹ï¼šæ•°å€¼
 def countValue_at_risk(yearlySigam):
      return 2.33*yearlySigam/math.sqrt(52)
 
 
 
 
-#¼ÆËãÄê»¯²¨¶¯ÂÊ£¬²ÎÊıÀàĞÍ£ºÁĞ±í
+#è®¡ç®—å¹´åŒ–æ³¢åŠ¨ç‡ï¼Œå‚æ•°ç±»å‹ï¼šåˆ—è¡¨
 def annualizedVolatility(r):
      return standardDeviation(r)*math.sqrt(Number_Of_Trading_Days)
 
 
 
-#¼ÆËãÄê»¯ÊÕÒæÂÊ£¬²ÎÊıÀàĞÍ£ºÁĞ±í
+#è®¡ç®—å¹´åŒ–æ”¶ç›Šç‡ï¼Œå‚æ•°ç±»å‹ï¼šåˆ—è¡¨
 def annualizedRate(dailyRate):
      result=0
      countLen=0
@@ -124,7 +124,7 @@ def annualizedRate(dailyRate):
 
 
 
-#¼ÆËãÌØÀ×Åµ±ÈÂÊ£¬²ÎÊıÀàĞÍ£ºÇ°Á½¸öÎªÁĞ±í£¬betaÎªÊıÖµ
+#è®¡ç®—ç‰¹é›·è¯ºæ¯”ç‡ï¼Œå‚æ•°ç±»å‹ï¼šå‰ä¸¤ä¸ªä¸ºåˆ—è¡¨ï¼Œbetaä¸ºæ•°å€¼
 def TreynorRatio(resultRate,rf,beta):
      Erp=sum(resultRate)/len(resultRate)
      Erf=sum(rf)/len(rf)
@@ -134,7 +134,7 @@ def TreynorRatio(resultRate,rf,beta):
 
 
 
-#ÇóÁ½¸öÁĞ±íµÄ²î
+#æ±‚ä¸¤ä¸ªåˆ—è¡¨çš„å·®
 def ListSub(l1,l2):
      rtn=[]
      length=min(len(l1),len(l2))
@@ -152,37 +152,37 @@ def ListSubSqare(l1,l2):
 
 
 
-#»ñÈ¡Êı¾İ¿âÀï»ù½ğµÄËùÓĞ´úÂë
+#è·å–æ•°æ®åº“é‡ŒåŸºé‡‘çš„æ‰€æœ‰ä»£ç 
 def getCode():
     try:
         conn=pymysql.connect(host='106.15.203.173',user='reaper',passwd='reaper112233',db='reaper',port=3306,charset='utf8')
-        cur=conn.cursor()#»ñÈ¡Ò»¸öÓÎ±ê
-        cur.execute('SELECT  distinct code FROM reaper.fund_netValue')
+        cur=conn.cursor()#è·å–ä¸€ä¸ªæ¸¸æ ‡
+        cur.execute('SELECT  distinct id FROM reaper.fund_netValue')
         data=cur.fetchall()
-        code=[]    
+        id=[]
         for d in data :
-            code.append(str(d[0]))        
-    except Exception :print("²éÑ¯Ê§°Ü")
-    return code
+            id.append(str(d[0]))
+    except Exception :print("æŸ¥è¯¢å¤±è´¥")
+    return id
 
-#»ù½ğÀà
+#åŸºé‡‘ç±»
 class Fund:
-     def __init__(self,code):
-          self.code=code   #»ù½ğ´úÂë
+     def __init__(self,id):
+          self.id=id   #åŸºé‡‘ä»£ç 
           self.date=[]
-          self.nav=[]   #µ¥Î»¾»Öµ
-          self.dailyRate=[]   #ÈÕÊÕÒæÂÊ       
+          self.nav=[]   #å•ä½å‡€å€¼
+          self.dailyRate=[]   #æ—¥æ”¶ç›Šç‡       
 
-#¸ù¾İ»ù½ğ´úÂë´ÓÊı¾İ¿âÀï»ñÈ¡Ä³¸ö»ù½ğµÄĞÅÏ¢
-def getFund(code):
-    fund=Fund(code)
+#æ ¹æ®åŸºé‡‘ä»£ç ä»æ•°æ®åº“é‡Œè·å–æŸä¸ªåŸºé‡‘çš„ä¿¡æ¯
+def getFund(id):
+    fund=Fund(id)
     try:
         conn=pymysql.connect(host='106.15.203.173',user='reaper',passwd='reaper112233',db='reaper',port=3306,charset='utf8')
         cur=conn.cursor()
-        cur.execute('SELECT  date,unitNetValue,dailyRate FROM reaper.fund_netValue WHERE code='+code)
+        cur.execute('SELECT  date,unitNetValue,dailyRate FROM reaper.fund_netValue WHERE id='+id)
         data=cur.fetchall()               
         for d in data :          
-            fund.date.append((str(d[0]))[:10]) #È¥µôÊ±·ÖÃë
+            fund.date.append((str(d[0]))[:10]) #å»æ‰æ—¶åˆ†ç§’
             nav=filter(lambda ch: ch in '0123456789.',str(d[1]))
             if(''==nav):
                 appNav=sum(fund.nav[-11:-1])/10
@@ -206,22 +206,22 @@ def getFund(code):
                 
                 fund.dailyRate.append(appDailyRate)
             else:       
-                fund.dailyRate.append((float(dailyRate))/100) #Êı¾İ¿âÀïµÄÀûÂÊÊ¡ÂÔÁË°Ù·ÖºÅµÄ£¬³ı»ØÀ´
+                fund.dailyRate.append((float(dailyRate))/100) #æ•°æ®åº“é‡Œçš„åˆ©ç‡çœç•¥äº†ç™¾åˆ†å·çš„ï¼Œé™¤å›æ¥
             #print (float(d[2]))/100
-    except Exception :print(code+"²éÑ¯Ê§°Ü")
+    except Exception :print(id+"æŸ¥è¯¢å¤±è´¥")
     return fund
     
 
 
-#½â¾öÈÕÆÚÓëÊÕÒæÂÊÒÔ¼°¾»ÖµµÄ¶ÔÓ¦ÎÊÌâ£¬·µ»ØµÄ¶ÔÏóµÄÊôĞÔ°üÀ¨£º
-#¸÷¸öÈÕÆÚĞòÁĞµÄ²¢Öµ£¬ÒÔ¼°¸ÃÊ±¼äĞòÁĞ¶ÔÓ¦µÄ»ù½ğÊÕÒæÂÊ£¬ÊĞ³¡ÊÕÒæÂÊºÍÎŞ·çÏÕÀûÂÊ(Í¨¹ıÏàÍ¬µÄÏÂ±ê¶ÔÓ¦£¬ÈçfundRate[i],rm[i],rf[i]Í¬Îªdate[i]ÕâÒ»ÌìµÄÊı¾İ£©
+#è§£å†³æ—¥æœŸä¸æ”¶ç›Šç‡ä»¥åŠå‡€å€¼çš„å¯¹åº”é—®é¢˜ï¼Œè¿”å›çš„å¯¹è±¡çš„å±æ€§åŒ…æ‹¬ï¼š
+#å„ä¸ªæ—¥æœŸåºåˆ—çš„å¹¶å€¼ï¼Œä»¥åŠè¯¥æ—¶é—´åºåˆ—å¯¹åº”çš„åŸºé‡‘æ”¶ç›Šç‡ï¼Œå¸‚åœºæ”¶ç›Šç‡å’Œæ— é£é™©åˆ©ç‡(é€šè¿‡ç›¸åŒçš„ä¸‹æ ‡å¯¹åº”ï¼Œå¦‚fundRate[i],rm[i],rf[i]åŒä¸ºdate[i]è¿™ä¸€å¤©çš„æ•°æ®ï¼‰
 class corrDate:   
     def __init__(self,date1,l1,date2,l2,date3=0,l3=0):    
-          self.date=[]  #date1£¬date2£¬date3ÕâÈı¸öÈÕÆÚĞòÁĞµÄ²¢Öµ
+          self.date=[]  #date1ï¼Œdate2ï¼Œdate3è¿™ä¸‰ä¸ªæ—¥æœŸåºåˆ—çš„å¹¶å€¼
           self.fundRate=[]
           self.rm=[]
           self.rf=[]    
-          if(0==date3): #Ö»ÓĞÁ½¸öÊ±¼äĞòÁĞµÄÇé¿ö
+          if(0==date3): #åªæœ‰ä¸¤ä¸ªæ—¶é—´åºåˆ—çš„æƒ…å†µ
                i1=0
                i2=0
                while(i1<len(date1) and i2<len(date2)):
@@ -233,13 +233,13 @@ class corrDate:
                              i2+=1
                     
                    if(i1<len(date1) and i2<len(date2)):
-                        #´Ë´¦ÓĞdate1[i1]=date2[i2]
+                        #æ­¤å¤„æœ‰date1[i1]=date2[i2]
                         self.date.append(date1[i1])
                         self.fundRate.append(l1[i1])
                         self.rm.append(l2[i2])
                         i1+=1
                         i2+=1
-          else:#Èı¸öÊ±¼äĞòÁĞ
+          else:#ä¸‰ä¸ªæ—¶é—´åºåˆ—
                i1=0
                i2=0
                i3=0
@@ -270,7 +270,7 @@ class corrDate:
                         i1+=1
                         i2+=1
                         i3+=1
-     #°´ÆğÊ¼Ê±¼ä¼ÆËã(ÈçÓÃ»§ÒªÇó¼ÆËãÄ³Ò»¶ÎÊ±¼äµÄ²¨¶¯ÂÊ£©
+     #æŒ‰èµ·å§‹æ—¶é—´è®¡ç®—(å¦‚ç”¨æˆ·è¦æ±‚è®¡ç®—æŸä¸€æ®µæ—¶é—´çš„æ³¢åŠ¨ç‡ï¼‰
     def countByDate(self,startTime,endTime):
         i=0
         tempDate=[]
@@ -295,7 +295,7 @@ class corrDate:
           
 
 
-#ÊĞ³¡ÊÕÒæÂÊ¶ÔÏó£¬ÔİÊ±ÊÇ´ÓcsvÎÄ¼ş¶ÁÈ¡Êı¾İ£¬Êı¾İ¿âÀïÓĞ¸ÃÊı¾İ¿ÉĞŞ¸Ä³É´ÓÊı¾İ¿âÀï¶ÁÈ¡
+#å¸‚åœºæ”¶ç›Šç‡å¯¹è±¡ï¼Œæš‚æ—¶æ˜¯ä»csvæ–‡ä»¶è¯»å–æ•°æ®ï¼Œæ•°æ®åº“é‡Œæœ‰è¯¥æ•°æ®å¯ä¿®æ”¹æˆä»æ•°æ®åº“é‡Œè¯»å–
 class Rm:
      def __init__(self,fileName):
           self.date=[]   
@@ -310,14 +310,14 @@ class Rm:
                if(1==firstRow):
                          firstRow=0
                          continue    
-               fundData.append(row)#¶ÁÈëÃ¿Ò»ĞĞÊı¾İ
+               fundData.append(row)#è¯»å…¥æ¯ä¸€è¡Œæ•°æ®
                
           dataLen=len(fundData)
           i=0
           while(i+20<dataLen):     
              self.date.append((filter(lambda ch: ch in '-0123456789',fundData[i][0])))
              curPrice=(float)(filter(lambda ch: ch in '0123456789.', fundData[i][3]))
-             monthAgoPrice=(float)(filter(lambda ch: ch in '0123456789.', fundData[i+20][3]))#ÉèÃ¿ÔÂ20¸ö½»Ò×ÈÕ
+             monthAgoPrice=(float)(filter(lambda ch: ch in '0123456789.', fundData[i+20][3]))#è®¾æ¯æœˆ20ä¸ªäº¤æ˜“æ—¥
              self.closingPrice.append(curPrice)
              dateRate=(filter(lambda ch: ch in '-0123456789.',fundData[i][4]))
              if(''==dateRate):
@@ -328,7 +328,7 @@ class Rm:
              i+=1
 
 
-#ÎŞ·çÏÕÊÕÒæÂÊ¶ÔÏó£¬ÔİÊ±ÊÇ´ÓcsvÎÄ¼ş¶ÁÈ¡Êı¾İ
+#æ— é£é™©æ”¶ç›Šç‡å¯¹è±¡ï¼Œæš‚æ—¶æ˜¯ä»csvæ–‡ä»¶è¯»å–æ•°æ®
 class Rf:
      def __init__(self,fileName,Treasury=''):
           self.date=[]   
@@ -344,7 +344,7 @@ class Rf:
               rm=[]
               r=1
               date=datetime(*xldate_as_tuple(table.row_values(r,0)[0],0)).strftime('%Y-%m-%d')
-              while (date>'2016-12-30'):  #ÓÃ¹úÕ®Êı¾İ¼ÆËã2016/12/30ÒÔºóµÄÎŞ·çÏÕÊÕÒæÂÊ£¨ÒòÎªFund_RiskFree.csvÀïÃ»ÓĞ£©
+              while (date>'2016-12-30'):  #ç”¨å›½å€ºæ•°æ®è®¡ç®—2016/12/30ä»¥åçš„æ— é£é™©æ”¶ç›Šç‡ï¼ˆå› ä¸ºFund_RiskFree.csvé‡Œæ²¡æœ‰ï¼‰
                   self.date.append(date)
                   self.rfDaily.append(table.row_values(r,4)[0])
                   self.rfWeekly.append((table.row_values(r,3)[0]-table.row_values(r+5,3)[0])/table.row_values(r+5,3)[0])
@@ -361,7 +361,7 @@ class Rf:
                lastLine=lines[-1]
 
                lineLen=len(lines)
-               i=lineLen-1-1 #×îºóÒ»ĞĞÎª¿ÕĞĞ£¬ÉáÈ¥
+               i=lineLen-1-1 #æœ€åä¸€è¡Œä¸ºç©ºè¡Œï¼Œèˆå»
                
                while i>0:
                     line=lines[i]
@@ -396,61 +396,61 @@ class Rf:
 
 
 
-#¹¹Ôì»ù½ğ×éºÏ£¬´ıĞø
+#æ„é€ åŸºé‡‘ç»„åˆï¼Œå¾…ç»­
 def fundGroup():
      fundDict={}
-     codeList=[]    #Ç°¶ËÓ¦¸Ã´«À´µÄÓÃÓÚ¹¹Ôì»ù½ğ×éºÏµÄÊı¾İ
-     pencentage=[]  #codeListÎªÓÃ»§ËùÑ¡µÄ×éºÏÖĞËùÓÃ»ù½ğµÄ´úÂë£¨ÁĞ±íÀàĞÍ£©£¬pencentageÎª×éºÏÖĞËùÓÃ»ù½ğÕ¼×éºÏµÄ°Ù·Ö±È£¨Ò²ÎªÁĞ±íÀàĞÍ£¬ÓëcodeListÍ¨¹ıÏÂ±ê¶ÔÓ¦£¬Èçpencentage[i]±íÊ¾»ù½ğ´úÂëÎªcodeList[i]µÄ»ù½ğÕ¼×éºÏµÄ°Ù·Ö±È£©
-     for code in codeList:
-        fundDict[code]=getFund(code) #»ñÈ¡×éºÏÖĞ¸÷¸ö»ù½ğµÄĞÅÏ¢
+     codeList=[]    #å‰ç«¯åº”è¯¥ä¼ æ¥çš„ç”¨äºæ„é€ åŸºé‡‘ç»„åˆçš„æ•°æ®
+     pencentage=[]  #codeListä¸ºç”¨æˆ·æ‰€é€‰çš„ç»„åˆä¸­æ‰€ç”¨åŸºé‡‘çš„ä»£ç ï¼ˆåˆ—è¡¨ç±»å‹ï¼‰ï¼Œpencentageä¸ºç»„åˆä¸­æ‰€ç”¨åŸºé‡‘å ç»„åˆçš„ç™¾åˆ†æ¯”ï¼ˆä¹Ÿä¸ºåˆ—è¡¨ç±»å‹ï¼Œä¸codeListé€šè¿‡ä¸‹æ ‡å¯¹åº”ï¼Œå¦‚pencentage[i]è¡¨ç¤ºåŸºé‡‘ä»£ç ä¸ºcodeList[i]çš„åŸºé‡‘å ç»„åˆçš„ç™¾åˆ†æ¯”ï¼‰
+     for id in codeList:
+        fundDict[id]=getFund(id) #è·å–ç»„åˆä¸­å„ä¸ªåŸºé‡‘çš„ä¿¡æ¯
         
-     myFundGroup=Fund("myFundGroup")#´´½¨Ò»¸ö¿ÕµÄ»ù½ğ×éºÏ¶ÔÏó£¬¼ÓÈ¨Æ½¾ùºóµÄÊı¾İ¿É·Åµ½Õâ¸ö¶ÔÏóÖĞ
-     #¡£¡£¡£
+     myFundGroup=Fund("myFundGroup")#åˆ›å»ºä¸€ä¸ªç©ºçš„åŸºé‡‘ç»„åˆå¯¹è±¡ï¼ŒåŠ æƒå¹³å‡åçš„æ•°æ®å¯æ”¾åˆ°è¿™ä¸ªå¯¹è±¡ä¸­
+     #ã€‚ã€‚ã€‚
      
 
 
 
 
-#²âÊÔº¯Êı
+#æµ‹è¯•å‡½æ•°
 def test():
-     rm=Rm('000001.csv')#¶ÁÈ¡ÊĞ³¡Êı¾İ
+     rm=Rm('000001.csv')#è¯»å–å¸‚åœºæ•°æ®
      #print rm.monthRate
      rf=Rf('Fund_RiskFree.csv','Treasury.xlsx')
      #print rf.date
-     fundDict={} #»ù½ğ×Öµä£¬ÓÃÓÚ²éÑ¯»ò¹ÜÀí»ù½ğ£¬keyÎª»ù½ğ´úÂë£¬valueÎªFund¶ÔÏó    
+     fundDict={} #åŸºé‡‘å­—å…¸ï¼Œç”¨äºæŸ¥è¯¢æˆ–ç®¡ç†åŸºé‡‘ï¼Œkeyä¸ºåŸºé‡‘ä»£ç ï¼Œvalueä¸ºFundå¯¹è±¡    
      #codeList=getCode()   
-     #for code in codeList:
-     #    fundDict[code]=getFund(code)
+     #for id in codeList:
+     #    fundDict[id]=getFund(id)
          
-     code='000003' #Ç°¶Ëµã»÷²é¿´Ä³Ö»»ù½ğµÄĞÅÏ¢ºó£¬´«À´¸Ã»ù½ğµÄ´úÂë£¬¸³Öµµ½ÕâÀï£¬±ã¿É»ñÈ¡¸Ã»ù½ğµÄĞÅÏ¢²¢¼ÆËã¸÷ÖÖ·çÏÕÒò×Ó
-     fundDict[code]=getFund(code)
+     id='000003' #å‰ç«¯ç‚¹å‡»æŸ¥çœ‹æŸåªåŸºé‡‘çš„ä¿¡æ¯åï¼Œä¼ æ¥è¯¥åŸºé‡‘çš„ä»£ç ï¼Œèµ‹å€¼åˆ°è¿™é‡Œï¼Œä¾¿å¯è·å–è¯¥åŸºé‡‘çš„ä¿¡æ¯å¹¶è®¡ç®—å„ç§é£é™©å› å­
+     fundDict[id]=getFund(id)
      
-     temp=corrDate(fundDict[code].date,fundDict[code].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly) 
-        #Í³Ò»ÈÕÆÚ£¬²¢·µ»ØÍ³Ò»ºóµÄÈÕÆÚĞòÁĞºÍ¸ÃÈÕÆÚĞòÁĞ¶ÔÓ¦µÄ»ù½ğÊÕÒæÂÊĞòÁĞ/ÊĞ³¡ÊÕÒæÂÊĞòÁĞ/ÎŞ·çÏÕÀûÂÊĞòÁĞ,ÊĞ³¡Êı¾İÓÃµÄÊÇÈÕÊÕÒæÂÊ£¬ÎŞ·çÏÕÀûÂÊÓÃµÄÊÇÔÂÊÕÒæÂÊ
+     temp=corrDate(fundDict[id].date,fundDict[id].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly)
+        #ç»Ÿä¸€æ—¥æœŸï¼Œå¹¶è¿”å›ç»Ÿä¸€åçš„æ—¥æœŸåºåˆ—å’Œè¯¥æ—¥æœŸåºåˆ—å¯¹åº”çš„åŸºé‡‘æ”¶ç›Šç‡åºåˆ—/å¸‚åœºæ”¶ç›Šç‡åºåˆ—/æ— é£é™©åˆ©ç‡åºåˆ—,å¸‚åœºæ•°æ®ç”¨çš„æ˜¯æ—¥æ”¶ç›Šç‡ï¼Œæ— é£é™©åˆ©ç‡ç”¨çš„æ˜¯æœˆæ”¶ç›Šç‡
 
      
      beta=countBeta(temp.fundRate,temp.rm)
      alpha=countAlpha(temp.fundRate,temp.rm,temp.rf,beta)
      
       
-     print "Ä¿±ê»ù½ğÄê»¯ÊÕÒæÂÊ=",annualizedRate(fundDict[code].dailyRate)
-     print "Ä¿±ê»ù½ğÄê»¯²¨¶¯ÂÊ=",annualizedVolatility(temp.fundRate)
-     print "Ä¿±ê»ù½ğÔÚÏÕ¼ÛÖµ=",countValue_at_risk(annualizedVolatility(temp.fundRate))
-     print "Ä¿±ê»ù½ğÊÕÒæÂÊĞòÁĞµÄÏÂĞĞ±ê×¼²î=",downsideStdDev(temp.fundRate,temp.rf)
-     print "Ä¿±ê»ù½ğÏÄÆÕ±È=",countSharpeRatio(temp.fundRate,temp.rf)
+     print "ç›®æ ‡åŸºé‡‘å¹´åŒ–æ”¶ç›Šç‡=",annualizedRate(fundDict[id].dailyRate)
+     print "ç›®æ ‡åŸºé‡‘å¹´åŒ–æ³¢åŠ¨ç‡=",annualizedVolatility(temp.fundRate)
+     print "ç›®æ ‡åŸºé‡‘åœ¨é™©ä»·å€¼=",countValue_at_risk(annualizedVolatility(temp.fundRate))
+     print "ç›®æ ‡åŸºé‡‘æ”¶ç›Šç‡åºåˆ—çš„ä¸‹è¡Œæ ‡å‡†å·®=",downsideStdDev(temp.fundRate,temp.rf)
+     print "ç›®æ ‡åŸºé‡‘å¤æ™®æ¯”=",countSharpeRatio(temp.fundRate,temp.rf)
      print "beta=",beta
      #for i in range(len(alpha)):
-     #    print temp.date[i]+"¶ÔÓ¦µÄalphaÖµÎª",alpha[i]   
-     print "Ä¿±ê»ù½ğÌØÀ×ÅµÖ¸Êı=",TreynorRatio(temp.fundRate,temp.rf,beta)
+     #    print temp.date[i]+"å¯¹åº”çš„alphaå€¼ä¸º",alpha[i]   
+     print "ç›®æ ‡åŸºé‡‘ç‰¹é›·è¯ºæŒ‡æ•°=",TreynorRatio(temp.fundRate,temp.rf,beta)
 
      
      
-     #T-M»Ø¹éÄ£ĞÍ£¨ÏêÇé¼ûÖ¸±êÊı¾İ¹éÄÉ.pdf)
+     #T-Må›å½’æ¨¡å‹ï¼ˆè¯¦æƒ…è§æŒ‡æ ‡æ•°æ®å½’çº³.pdf)
      y=ListSub(temp.fundRate,temp.rf)
      x1=ListSub(temp.rm,temp.rf)
      x2=ListSubSqare(temp.rm,temp.rf)
      obj_dict={'y':y,'x1':x1,'x2':x2}
-     data=pd.DataFrame(obj_dict)#Í¨¹ı×Öµä´´½¨dataframe
+     data=pd.DataFrame(obj_dict)#é€šè¿‡å­—å…¸åˆ›å»ºdataframe
      #data.to_csv("testfoo.csv")
      x=data[['x1','x2']]
      y=data['y']
@@ -458,37 +458,37 @@ def test():
      linreg = LinearRegression()  
      model=linreg.fit(X_train, y_train)  
      #print model    
-     print 'Ôñ¹ÉÏµÊı£º',linreg.intercept_
-     print 'ÔñÊ±ÏµÊı£º',linreg.coef_[1]
+     print 'æ‹©è‚¡ç³»æ•°ï¼š',linreg.intercept_
+     print 'æ‹©æ—¶ç³»æ•°ï¼š',linreg.coef_[1]
 
 
 
-     #¼ÆËãÄ³¶ÎÊ±¼äÄÚµÄ¸÷ÖÖ»ù½ğÖ¸±ê
-     code='000003' #Ç°¶Ëµã»÷²é¿´Ä³Ö»»ù½ğµÄĞÅÏ¢ºó£¬´«À´¸Ã»ù½ğµÄ´úÂë£¬¸³Öµµ½ÕâÀï£¬±ã¿É»ñÈ¡¸Ã»ù½ğµÄĞÅÏ¢²¢¼ÆËã¸÷ÖÖ·çÏÕÒò×Ó
-     fundDict[code]=getFund(code)    
-     temp=corrDate(fundDict[code].date,fundDict[code].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly) 
-     temp.countByDate('2016-05-06','2017-08-01') #ÈôÒª¼ÆËã Ä³¶ÎÊ±¼äÄÚ µÄ²¨¶¯ÂÊ£¬ÔòÒªÏÈµ÷ÓÃÕâ¸öº¯Êı£¬²ÎÊıÎª¿ªÊ¼ºÍ½ØÖÁÈÕÆÚ£¬ÀàĞÍÎª×Ö·û´®£¬¸ñÊ½Îª'yyyy-mm-dd'(ÎåÔÂÁùºÅµÄ5ºÍ6Ç°µÄ0²»ÄÜÊ¡ÂÔ£©
-     #È»ºóÓÃtempµÄÊôĞÔ¼ÆËã³öÀ´µÄ²¨¶¯ÂÊ¾ÍÊÇÕâ¶ÎÊ±¼äÄÚµÄÁË£¨Ç°ÌáÊÇÄ¿±ê»ù½ğ/ÊĞ³¡ÊÕÒæÂÊ/ÎŞ·çÏÕÀûÂÊÓĞÕâ¶ÎÊ±¼äÄÚµÄÊı¾İ£©
-     #¼ÆËã·½·¨Í¬ÉÏ
+     #è®¡ç®—æŸæ®µæ—¶é—´å†…çš„å„ç§åŸºé‡‘æŒ‡æ ‡
+     id='000003' #å‰ç«¯ç‚¹å‡»æŸ¥çœ‹æŸåªåŸºé‡‘çš„ä¿¡æ¯åï¼Œä¼ æ¥è¯¥åŸºé‡‘çš„ä»£ç ï¼Œèµ‹å€¼åˆ°è¿™é‡Œï¼Œä¾¿å¯è·å–è¯¥åŸºé‡‘çš„ä¿¡æ¯å¹¶è®¡ç®—å„ç§é£é™©å› å­
+     fundDict[id]=getFund(id)
+     temp=corrDate(fundDict[id].date,fundDict[id].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly)
+     temp.countByDate('2016-05-06','2017-08-01') #è‹¥è¦è®¡ç®— æŸæ®µæ—¶é—´å†… çš„æ³¢åŠ¨ç‡ï¼Œåˆ™è¦å…ˆè°ƒç”¨è¿™ä¸ªå‡½æ•°ï¼Œå‚æ•°ä¸ºå¼€å§‹å’Œæˆªè‡³æ—¥æœŸï¼Œç±»å‹ä¸ºå­—ç¬¦ä¸²ï¼Œæ ¼å¼ä¸º'yyyy-mm-dd'(äº”æœˆå…­å·çš„5å’Œ6å‰çš„0ä¸èƒ½çœç•¥ï¼‰
+     #ç„¶åç”¨tempçš„å±æ€§è®¡ç®—å‡ºæ¥çš„æ³¢åŠ¨ç‡å°±æ˜¯è¿™æ®µæ—¶é—´å†…çš„äº†ï¼ˆå‰ææ˜¯ç›®æ ‡åŸºé‡‘/å¸‚åœºæ”¶ç›Šç‡/æ— é£é™©åˆ©ç‡æœ‰è¿™æ®µæ—¶é—´å†…çš„æ•°æ®ï¼‰
+     #è®¡ç®—æ–¹æ³•åŒä¸Š
      beta=countBeta(temp.fundRate,temp.rm)
      alpha=countAlpha(temp.fundRate,temp.rm,temp.rf,beta)
-     print "Ä¿±ê»ù½ğÊÕÒæÂÊĞòÁĞ2016-05-06ÖÁ2017-08-01µÄÄê»¯ÊÕÒæÂÊ=",annualizedRate(fundDict[code].dailyRate)
-     print "Ä¿±ê»ù½ğÊÕÒæÂÊĞòÁĞ2016-05-06ÖÁ2017-08-01µÄÄê»¯²¨¶¯ÂÊ=",annualizedVolatility(temp.fundRate)
-     print "Ä¿±ê»ù½ğÊÕÒæÂÊĞòÁĞ2016-05-06ÖÁ2017-08-01µÄÔÚÏÕ¼ÛÖµ=",countValue_at_risk(annualizedVolatility(temp.fundRate))
-     print "Ä¿±ê»ù½ğÊÕÒæÂÊĞòÁĞ2016-05-06ÖÁ2017-08-01µÄÊÕÒæÂÊĞòÁĞµÄÏÂĞĞ±ê×¼²î=",downsideStdDev(temp.fundRate,temp.rf)
-     print "Ä¿±ê»ù½ğÊÕÒæÂÊĞòÁĞ2016-05-06ÖÁ2017-08-01µÄÏÄÆÕ±È=",countSharpeRatio(temp.fundRate,temp.rf)
-     print "Ä¿±ê»ù½ğÊÕÒæÂÊĞòÁĞ2016-05-06ÖÁ2017-08-01µÄbeta=",beta
+     print "ç›®æ ‡åŸºé‡‘æ”¶ç›Šç‡åºåˆ—2016-05-06è‡³2017-08-01çš„å¹´åŒ–æ”¶ç›Šç‡=",annualizedRate(fundDict[id].dailyRate)
+     print "ç›®æ ‡åŸºé‡‘æ”¶ç›Šç‡åºåˆ—2016-05-06è‡³2017-08-01çš„å¹´åŒ–æ³¢åŠ¨ç‡=",annualizedVolatility(temp.fundRate)
+     print "ç›®æ ‡åŸºé‡‘æ”¶ç›Šç‡åºåˆ—2016-05-06è‡³2017-08-01çš„åœ¨é™©ä»·å€¼=",countValue_at_risk(annualizedVolatility(temp.fundRate))
+     print "ç›®æ ‡åŸºé‡‘æ”¶ç›Šç‡åºåˆ—2016-05-06è‡³2017-08-01çš„æ”¶ç›Šç‡åºåˆ—çš„ä¸‹è¡Œæ ‡å‡†å·®=",downsideStdDev(temp.fundRate,temp.rf)
+     print "ç›®æ ‡åŸºé‡‘æ”¶ç›Šç‡åºåˆ—2016-05-06è‡³2017-08-01çš„å¤æ™®æ¯”=",countSharpeRatio(temp.fundRate,temp.rf)
+     print "ç›®æ ‡åŸºé‡‘æ”¶ç›Šç‡åºåˆ—2016-05-06è‡³2017-08-01çš„beta=",beta
      #for i in range(len(alpha)):
-     #    print temp.date[i]+"¶ÔÓ¦µÄalphaÖµÎª",alpha[i]
-     print "Ä¿±ê»ù½ğÊÕÒæÂÊĞòÁĞ2016-05-06ÖÁ2017-08-01µÄÌØÀ×ÅµÖ¸Êı=",TreynorRatio(temp.fundRate,temp.rf,beta)
+     #    print temp.date[i]+"å¯¹åº”çš„alphaå€¼ä¸º",alpha[i]
+     print "ç›®æ ‡åŸºé‡‘æ”¶ç›Šç‡åºåˆ—2016-05-06è‡³2017-08-01çš„ç‰¹é›·è¯ºæŒ‡æ•°=",TreynorRatio(temp.fundRate,temp.rf,beta)
 
      
-     #T-M»Ø¹éÄ£ĞÍµÄ¼ÆËãÒ²Í¬ÉÏ
+     #T-Må›å½’æ¨¡å‹çš„è®¡ç®—ä¹ŸåŒä¸Š
      y=ListSub(temp.fundRate,temp.rf)
      x1=ListSub(temp.rm,temp.rf)
      x2=ListSubSqare(temp.rm,temp.rf)
      obj_dict={'y':y,'x1':x1,'x2':x2}
-     data=pd.DataFrame(obj_dict)#Í¨¹ı×Öµä´´½¨dataframe
+     data=pd.DataFrame(obj_dict)#é€šè¿‡å­—å…¸åˆ›å»ºdataframe
      #data.to_csv("testfoo.csv")
      x=data[['x1','x2']]
      y=data['y']
@@ -496,25 +496,25 @@ def test():
      linreg = LinearRegression()  
      model=linreg.fit(X_train, y_train)  
      #print model    
-     print 'Ôñ¹ÉÏµÊı£º',linreg.intercept_
-     print 'ÔñÊ±ÏµÊı£º',linreg.coef_[1]
+     print 'æ‹©è‚¡ç³»æ•°ï¼š',linreg.intercept_
+     print 'æ‹©æ—¶ç³»æ•°ï¼š',linreg.coef_[1]
 
 
 
 
 
 
-def test2(code,startTime,endTime,option):   #²ÎÊı£º»ù½ğµÄ´úÂë£¬²éÑ¯µÄÆğÊ¼ºÍ½áÊøÈÕÆÚ£¨'yyyy-mm-dd'µÄ×Ö·û´®ÀàĞÍ,optionÎª×Ö·û´®£¬Ñ¡Ôñ²é¿´ÄÄÒ»¸öÒò×Ó
-     rm=Rm('000001.csv')#¶ÁÈ¡ÊĞ³¡Êı¾İ
+def test2(id,startTime,endTime,option):   #å‚æ•°ï¼šåŸºé‡‘çš„ä»£ç ï¼ŒæŸ¥è¯¢çš„èµ·å§‹å’Œç»“æŸæ—¥æœŸï¼ˆ'yyyy-mm-dd'çš„å­—ç¬¦ä¸²ç±»å‹,optionä¸ºå­—ç¬¦ä¸²ï¼Œé€‰æ‹©æŸ¥çœ‹å“ªä¸€ä¸ªå› å­
+     rm=Rm('000001.csv')#è¯»å–å¸‚åœºæ•°æ®
      #print rm.monthRate
      rf=Rf('Fund_RiskFree.csv','Treasury.xlsx')
      #print rf.date
      fundDict={}
 
-     #¼ÆËãÄ³¶ÎÊ±¼äÄÚµÄ¸÷ÖÖ»ù½ğÖ¸±ê
+     #è®¡ç®—æŸæ®µæ—¶é—´å†…çš„å„ç§åŸºé‡‘æŒ‡æ ‡
 
-     fundDict[code]=getFund(code)
-     temp=corrDate(fundDict[code].date,fundDict[code].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly)
+     fundDict[id]=getFund(id)
+     temp=corrDate(fundDict[id].date,fundDict[id].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly)
      
      
      startTime = datetime.strptime(startTime,'%Y-%m-%d')
@@ -540,9 +540,9 @@ def test2(code,startTime,endTime,option):   #²ÎÊı£º»ù½ğµÄ´úÂë£¬²éÑ¯µÄÆğÊ¼ºÍ½áÊøÈ
      
      i=0
      while(i<=days):      
-          temp=corrDate(fundDict[code].date,fundDict[code].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly)  
+          temp=corrDate(fundDict[id].date,fundDict[id].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly)
           curEndTime = startTime + timedelta(days=i)
-          curStartTime=curEndTime - timedelta(days=365) #ÄÃÃ¿Ò»ÌìºÍÒ»ÄêÇ°µÄÊı¾İÀ´Ëã
+          curStartTime=curEndTime - timedelta(days=365) #æ‹¿æ¯ä¸€å¤©å’Œä¸€å¹´å‰çš„æ•°æ®æ¥ç®—
           #print curStartTime
           temp.countByDate(curStartTime.strftime('%Y-%m-%d'),curEndTime.strftime('%Y-%m-%d'))
           
@@ -580,7 +580,7 @@ def test2(code,startTime,endTime,option):   #²ÎÊı£º»ù½ğµÄ´úÂë£¬²éÑ¯µÄÆğÊ¼ºÍ½áÊøÈ
                x1=ListSub(temp.rm,temp.rf)
                x2=ListSubSqare(temp.rm,temp.rf)
                obj_dict={'y':y,'x1':x1,'x2':x2}
-               data=pd.DataFrame(obj_dict)#Í¨¹ı×Öµä´´½¨dataframe
+               data=pd.DataFrame(obj_dict)#é€šè¿‡å­—å…¸åˆ›å»ºdataframe
                x=data[['x1','x2']]
                y=data['y']
                X_train,X_test, y_train, y_test = train_test_split(x, y, random_state=1)
