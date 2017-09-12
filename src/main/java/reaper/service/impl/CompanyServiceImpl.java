@@ -95,7 +95,7 @@ public class CompanyServiceImpl implements CompanyService {
         for (ManagerCompany managerCompany : managerCompanies) {
             try {
                 Manager manager = managerRepository.findByManagerId(managerCompany.getManagerId());
-                if(manager.getBestReturns()!=null&&manager.getRisk()!=null) {
+                if(manager.getReturnRate()!=null&&manager.getRisk()!=null) {
                     managers.add(new PerformanceDataBean(manager.getManagerId(), manager.getName(), manager.getReturnRate(), manager.getRisk()));
                 }
             } catch (NullPointerException e) {

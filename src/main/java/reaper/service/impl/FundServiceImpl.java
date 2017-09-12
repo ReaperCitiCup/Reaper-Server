@@ -236,17 +236,7 @@ public class FundServiceImpl implements FundService {
 
     @Override
     public List<ValueDateBean> findJensenByCode(String code) {
-        List<ValueDateBean> res = new ArrayList<>();
-        String pyRes = PythonUser.usePy("alpha.py", fillCode(code));
-        for(String line:pyRes.split("\n")){
-            //处理每行
-            String attrs[] = line.split(" ");
-            //判断是否是日期行
-            if(attrs[0].startsWith("2")) {
-                res.add(new ValueDateBean(attrs[0], Double.valueOf(attrs[1])));
-            }
-        }
-        return res;
+        return getGraphData(code,"0");
     }
 
     @Override
@@ -374,7 +364,7 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public List<ValueDateBean> findVolatility(String code) {
-        return null;
+        return getGraphData(code,"3");
     }
 
     /**
@@ -384,7 +374,7 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public List<ValueDateBean> findValueAtRisk(String code) {
-        return null;
+        return getGraphData(code,"4");
     }
 
     /**
@@ -394,7 +384,7 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public List<ValueDateBean> findDownsideVolatility(String code) {
-        return null;
+        return getGraphData(code,"5");
     }
 
     /**
@@ -404,7 +394,7 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public List<ValueDateBean> findSharpeIndex(String code) {
-        return null;
+        return getGraphData(code,"6");
     }
 
     /**
@@ -414,7 +404,7 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public List<ValueDateBean> findTreynorIndex(String code) {
-        return null;
+        return getGraphData(code,"7");
     }
 
     /**
@@ -565,5 +555,20 @@ public class FundServiceImpl implements FundService {
             }
         }
         return list;
+    }
+
+    private List<ValueDateBean> getGraphData(String code, String attr){
+        if(!checkCodeExist(code)){
+            return null;
+        }
+        List<ValueDateBean> res = new ArrayList<>();
+        String pyRes = PythonUser.usePy("graphData.py", fillCode(code)+" "+attr);
+        for(String line:pyRes.split("\n")){
+            //处理每行
+            String attrs[] = line.split(" ");
+            //判断是否是日期行
+            res.add(new ValueDateBean(attrs[0], Double.valueOf(attrs[1])));
+        }
+        return res;
     }
 }
