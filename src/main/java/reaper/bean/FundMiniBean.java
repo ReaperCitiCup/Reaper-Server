@@ -1,5 +1,7 @@
 package reaper.bean;
 
+import reaper.util.FormatData;
+
 import java.util.List;
 
 /**
@@ -25,8 +27,8 @@ public class FundMiniBean {
     public FundMiniBean(String code, String name, Double annualProfit, Double volatility, List<MiniBean> manager) {
         this.code = code;
         this.name = name;
-        this.annualProfit = annualProfit;
-        this.volatility = volatility;
+        this.annualProfit = FormatData.fixToTwo(annualProfit);
+        this.volatility = FormatData.fixToTwo(volatility);
         this.manager = manager;
     }
 }

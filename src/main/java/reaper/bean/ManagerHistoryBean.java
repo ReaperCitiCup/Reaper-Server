@@ -12,7 +12,7 @@ public class ManagerHistoryBean {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
-        this.endDate = endDate;
+        this.endDate = endDate==null?"至今":endDate;
         this.days = days;
         this.returns = returns;
     }

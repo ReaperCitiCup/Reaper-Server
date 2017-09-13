@@ -1,5 +1,7 @@
 package reaper.bean;
 
+import reaper.util.FormatData;
+
 /**
  * 当前资产配置
  */
@@ -21,6 +23,6 @@ public class CurrentAssetBean {
         if(stock.equals(0.0)&&bank.equals(0.0)){
             this.bond = 100.0;
         }
-        other = 100-this.bank-this.bond-this.stock;
+        other = FormatData.fixToTwo(100-this.bank-this.bond-this.stock);
     }
 }

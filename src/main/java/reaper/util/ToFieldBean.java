@@ -3,6 +3,7 @@ package reaper.util;
 import reaper.bean.FieldValueBean;
 import reaper.model.BrisonResult;
 import reaper.model.FactorResult;
+import reaper.model.StockBrinsonResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,10 +70,22 @@ public class ToFieldBean {
             return null;
         }
         List<FieldValueBean> res = new ArrayList<>();
-        res.add(new FieldValueBean("资产配置效益", brisonResult.getAllocationEffect()));
-        res.add(new FieldValueBean("债券选择效益", brisonResult.getSelectionEffect()));
-        res.add(new FieldValueBean("交叉效益", brisonResult.getInteractionEffect()));
-        res.add(new FieldValueBean("总超额效益", brisonResult.getActiveReturn()));
+        res.add(new FieldValueBean("资产配置效益", FormatData.fixToTwoAndPercent(brisonResult.getAllocationEffect())));
+        res.add(new FieldValueBean("债券选择效益", FormatData.fixToTwoAndPercent(brisonResult.getSelectionEffect())));
+        res.add(new FieldValueBean("交叉效益", FormatData.fixToTwoAndPercent(brisonResult.getInteractionEffect())));
+        res.add(new FieldValueBean("总超额效益", FormatData.fixToTwoAndPercent(brisonResult.getActiveReturn())));
+        return res;
+    }
+
+    public static List<FieldValueBean> stockBrisonResultToFieldValue(StockBrinsonResult stockBrinsonResult){
+        if(stockBrinsonResult==null){
+            return null;
+        }
+        List<FieldValueBean> res = new ArrayList<>();
+        res.add(new FieldValueBean("资产配置效益", FormatData.fixToTwoAndPercent(stockBrinsonResult.getAllocationEffect())));
+        res.add(new FieldValueBean("债券选择效益", FormatData.fixToTwoAndPercent(stockBrinsonResult.getSelectionEffect())));
+        res.add(new FieldValueBean("交叉效益", FormatData.fixToTwoAndPercent(stockBrinsonResult.getInteractionEffect())));
+        res.add(new FieldValueBean("总超额效益", FormatData.fixToTwoAndPercent(stockBrinsonResult.getActiveReturn())));
         return res;
     }
 

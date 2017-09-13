@@ -7,8 +7,6 @@ import reaper.bean.*;
 import reaper.service.FundService;
 import reaper.util.Page;
 
-import java.text.DecimalFormat;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -166,7 +164,6 @@ public class FundController {
         return fundService.findHistoryManagerByCode(code);
     }
 
-    //TODO 这一部分修改了之前的，不知道对不对，请多注意
     /**
      * 基金波动率
      * @param code
@@ -493,7 +490,7 @@ public class FundController {
             value = "/{code}/position-network",
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"})
-    public NetworkBean findPositionNetwork(@PathVariable String code){
+    public FundNetworkBean findPositionNetwork(@PathVariable String code){
         return fundService.findPositionNetwork(code);
     }
 

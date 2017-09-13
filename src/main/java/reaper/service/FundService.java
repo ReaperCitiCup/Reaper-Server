@@ -1,12 +1,9 @@
 package reaper.service;
 
 import reaper.bean.*;
-import reaper.model.Manager;
 import reaper.util.Page;
 
-import java.io.File;
 import java.util.List;
-import java.util.LongSummaryStatistics;
 
 /**
  * Created by Sorumi on 17/8/21.
@@ -250,5 +247,5 @@ public interface FundService {
      * @param code
      * @return
      */
-    public NetworkBean findPositionNetwork(String code);
+    public FundNetworkBean findPositionNetwork(String code);
 }

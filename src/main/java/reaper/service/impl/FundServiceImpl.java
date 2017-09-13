@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by Sorumi on 17/8/21.
@@ -60,6 +61,9 @@ public class FundServiceImpl implements FundService {
     BrisonResultRepository brisonResultRepository;
 
     @Autowired
+    StockBrinsonResultRepository stockBrinsonResultRepository;
+
+    @Autowired
     CPRRepository cprRepository;
 
     @Autowired
@@ -75,8 +79,15 @@ public class FundServiceImpl implements FundService {
         res.setOrder(order);
         res.setSize(size);
         res.setPage(page);
-        //默认以升序进行排列
-        org.springframework.data.domain.Page<Fund> fundPage = fundRepository.findAllByNameLike("%" + keyword + "%", new PageRequest(page - 1, size, new Sort(Sort.Direction.ASC, order==null?"id":order)));
+
+        org.springframework.data.domain.Page<Fund> fundPage = null;
+        //判断传入的是否是代码
+        if(keyword.matches("^\\d+$")) {
+            fundPage = fundRepository.findAllByCodeContaining(keyword,new PageRequest(page - 1, size, new Sort(Sort.Direction.ASC, order == null ? "code" : order)));
+        }else {
+            //默认以升序进行排列
+            fundPage = fundRepository.findAllByNameLike("%" + keyword + "%", new PageRequest(page - 1, size, new Sort(Sort.Direction.ASC, order == null ? "code" : order)));
+        }
         List<FundMiniBean> miniBeans = new ArrayList<>();
         for (Fund fund : fundPage.getContent()) {
             //根据基金代码找到经理代码
@@ -123,12 +134,12 @@ public class FundServiceImpl implements FundService {
         FundNetValue fundNetValue = fundNetValueRepository.findFirstByCodeOrderByDateDesc(code);
         RateBean rateBean = getFundRate(code);
 
-        List<MiniBean> managers = new ArrayList<>();
+        List<IdNameBean> managers = new ArrayList<>();
         for(FundManager fundManager:fundManagerRepository.findByFundCode(code)){
-            managers.add(new MiniBean(fundManager.getManagerId(), managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
+            managers.add(new IdNameBean(fundManager.getManagerId(), managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
         }
         String id = fundCompanyRepository.findByFundId(code).getCompanyId();
-        MiniBean company = new MiniBean(id, companyRepository.findByCompanyId(id).getName());
+        IdNameBean company = new IdNameBean(id, companyRepository.findByCompanyId(id).getName());
         return fundModelToBean.modelToBean(fund, fundNetValue, rateBean, managers, company);
     }
 
@@ -440,7 +451,7 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public List<FieldValueBean> findBrisonAttributionStock(String code) {
-        return null;
+        return ToFieldBean.stockBrisonResultToFieldValue(stockBrinsonResultRepository.findByFundId(code));
     }
 
     /**
@@ -548,7 +559,7 @@ public class FundServiceImpl implements FundService {
      * @return
      */
     @Override
-    public NetworkBean findPositionNetwork(String code) {
+    public FundNetworkBean findPositionNetwork(String code) {
         List<NodeDataBean> nodes = new ArrayList<>();
         List<FundLinkDataBean> links = new ArrayList<>();
 
@@ -578,7 +589,7 @@ public class FundServiceImpl implements FundService {
             links.add(new FundLinkDataBean(indexA,indexB,fundNetEdge.getWeight()));
         }
         //把id转化成name
-        return new NetworkBean(nodes,links);
+        return new FundNetworkBean(nodes,links);
     }
 
     private List<PerformanceDataBean> addFundPerformOfManager(List<PerformanceDataBean> list,String managerId){

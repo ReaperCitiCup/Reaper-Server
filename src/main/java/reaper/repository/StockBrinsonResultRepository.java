@@ -8,4 +8,5 @@ import reaper.model.TotalPortion;
  * Created by max on 2017/9/12.
  */
 public interface StockBrinsonResultRepository  extends JpaRepository<StockBrinsonResult,String> {
+    public StockBrinsonResult findByFundId(String fundId);
 }
