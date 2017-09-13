@@ -60,7 +60,7 @@ public class FundServiceTest {
                         "000005", "嘉实增强信用定期债券"
                 },
                 new String[]{
-                        miniBean.id, miniBean.name
+                        miniBean.code, miniBean.name
                 }
         );
     }
@@ -79,7 +79,7 @@ public class FundServiceTest {
                         "000007", "鹏华国企债债券"
                 },
                 new String[]{
-                        miniBean.id, miniBean.name
+                        miniBean.code, miniBean.name
                 }
         );
     }
@@ -92,7 +92,7 @@ public class FundServiceTest {
                         "000950", "易方达沪深300非银ETF联接"
                 },
                 new String[]{
-                        miniBean.id, miniBean.name
+                        miniBean.code, miniBean.name
                 }
         );
     }
@@ -105,7 +105,7 @@ public class FundServiceTest {
                         "000005", "嘉实增强信用定期债券"
                 },
                 new String[]{
-                        miniBean.id, miniBean.name
+                        miniBean.code, miniBean.name
                 }
         );
     }
@@ -118,7 +118,7 @@ public class FundServiceTest {
                         "000005", "嘉实增强信用定期债券"
                 },
                 new String[]{
-                        miniBean.id, miniBean.name
+                        miniBean.code, miniBean.name
                 }
         );
     }
@@ -1406,7 +1406,7 @@ public class FundServiceTest {
     //TODO
     @Test
     public void findPositionNetworkTest() throws Exception {
-        NetworkBean networkBean=fundService.findPositionNetwork("000005");
+        FundNetworkBean networkBean=fundService.findPositionNetwork("000005");
     }
 
 }
