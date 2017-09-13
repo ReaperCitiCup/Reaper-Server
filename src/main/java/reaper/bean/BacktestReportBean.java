@@ -17,21 +17,6 @@ public class BacktestReportBean {
     public String baseIndex;
 
     /**
-     * 综合评分
-     */
-    public Integer score;
-
-    /**
-     * 超越同级产品数
-     */
-    public Integer transcendQuantity;
-
-    /**
-     * 基金组合排名
-     */
-    public Integer rank;
-
-    /**
      * 基金组成
      */
     public List<FundRatioNameBean> combination;
@@ -72,7 +57,7 @@ public class BacktestReportBean {
     public Double volatility;
 
     /**
-     * TODO 主要的三个因子
+     * 主要的三个因子
      */
     public List<String> mainFactors;
 
@@ -119,7 +104,7 @@ public class BacktestReportBean {
     /**
      * 【表】相关系数
      */
-    public BacktestCorrelationTable correlationCoefficientTrend;
+    public List<BacktestCorrelationTable> correlationCoefficientTrend;
 
     /**
      * 最大单日跌幅
@@ -132,22 +117,22 @@ public class BacktestReportBean {
     public Integer maxDownDays;
 
     /**
-     * TODO 年化波动率
+     * 年化波动率
      */
     public Double annualVolatility;
 
     /**
-     * TODO beta
+     * beta
      */
     public Double beta;
 
     /**
-     * TODO var
+     * var
      */
     public Double var;
 
     /**
-     * TODO 平均相关系数
+     * 平均相关系数
      */
     public Double averageCorrelationCoefficient;
 
@@ -186,13 +171,21 @@ public class BacktestReportBean {
      */
     public List<FieldValueBean> brisonAttributionBond;
 
-    public BacktestReportBean(String startDate, String endDate, String baseIndex, Integer score, Integer transcendQuantity, Integer rank, List<FundRatioNameBean> combination, String investmentGoal, Double intervalAnnualProfit, Double cumulativeProfit, Double finalNetValue, Double maxRetracement, Double sharpeRatio, Double volatility, List<String> mainFactors, BacktestComparisonBean cumulativeNetValueTrend, BacktestComparisonBean profitRateTrend, BacktestValueComparisonBean totalProfitRate, BacktestValueComparisonBean overProfitRate, BacktestValueComparisonBean annualProfit, BacktestValueComparisonBean maxMonthProfit, BacktestValueComparisonBean profitDaysRatio, BacktestComparisonBean dailyRetracementTrend, BacktestCorrelationTable correlationCoefficientTrend, Double maxDayDown, Integer maxDownDays, Double annualVolatility, Double beta, Double var, Double averageCorrelationCoefficient, List<FieldValueBean> styleAttributionProfit, List<FieldValueBean> styleAttributionRisk, List<FieldValueBean> industryAttributionProfit, List<FieldValueBean> industryAttributionRisk, List<FieldValueBean> varietyAttribution, List<FieldValueBean> brisonAttributionStock, List<FieldValueBean> brisonAttributionBond) {
+    public BacktestReportBean(String startDate, String endDate, String baseIndex, List<FundRatioNameBean> combination, String investmentGoal, Double intervalAnnualProfit,
+                              Double cumulativeProfit, Double finalNetValue, Double maxRetracement, Double sharpeRatio,
+                              Double volatility, List<String> mainFactors, BacktestComparisonBean cumulativeNetValueTrend,
+                              BacktestComparisonBean profitRateTrend, BacktestValueComparisonBean totalProfitRate,
+                              BacktestValueComparisonBean overProfitRate, BacktestValueComparisonBean annualProfit,
+                              BacktestValueComparisonBean maxMonthProfit, BacktestValueComparisonBean profitDaysRatio,
+                              BacktestComparisonBean dailyRetracementTrend, List<BacktestCorrelationTable> correlationCoefficientTrend,
+                              Double maxDayDown, Integer maxDownDays, Double annualVolatility, Double beta, Double var,
+                              Double averageCorrelationCoefficient, List<FieldValueBean> styleAttributionProfit,
+                              List<FieldValueBean> styleAttributionRisk, List<FieldValueBean> industryAttributionProfit,
+                              List<FieldValueBean> industryAttributionRisk, List<FieldValueBean> varietyAttribution,
+                              List<FieldValueBean> brisonAttributionStock, List<FieldValueBean> brisonAttributionBond) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.baseIndex = baseIndex;
-        this.score = score;
-        this.transcendQuantity = transcendQuantity;
-        this.rank = rank;
         this.combination = combination;
         this.investmentGoal = investmentGoal;
         this.intervalAnnualProfit = intervalAnnualProfit;
