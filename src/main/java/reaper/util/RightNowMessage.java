@@ -32,7 +32,6 @@ public class RightNowMessage {
             String code = matcher.group(2);
 
             net_now = Double.parseDouble(code);
-            System.out.println(net_now);
 
 
         }
@@ -44,7 +43,6 @@ public class RightNowMessage {
 
             String code = matcher1.group(2);
             change = Double.parseDouble(code);
-            System.out.println(change);
 
 
         }
@@ -58,7 +56,6 @@ public class RightNowMessage {
             String fundup = matcher2.group(2);
             //
             poportion = Double.parseDouble(fundup);
-            System.out.println(poportion);
 
 
         }
@@ -70,5 +67,10 @@ public class RightNowMessage {
             arrayList.add(poportion);
 
             return arrayList;
+    }
+
+    public static void main(String[] args) {
+        getSingleFundRightNowMessage("000003");
+
     }
 }
