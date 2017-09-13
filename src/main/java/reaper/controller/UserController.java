@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import reaper.bean.PasswordBean;
 import reaper.bean.ResultMessageBean;
 import reaper.model.User;
 import reaper.service.UserService;
@@ -101,11 +102,27 @@ public class UserController {
             value = "/user",
             method = RequestMethod.GET)
     public User getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            return userService.findUserByUsername(auth.getName());
+       return userService.getCurrentUser();
+    }
+
+    /**
+     * 修改密码
+     *
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(
+            value = "/user/password",
+            method = RequestMethod.POST,
+            produces = {"application/json; charset=UTF-8"})
+    public ResultMessageBean editPassword(@RequestBody PasswordBean password) {
+        ResultMessage resultMessage = userService.resetPassword(password);
+        boolean result = resultMessage == ResultMessage.SUCCESS;
+        String message = "";
+        if (!result) {
+            message = "修改失败";
         }
-        return null;
+        return new ResultMessageBean(result, message);
     }
 
 

@@ -1,5 +1,6 @@
 package reaper.service;
 
+import reaper.bean.PasswordBean;
 import reaper.model.User;
 import reaper.util.ResultMessage;
 
@@ -27,12 +28,11 @@ public interface UserService {
     /**
      * 重置密码
      *
-     * @param id          用户id
      * @param oldPassword 旧密码
      * @param newPassword 新密码
      * @return 重置密码结果状态
      */
-    public ResultMessage resetPassword(int id, String oldPassword, String newPassword);
+    public ResultMessage resetPassword(PasswordBean passwordBean);
 
     /**
      * 增加用户
