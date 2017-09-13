@@ -47,13 +47,6 @@ public interface ManagerService {
     public List<RateTrendBean> findFundRateTrendByManagerId(String managerId);
 
     /**
-     * 根据经理id获得经理现任基金排名走势
-     * @param managerId 经理id
-     * @return 经理现任基金排名走势
-     */
-    public List<RankTrendBean> findFundRankTrendByManagerId(String managerId);
-
-    /**
      * 根据经理id获得经理历任基金表现
      * @param managerId 经理id
      * @return 经理历任基金表现

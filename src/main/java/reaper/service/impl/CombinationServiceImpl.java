@@ -9,12 +9,8 @@ import com.mathworks.toolbox.javabuilder.MWNumericArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reaper.bean.*;
-import reaper.model.BasicStockIndex;
-import reaper.model.Combination;
-import reaper.model.User;
-import reaper.repository.BasicStockIndexRepository;
-import reaper.repository.CombinationRepository;
-import reaper.repository.FundNetValueRepository;
+import reaper.model.*;
+import reaper.repository.*;
 import reaper.service.CombinationService;
 import reaper.service.FundService;
 import reaper.service.UserService;
@@ -40,6 +36,14 @@ public class CombinationServiceImpl implements CombinationService {
     private FundNetValueRepository fundNetValueRepository;
     @Autowired
     private BasicStockIndexRepository basicStockIndexRepository;
+    @Autowired
+    private FundRankRepository fundRankRepository;
+    @Autowired
+    private FactorResultRepository factorResultRepository;
+    @Autowired
+    private StockBrinsonResultRepository stockBrinsonResultRepository;
+    @Autowired
+    private BrisonResultRepository brisonResultRepository;
 
     @Autowired
     private FundService fundService;
@@ -186,7 +190,6 @@ public class CombinationServiceImpl implements CombinationService {
      * @return
      */
     @Override
-    //TODO 所有百分比都乘以100，保留两位小数   FormatData.fixToTwoAndPercent
     public BacktestReportBean backtestCombination(Integer combinationId, String startDate, String endDate, String baseIndex) throws java.text.ParseException {
         BacktestReportBean backtestReportBean = new BacktestReportBean();
         int days = DaysBetween.daysOfTwo(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
@@ -199,14 +202,6 @@ public class CombinationServiceImpl implements CombinationService {
         backtestReportBean.baseIndex = baseIndex;
 
         /**
-         * 排名信息
-         */
-        //TODO 商业组的代码
-        backtestReportBean.score = 0;
-        backtestReportBean.transcendQuantity = 0;
-        backtestReportBean.rank = 0;
-
-        /**
          * 基金组成
          */
         Combination combination = combinationRepository.findOne(combinationId);
@@ -216,10 +211,10 @@ public class CombinationServiceImpl implements CombinationService {
             FundRatioNameBean fundRatioNameBean = new FundRatioNameBean();
             fundRatioNameBean.code = combination.getFunds().split("\\|")[i];
             codes.add(fundRatioNameBean.code);
-            //name
+            fundRatioNameBean.name = fundService.findFundNameByCode(fundRatioNameBean.code).name;
             fundRatioNameBean.weight = FormatData.fixToTwoAndPercent(Double.parseDouble(combination.getFunds().split("\\|")[i]));
             weights.add(fundRatioNameBean.weight);
-            //positionRatio
+
             backtestReportBean.combination.add(fundRatioNameBean);
         }
 
@@ -278,8 +273,10 @@ public class CombinationServiceImpl implements CombinationService {
          */
         backtestReportBean.volatility = Calculator.calStandardDeviation(dailyRates);
 
-        //TODO 主要的3个因子
-        backtestReportBean.mainFactors.add("周沁涵你来写吧");
+        /**
+         * 主要的三个因子
+         */
+        backtestReportBean.mainFactors = findMainFactors(codes, weights);
 
         /**
          * 【图】累计净值
@@ -345,9 +342,6 @@ public class CombinationServiceImpl implements CombinationService {
         }
         backtestReportBean.annualProfit = new BacktestValueComparisonBean(fundAnnualProfit, FormatData.fixToTwoAndPercent(baseAnnualProfit));
 
-        //TODO 最大月度收益
-
-
         /**
          * 盈利天占比
          */
@@ -403,7 +397,26 @@ public class CombinationServiceImpl implements CombinationService {
         backtestReportBean.dailyRetracementTrend = new BacktestComparisonBean(fundRetracementList, baseRetracementList);
         backtestReportBean.maxRetracement = FormatData.fixToTwoAndPercent(maxRetracement);
 
-        //TODO【表】相关系数
+        /**
+         * 【表】相关系数
+         * 平均相关系数
+         * beta
+         */
+        List<BacktestCorrelationTable> backtestCorrelationTables = new ArrayList<>();
+        PyAnalysisResult pyAnalysisResult = getBasicFactors(codes, startDate, endDate);
+        double sum = 0.0;
+        for (PyAnalysisResult.CorrelationCoefficient coefficient : pyAnalysisResult.pjxgxs) {
+            sum += coefficient.getCc();
+            backtestCorrelationTables.add(new BacktestCorrelationTable(coefficient.getCode1(), coefficient.getCode2(), coefficient.getCc()));
+        }
+        backtestReportBean.averageCorrelationCoefficient = FormatData.fixToTwo(sum / pyAnalysisResult.pjxgxs.size());
+        backtestReportBean.correlationCoefficientTrend = backtestCorrelationTables;
+
+        double betasum = 0.0;
+        for (int i = 0; i < codes.size(); i++) {
+            betasum += pyAnalysisResult.beta.get(codes.get(i)) * weights.get(i) / 100.00;
+        }
+        backtestReportBean.beta = FormatData.fixToTwo(betasum / codes.size());
 
         /**
          * 最大单日跌幅、最大连跌天数
@@ -419,10 +432,130 @@ public class CombinationServiceImpl implements CombinationService {
         backtestReportBean.maxDayDown = FormatData.fixToTwo(0.0 - maxDayDown);
         backtestReportBean.maxDownDays = downDays;
 
-        //TODO 年化波动率及后面
+        /**
+         * 年化波动率
+         */
+        backtestReportBean.annualVolatility = FormatData.fixToTwo(backtestReportBean.volatility / 100.00 * Math.sqrt(252.0));
+
+        /**
+         * VaR 在险价值
+         */
+        backtestReportBean.var = FormatData.fixToTwo(backtestReportBean.volatility / 100.00 * 2.33 * 1.0 / Math.sqrt(52.0));
+
+        /**
+         * 风格归因-收益, 风格归因-风险, 行业归因-收益, 行业归因-风险, 品种归因, Brison归因-股票, Brison归因-债券
+         */
+        // 风格归因-收益
+        List<FieldValueBean> styleAttributionProfit = new ArrayList<>();
+        // 风格归因-风险
+        List<FieldValueBean> styleAttributionRisk = new ArrayList<>();
+        // 行业归因-收益
+        List<FieldValueBean> industryAttributionProfit = new ArrayList<>();
+        // 行业归因-风险
+        List<FieldValueBean> industryAttributionRisk = new ArrayList<>();
+        // 品种归因
+        List<FieldValueBean> varietyAttribution = new ArrayList<>();
+        // Brison归因-股票
+        List<FieldValueBean> brisonAttributionStock = new ArrayList<>();
+        // Brison归因-债券
+        List<FieldValueBean> brisonAttributionBond = new ArrayList<>();
+
+        for (int i = 0; i < codes.size(); i++) {
+            BrisonResult brisonResult = brisonResultRepository.findByCode(codes.get(i));
+            StockBrinsonResult stockBrinsonResult = stockBrinsonResultRepository.findByFundId(codes.get(i));
+            FactorResult normal_factorResult = factorResultRepository.findByCodeAndFactorType(codes.get(i), 'N');
+            FactorResult risk_factorResult = factorResultRepository.findByCodeAndFactorType(codes.get(i), 'R');
 
 
-        return null;
+            if (i == 0) {
+                // 风格归因-收益
+                styleAttributionProfit = ToFieldBean.factorResultToStyleAttribution(normal_factorResult);
+                for(int j = 0; j < styleAttributionProfit.size(); j++) {
+                    styleAttributionProfit.get(j).value *= weights.get(i);
+                }
+
+                // 风格归因-风险
+                styleAttributionRisk = ToFieldBean.factorResultToStyleAttribution(risk_factorResult);
+                for(int j = 0; j < styleAttributionRisk.size(); j++) {
+                    styleAttributionRisk.get(j).value *= weights.get(i);
+                }
+
+                // 行业归因-收益
+                industryAttributionProfit = ToFieldBean.factorResultToIndustryAttribution(normal_factorResult);
+                for(int j = 0; j < industryAttributionProfit.size(); j++) {
+                    industryAttributionProfit.get(j).value *= weights.get(i);
+                }
+
+                // 行业归因-风险
+                industryAttributionRisk = ToFieldBean.factorResultToIndustryAttribution(risk_factorResult);
+                for(int j = 0; j < industryAttributionRisk.size(); j++) {
+                    industryAttributionRisk.get(j).value *= weights.get(i);
+                }
+
+                // 品种归因
+                varietyAttribution = ToFieldBean.brisonResultToVarietyAttribution(brisonResult);
+                for(int j = 0; j < varietyAttribution.size(); j++) {
+                    varietyAttribution.get(j).value *= weights.get(i);
+                }
+
+                // Brison归因-股票
+                brisonAttributionStock = ToFieldBean.stockBrisonResultToFieldValue(stockBrinsonResult);
+                for(int j = 0; j < brisonAttributionStock.size(); j++) {
+                    brisonAttributionStock.get(j).value *= weights.get(i);
+                }
+
+                // Brison归因-债券
+                brisonAttributionBond = ToFieldBean.brisonResultToFieldValue(brisonResult);
+                for(int j = 0; j < brisonAttributionBond.size(); j++) {
+                    brisonAttributionBond.get(j).value *= weights.get(i);
+                }
+
+            } else {
+                // 风格归因-收益
+                for(int j = 0; j < styleAttributionProfit.size(); j++) {
+                    styleAttributionProfit.get(j).value += ToFieldBean.factorResultToStyleAttribution(normal_factorResult).get(j).value * weights.get(i);
+                }
+
+                // 风格归因-风险
+                for(int j = 0; j < styleAttributionRisk.size(); j++) {
+                    styleAttributionRisk.get(j).value += ToFieldBean.factorResultToStyleAttribution(risk_factorResult).get(j).value * weights.get(i);
+                }
+
+                // 行业归因-收益
+                for(int j = 0; j < industryAttributionProfit.size(); j++) {
+                    industryAttributionProfit.get(j).value += ToFieldBean.factorResultToIndustryAttribution(normal_factorResult).get(j).value * weights.get(i);
+                }
+
+                // 行业归因-风险
+                for(int j = 0; j < industryAttributionRisk.size(); j++) {
+                    industryAttributionRisk.get(j).value += ToFieldBean.factorResultToIndustryAttribution(risk_factorResult).get(j).value * weights.get(i);
+                }
+
+                // 品种归因
+                for(int j = 0; j < varietyAttribution.size(); j++) {
+                    varietyAttribution.get(j).value += ToFieldBean.brisonResultToVarietyAttribution(brisonResult).get(j).value * weights.get(i);
+                }
+
+                // Brison归因-股票
+                for(int j = 0; j < brisonAttributionStock.size(); j++) {
+                    brisonAttributionStock.get(j).value += ToFieldBean.stockBrisonResultToFieldValue(stockBrinsonResult).get(j).value * weights.get(i);
+                }
+
+                // Brison归因-债券
+                for(int j = 0; j < brisonAttributionBond.size(); j++) {
+                    brisonAttributionBond.get(j).value += ToFieldBean.brisonResultToFieldValue(brisonResult).get(j).value * weights.get(i);
+                }
+            }
+        }
+        backtestReportBean.styleAttributionProfit = styleAttributionProfit;
+        backtestReportBean.styleAttributionRisk = styleAttributionRisk;
+        backtestReportBean.industryAttributionProfit = industryAttributionProfit;
+        backtestReportBean.industryAttributionRisk = industryAttributionRisk;
+        backtestReportBean.varietyAttribution = varietyAttribution;
+        backtestReportBean.brisonAttributionBond = brisonAttributionBond;
+        backtestReportBean.brisonAttributionStock = brisonAttributionStock;
+
+        return backtestReportBean;
     }
 
 
@@ -516,7 +649,11 @@ public class CombinationServiceImpl implements CombinationService {
             }
 
             result = calComponentWeight(codes, portfolioType, input_kind, input_weight, uncentralize_type);
-        } else if (uncentralize_type == 2) {
+        }
+        /**
+         * 因子间分散
+         */
+        else if (uncentralize_type == 2) {
             for (FundCategoryBean categoryBean : fundCombination.funds) {
                 Double category = FactorNumberMapping.factorName2No(categoryBean.category);
                 for (String code : categoryBean.codes) {
@@ -676,7 +813,7 @@ public class CombinationServiceImpl implements CombinationService {
 
     /**
      * 调用python代码 backtest_analysis.py
-     * 可得到年化收益率，年化波动率，在险价值，收益率序列的下行标准差，夏普比率，beta，特雷诺指数，择股系数，择时系数，平均相关系数
+     * 可得到年化收益率，年化波动率，在险价值，收益率序列的下行标准差，夏普比率，beta，特雷诺指数，择股系数，择时系数，相关系数
      *
      * @param codes     代码
      * @param startDate 开始日期
@@ -790,5 +927,98 @@ public class CombinationServiceImpl implements CombinationService {
         } else {
             return getCodeList(pyRes);
         }
+    }
+
+    /**
+     * 获得主要的三个因子
+     *
+     * @param codes
+     * @param weights 权重（使用时需要除以100）
+     * @return
+     */
+    private List<String> findMainFactors(List<String> codes, List<Double> weights) {
+        Map<String, Double> factor_sum = new HashMap<>();
+        /**
+         * 1 beta beta
+         * 2 btop 价值
+         * 3 earningsyield 盈利能力 profit
+         * 4 growth 成长性
+         * 5 leverage 杠杆率
+         * 6 liquidity 流动性
+         * 7 momentum 动量
+         * 8 nlsize 非线性市值
+         * 9 residualvolatility 波动率
+         * 10 size 市值
+         */
+        factor_sum.put("beta", 0.0);
+        factor_sum.put("btop", 0.0);
+        factor_sum.put("profit", 0.0);
+        factor_sum.put("growth", 0.0);
+        factor_sum.put("leverage", 0.0);
+        factor_sum.put("liquidity", 0.0);
+        factor_sum.put("momentum", 0.0);
+        factor_sum.put("nlsize", 0.0);
+        factor_sum.put("residualvolatility", 0.0);
+        factor_sum.put("size", 0.0);
+        for (String code : codes) {
+            FundRank fundRank = fundRankRepository.findOne(code);
+            if (fundRank == null) {
+                continue;
+            }
+            Double beta = factor_sum.get("beta");
+            beta += fundRank.getRank1() * weights.get(0) / 100.00;
+            factor_sum.put("beta", beta);
+
+            Double btop = factor_sum.get("btop");
+            btop += fundRank.getRank2() * weights.get(1) / 100.00;
+            factor_sum.put("btop", btop);
+
+            Double profit = factor_sum.get("profit");
+            profit += fundRank.getRank3() * weights.get(2) / 100.00;
+            factor_sum.put("profit", profit);
+
+            Double growth = factor_sum.get("growth");
+            growth += fundRank.getRank4() * weights.get(3) / 100.00;
+            factor_sum.put("growth", growth);
+
+            Double leverage = factor_sum.get("leverage");
+            leverage += fundRank.getRank5() * weights.get(4) / 100.00;
+            factor_sum.put("leverage", leverage);
+
+            Double liquidity = factor_sum.get("liquidity");
+            liquidity += fundRank.getRank6() * weights.get(5) / 100.00;
+            factor_sum.put("liquidity", liquidity);
+
+            Double momentum = factor_sum.get("momentum");
+            momentum += fundRank.getRank7() * weights.get(6) / 100.00;
+            factor_sum.put("momentum", momentum);
+
+            Double nlsize = factor_sum.get("nlsize");
+            nlsize += fundRank.getRank8() * weights.get(7) / 100.00;
+            factor_sum.put("nlsize", nlsize);
+
+            Double residualvolatility = factor_sum.get("residualvolatility");
+            residualvolatility += fundRank.getRank9() * weights.get(8) / 100.00;
+            factor_sum.put("residualvolatility", residualvolatility);
+
+            Double size = factor_sum.get("size");
+            size += fundRank.getRank10() * weights.get(9) / 100.00;
+            factor_sum.put("size", size);
+        }
+
+        List<Map.Entry<String, Double>> entries = new ArrayList<>(factor_sum.entrySet());
+        Collections.sort(entries, new Comparator<Map.Entry<String, Double>>() {
+            @Override
+            public int compare(Map.Entry<String, Double> o1, Map.Entry<String, Double> o2) {
+                return (int) ((o2.getValue() - o1.getValue()) * 10000);
+            }
+        });
+
+        List<String> res = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            res.add(entries.get(i).getKey());
+        }
+
+        return res;
     }
 }

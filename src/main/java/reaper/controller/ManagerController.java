@@ -92,20 +92,6 @@ public class ManagerController {
     }
 
     /**
-     * 根据经理id获得经理现任基金排名走势
-     * @param managerId 经理id
-     * @return 经理现任基金排名走势
-     */
-    @ResponseBody
-    @RequestMapping(
-            value = "/{managerId}/fund-rank-trend",
-            method = RequestMethod.GET,
-            produces = {"application/json; charset=UTF-8"})
-    public List<RankTrendBean> findFundRankTrendByManagerId(@PathVariable String managerId){
-        return managerService.findFundRankTrendByManagerId(managerId);
-    }
-
-    /**
      * 根据经理id获得经理任期中的基金收益
      * @param managerId 经理id
      * @return 经理任期中的基金收益

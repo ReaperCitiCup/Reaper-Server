@@ -1316,18 +1316,6 @@ public class FundServiceTest {
         Assert.assertEquals(0, fieldValueBeans.size());
     }
 
-    //TODO
-    @Test
-    public void findRiskTrendTest() throws Exception {
-        List<ValueDateBean> valueDateBeans=fundService.findRiskTrend("000005");
-    }
-
-    //TODO
-    @Test
-    public void findDailyRetracementTest() throws Exception {
-        List<ValueDateBean> valueDateBeans=fundService.findDailyRetracement("000005");
-    }
-
     @Test
     public void findVolatilityTest() throws Exception {
         List<ValueDateBean> valueDateBeans=fundService.findVolatility("000005");

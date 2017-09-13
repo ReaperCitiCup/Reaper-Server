@@ -47,6 +47,9 @@ public class ManagerServiceImpl implements ManagerService {
     FundManagerRepository fundManagerRepository;
 
     @Autowired
+    FundRankByTypeRepository fundRankByTypeRepository;
+
+    @Autowired
     ManagerEdgeRepository managerEdgeRepository;
 
 
@@ -124,15 +127,24 @@ public class ManagerServiceImpl implements ManagerService {
      * @param managerId 经理id
      * @return 经理现任基金排名
      */
-    //TODO
     @Override
     public List<RankBean> findFundRankByManagerId(String managerId) {
         List<RankBean> res=new ArrayList<>();
-        List<FundHistory> fundHistories = fundHistoryRepository.findAllByManagerId(managerId);
-        for(FundHistory fundHistory : fundHistories){
-
+        List<FundManager> fundManagers = fundManagerRepository.findByManagerId(managerId);
+        for(FundManager fundManager : fundManagers){
+            String code = fundManager.getFundCode();
+            List<RankDataBean> ranks = new ArrayList<>();
+            for(FundRankByType fundRankByType:fundRankByTypeRepository.findAllByCode(code)){
+                ranks.add(new RankDataBean(fundRankByType.getType(),fundRankByType.getRank(),fundRankByType.getTotal()));
+            }
+            try {
+                res.add(new RankBean(code, fundRepository.findByCode(code).getName(), ranks));
+            }catch (NullPointerException e){
+                e.printStackTrace();
+                System.out.println(managerId+"的"+code+"基金找不到");
+            }
         }
-        return null;
+        return res;
     }
 
     /**
@@ -157,17 +169,6 @@ public class ManagerServiceImpl implements ManagerService {
             }
         }
         return res;
-    }
-
-    /**
-     * 根据经理id获得经理现任基金排名走势
-     * @param managerId 经理id
-     * @return 经理现任基金排名走势
-     */
-    //TODO
-    @Override
-    public List<RankTrendBean> findFundRankTrendByManagerId(String managerId) {
-        return null;
     }
 
     /**
