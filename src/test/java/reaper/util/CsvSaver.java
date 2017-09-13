@@ -8,10 +8,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reaper.model.*;
 import reaper.repository.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest()
@@ -177,4 +174,19 @@ public class CsvSaver {
         }
     }
 
+    @Test
+    public void saveFandRankByType() throws IOException {
+        File file = new File("src/main/factor_result.csv");
+        BufferedReader bf = new BufferedReader(new FileReader(file));
+        String s;
+        while ((s = bf.readLine()) != null) {
+            String attrs[] = s.split(",");
+
+            while (attrs[0].length() < 6) {
+                attrs[0] = "0" + attrs[0];
+            }
+
+            
+        }
+    }
 }

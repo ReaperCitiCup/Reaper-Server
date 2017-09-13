@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import reaper.bean.*;
-import reaper.model.Manager;
 import reaper.service.ManagerService;
 
 import java.util.List;
@@ -159,7 +158,7 @@ public class ManagerController {
             value = "/{managerId}/social-network",
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"})
-     public NetworkBean findSocialNetworkByManagerId(@PathVariable String managerId){
+     public ManagerNetworkBean findSocialNetworkByManagerId(@PathVariable String managerId){
         return managerService.findSocialNetworkByManagerId(managerId);
     }
 }

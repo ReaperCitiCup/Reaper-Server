@@ -56,12 +56,12 @@ public class FundBean {
     /**
      * 经理信息
      */
-    public List<MiniBean> manager;
+    public List<IdNameBean> manager;
 
     /**
      * 公司信息
      */
-    public MiniBean company;
+    public IdNameBean company;
 
     public Double assessNetValue;
 

@@ -80,5 +80,5 @@ public interface ManagerService {
      * @param managerId 经理id
      * @return 经理社会关系网络图
      */
-    public NetworkBean findSocialNetworkByManagerId(String managerId);
+    public ManagerNetworkBean findSocialNetworkByManagerId(String managerId);
 }

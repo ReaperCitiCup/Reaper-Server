@@ -2,6 +2,7 @@ package reaper.service.impl;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import reaper.bean.PasswordBean;
 import reaper.model.User;
 import reaper.repository.UserRepository;
 import reaper.service.UserService;
@@ -55,8 +56,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResultMessage resetPassword(int id, String oldPassword, String newPassword) {
-        return null;
+    public ResultMessage resetPassword(PasswordBean passwordBean) {
+        User user = getCurrentUser();
+        if (user != null && user.getPassword().equals(passwordBean.oldPassword)) {
+            user.setPassword(passwordBean.newPassword);
+            userRepository.save(user);
+            return ResultMessage.SUCCESS;
+        }
+
+        return ResultMessage.FAILED;
     }
 
     @Override
@@ -77,8 +85,8 @@ public class UserServiceImpl implements UserService {
     }
 
 //    @Override
-//    public User findUserById(int id) {
-//        return userRepository.findUserById(id);
+//    public User findUserById(int code) {
+//        return userRepository.findUserById(code);
 //    }
 
     @Override

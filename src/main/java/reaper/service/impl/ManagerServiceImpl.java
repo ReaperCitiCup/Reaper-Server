@@ -46,6 +46,10 @@ public class ManagerServiceImpl implements ManagerService {
     @Autowired
     FundManagerRepository fundManagerRepository;
 
+    @Autowired
+    ManagerEdgeRepository managerEdgeRepository;
+
+
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
@@ -238,8 +242,37 @@ public class ManagerServiceImpl implements ManagerService {
      * @return 经理社会关系网络图
      */
     @Override
-    public NetworkBean findSocialNetworkByManagerId(String managerId) {
-        return null;
+    public ManagerNetworkBean findSocialNetworkByManagerId(String managerId) {
+        List<NodeDataBean> nodes = new ArrayList<>();
+        List<ManagerLinkDataBean> links = new ArrayList<>();
+
+        for(ManagerEdge managerEdge:getInterfacingCode(managerId, new ArrayList<>())){
+            //记录两个点在node数组中的位置
+            int indexA;
+            int indexB;
+
+            //先用id作为name，方便判断是否已经包含，最后一起转化为name
+            NodeDataBean node = new NodeDataBean(managerEdge.getManagerIdA());
+            int i = nodes.indexOf(node);
+            if(i<0){
+                nodes.add(node);
+                indexA = nodes.size()-1;
+            }else {
+                indexA = i;
+            }
+
+            node = new NodeDataBean(managerEdge.getManagerIdB());
+            i = nodes.indexOf(node);
+            if(i<0){
+                nodes.add(node);
+                indexB = nodes.size()-1;
+            }else {
+                indexB = i;
+            }
+            links.add(new ManagerLinkDataBean(indexA,indexB,managerEdge.getDays(),managerEdge.getTimes()));
+        }
+        //把id转化成name
+        return new ManagerNetworkBean(nodes,links);
     }
 
     private List<PerformanceDataBean> addFundPerformOfManager(List<PerformanceDataBean> list,String managerId){
@@ -253,4 +286,27 @@ public class ManagerServiceImpl implements ManagerService {
         return list;
     }
 
+    /**
+     * 递归查找所有关系
+     * @param managerId 代码
+     * @param managerEdges 保存结果的数组
+     * @return
+     */
+    private List<ManagerEdge> getInterfacingCode(String managerId,List<ManagerEdge> managerEdges){
+        //作为左端点
+        for(ManagerEdge managerEdge:managerEdgeRepository.findAllByManagerIdA(managerId)){
+            if(!managerEdges.contains(managerEdge)) {
+                managerEdges.add(managerEdge);
+                managerEdges = getInterfacingCode(managerEdge.getManagerIdA(),managerEdges);
+            }
+        }
+        //作为右端点
+        for(ManagerEdge managerEdge:managerEdgeRepository.findAllByManagerIdB(managerId)){
+            if(!managerEdges.contains(managerEdge)) {
+                managerEdges.add(managerEdge);
+                managerEdges = getInterfacingCode(managerEdge.getManagerIdB(),managerEdges);
+            }
+        }
+        return managerEdges;
+    }
 }

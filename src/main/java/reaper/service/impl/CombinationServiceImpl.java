@@ -53,7 +53,7 @@ public class CombinationServiceImpl implements CombinationService {
 
     /**
      * 自定创建组合
-     * 用户已登录验证，从登录用户中获得用户 id
+     * 用户已登录验证，从登录用户中获得用户 code
      * 组合列表不为空，且配比之和为100
      *
      * @param name  组合名
@@ -86,7 +86,7 @@ public class CombinationServiceImpl implements CombinationService {
 
     /**
      * 我的组合列表
-     * 用户已登录验证，从登录用户中获得用户 id
+     * 用户已登录验证，从登录用户中获得用户 code
      *
      * @return
      */

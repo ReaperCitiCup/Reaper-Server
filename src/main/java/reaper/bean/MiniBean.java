@@ -7,17 +7,17 @@ package reaper.bean;
 public class MiniBean {
 
     /**
-     * 代码 id
+     * 代码 code
      */
-    public String id;
+    public String code;
 
     /**
      * 名称
      */
     public String name;
 
-    public MiniBean(String id, String name) {
-        this.id = id;
+    public MiniBean(String code, String name) {
+        this.code = code;
         this.name = name;
     }
 
