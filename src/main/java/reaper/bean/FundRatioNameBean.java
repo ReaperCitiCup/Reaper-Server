@@ -10,15 +10,12 @@ public class FundRatioNameBean {
 
     public String name;
 
-    /**
-     * 持仓比率
-     */
-    public Double positionRatio;
+    public Double weight;
 
-    public FundRatioNameBean(String code, String name, Double positionRatio) {
+    public FundRatioNameBean(String code, String name, Double weight) {
         this.code = code;
         this.name = name;
-        this.positionRatio = positionRatio;
+        this.weight = weight;
     }
 
     public FundRatioNameBean() {
