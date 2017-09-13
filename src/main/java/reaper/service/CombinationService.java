@@ -45,7 +45,7 @@ public interface CombinationService {
      * @param baseIndex 基准指标
      * @return
      */
-    public BacktestReportBean backtestCombination(Integer combinationId, String startDate, String endDate, String baseIndex);
+    public BacktestReportBean backtestCombination(Integer combinationId, String startDate, String endDate, String baseIndex) throws java.text.ParseException;
 
     /**
      * 资产配置-选择目标及路径

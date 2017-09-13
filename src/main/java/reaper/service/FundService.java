@@ -82,7 +82,7 @@ public interface FundService {
      * @param code 基金代码
      * @return
      */
-    public List<MiniBean> findCurrentManagers(String code);
+    public List<IdNameBean> findCurrentManagers(String code);
 
     /**
      * 基金历史经理
@@ -103,7 +103,7 @@ public interface FundService {
      * @param code 代码
      * @return
      */
-    public MiniBean findFundCompanyByCode(String code);
+    public IdNameBean findFundCompanyByCode(String code);
 
     /**
      * 基金行业归因-主动收益
@@ -250,5 +250,5 @@ public interface FundService {
      * @param code
      * @return
      */
-    public List<NetworkBean> findPositionNetwork(String code);
+    public NetworkBean findPositionNetwork(String code);
 }

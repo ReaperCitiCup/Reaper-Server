@@ -8,8 +8,8 @@ import javax.persistence.*;
  * Created by max on 2017/9/12.
  */
 @Entity
-@Table(name = "crp")
-public class CRP {
+@Table(name = "cpr")
+public class CPR {
 
     @Id
     @GeneratedValue
@@ -42,7 +42,7 @@ public class CRP {
 
     private Integer total;//总期数
 
-    public CRP() {
+    public CPR() {
     }
 
 

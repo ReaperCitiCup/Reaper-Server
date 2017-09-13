@@ -31,7 +31,7 @@ public class Crawler {
      */
     public void crawlFondHoldStock(String fundCode, String year, FundHoldStockRepository fundHoldStockRepository) {
         System.out.println(fundCode + " " + year);
-        String result = getHtml("http://fund.eastmoney.com/f10/FundArchivesDatas.aspx?type=jjcc&code=" + fundCode + "&topline=100&year=" + year);
+        String result = getHtml("http://fund.eastmoney.com/f10/FundArchivesDatas.aspx?type=jjcc&id=" + fundCode + "&topline=100&year=" + year);
 
 //        result = "<td><a href='http://quote.eastmoney.com/sz300335.html'>300335</a></td>";
 //        System.out.println(result);
@@ -66,7 +66,7 @@ public class Crawler {
 
     public void crawlFundHoldBond(String fundCode, String year, FundHoldBondRepository fundHoldBondRepository) {
         System.out.println(fundCode + " " + year);
-        String result = getHtml("http://fund.eastmoney.com/f10/FundArchivesDatas.aspx?type=zqcc&code=" + fundCode + "&topline=100&year=" + year);
+        String result = getHtml("http://fund.eastmoney.com/f10/FundArchivesDatas.aspx?type=zqcc&id=" + fundCode + "&topline=100&year=" + year);
 
 //        System.out.println(result);
         //分割季度的pattern

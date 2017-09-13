@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 public class RightNowMessage {
 
     public static ArrayList<Double> getSingleFundRightNowMessage(String fundCode) {
-        // write your code here
+        // write your id here
         MyBug myBug = new MyBug();
         String allmessage = myBug.sendGet("http://fund.eastmoney.com/"+fundCode+".html?spm=001.2.swh", "");
 

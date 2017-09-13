@@ -43,6 +43,9 @@ public class ManagerServiceImpl implements ManagerService {
     @Autowired
     FundNetValueRepository fundNetValueRepository;
 
+    @Autowired
+    FundManagerRepository fundManagerRepository;
+
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
@@ -170,7 +173,22 @@ public class ManagerServiceImpl implements ManagerService {
      */
     @Override
     public FundPerformanceBean findFundPerformanceByManagerId(String managerId) {
-        return null;
+        List<PerformanceDataBean> funds = new ArrayList<>();
+        List<PerformanceDataBean> others = new ArrayList<>();
+        //经理所持基金
+        try {
+            funds = addFundPerformOfManager(funds, managerId);
+        }catch (NullPointerException e){
+            System.out.println(managerId);
+        }
+        //其他基金
+        for(Fund fund:fundRepository.findAll()){
+            PerformanceDataBean res = new PerformanceDataBean(fund);
+            if(!funds.contains(res)){
+                others.add(res);
+            }
+        }
+        return new FundPerformanceBean(funds,others);
     }
 
     /**
@@ -181,7 +199,19 @@ public class ManagerServiceImpl implements ManagerService {
      */
     @Override
     public ManagerPerformanceBean findManagerPerformanceByManagerId(String managerId) {
-        return null;
+        List<PerformanceDataBean> managers = new ArrayList<>();
+        List<PerformanceDataBean> others = new ArrayList<>();
+        Manager manager = managerRepository.findByManagerId(managerId);
+        if(manager!=null){
+            managers.add(new PerformanceDataBean(manager));
+        }
+        for(Manager manager1 :managerRepository.findAll()){
+            PerformanceDataBean res = new PerformanceDataBean(manager1);
+            if(!managers.contains(res)){
+                others.add(res);
+            }
+        }
+        return new ManagerPerformanceBean(managers,others);
     }
 
     /**
@@ -210,6 +240,17 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public NetworkBean findSocialNetworkByManagerId(String managerId) {
         return null;
+    }
+
+    private List<PerformanceDataBean> addFundPerformOfManager(List<PerformanceDataBean> list,String managerId){
+        for(FundManager fundManager:fundManagerRepository.findByManagerId(managerId)){
+            Fund fund = fundRepository.findByCode(fundManager.getFundCode());
+            PerformanceDataBean res = new PerformanceDataBean(fund);
+            if(fund!=null&&fund.getAnnualProfit()!=null&&!list.contains(res)) {
+                list.add(res);
+            }
+        }
+        return list;
     }
 
 }
