@@ -216,10 +216,10 @@ public class CombinationServiceImpl implements CombinationService {
             FundRatioNameBean fundRatioNameBean = new FundRatioNameBean();
             fundRatioNameBean.code = combination.getFunds().split("\\|")[i];
             codes.add(fundRatioNameBean.code);
-            //name
-            fundRatioNameBean.weight = FormatData.fixToTwoAndPercent(Double.parseDouble(combination.getFunds().split("\\|")[i]));
-            weights.add(fundRatioNameBean.weight);
-            //positionRatio
+            fundRatioNameBean.name = fundService.findFundNameByCode(fundRatioNameBean.code).name;
+            fundRatioNameBean.positionRatio = FormatData.fixToTwoAndPercent(Double.parseDouble(combination.getFunds().split("\\|")[i]));
+            weights.add(fundRatioNameBean.positionRatio);
+
             backtestReportBean.combination.add(fundRatioNameBean);
         }
 

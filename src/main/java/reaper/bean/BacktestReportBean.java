@@ -72,7 +72,7 @@ public class BacktestReportBean {
     public Double volatility;
 
     /**
-     * 主要的三个因子
+     * TODO 主要的三个因子
      */
     public List<String> mainFactors;
 
@@ -102,7 +102,7 @@ public class BacktestReportBean {
     public BacktestValueComparisonBean annualProfit;
 
     /**
-     * 最大月度收益 比较
+     * TODO 最大月度收益 比较
      */
     public BacktestValueComparisonBean maxMonthProfit;
 
@@ -132,57 +132,57 @@ public class BacktestReportBean {
     public Integer maxDownDays;
 
     /**
-     * 年化波动率
+     * TODO 年化波动率
      */
     public Double annualVolatility;
 
     /**
-     * beta
+     * TODO beta
      */
     public Double beta;
 
     /**
-     * var
+     * TODO var
      */
     public Double var;
 
     /**
-     * 平均相关系数
+     * TODO 平均相关系数
      */
     public Double averageCorrelationCoefficient;
 
     /**
-     * 风格归因-收益
+     * TODO 风格归因-收益
      */
     public List<FieldValueBean> styleAttributionProfit;
 
     /**
-     * 风格归因-风险
+     * TODO 风格归因-风险
      */
     public List<FieldValueBean> styleAttributionRisk;
 
     /**
-     * 行业归因-收益
+     * TODO 行业归因-收益
      */
     public List<FieldValueBean> industryAttributionProfit;
 
     /**
-     * 行业归因-风险
+     * TODO 行业归因-风险
      */
     public List<FieldValueBean> industryAttributionRisk;
 
     /**
-     * 品种归因
+     * TODO 品种归因
      */
     public List<FieldValueBean> varietyAttribution;
 
     /**
-     * Brison归因-股票
+     * TODO Brison归因-股票
      */
     public List<FieldValueBean> brisonAttributionStock;
 
     /**
-     * Brison归因-债券
+     * TODO Brison归因-债券
      */
     public List<FieldValueBean> brisonAttributionBond;
 
