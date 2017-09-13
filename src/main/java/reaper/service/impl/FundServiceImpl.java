@@ -253,7 +253,7 @@ public class FundServiceImpl implements FundService {
 
     @Override
     public List<ValueDateBean> findJensenByCode(String code) {
-        return getGraphData(code,"0");
+        return getAllGraphData(code,"0");
     }
 
     @Override
@@ -355,33 +355,13 @@ public class FundServiceImpl implements FundService {
     }
 
     /**
-     * 基金风险走势
-     * @param code 代码
-     * @return
-     */
-    @Override
-    public List<ValueDateBean> findRiskTrend(String code) {
-        return null;
-    }
-
-    /**
-     * 基金每日回撤
-     * @param code
-     * @return
-     */
-    @Override
-    public List<ValueDateBean> findDailyRetracement(String code) {
-        return null;
-    }
-
-    /**
      * 基金波动率
      * @param code
      * @return
      */
     @Override
     public List<ValueDateBean> findVolatility(String code) {
-        return getGraphData(code,"3");
+        return getAllGraphData(code,"3");
     }
 
     /**
@@ -391,7 +371,7 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public List<ValueDateBean> findValueAtRisk(String code) {
-        return getGraphData(code,"4");
+        return getAllGraphData(code,"4");
     }
 
     /**
@@ -401,7 +381,7 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public List<ValueDateBean> findDownsideVolatility(String code) {
-        return getGraphData(code,"5");
+        return getAllGraphData(code,"5");
     }
 
     /**
@@ -411,7 +391,7 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public List<ValueDateBean> findSharpeIndex(String code) {
-        return getGraphData(code,"6");
+        return getAllGraphData(code,"6");
     }
 
     /**
@@ -421,7 +401,7 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public List<ValueDateBean> findTreynorIndex(String code) {
-        return getGraphData(code,"7");
+        return getAllGraphData(code,"7");
     }
 
     /**
@@ -603,12 +583,42 @@ public class FundServiceImpl implements FundService {
         return list;
     }
 
-    private List<ValueDateBean> getGraphData(String code, String attr){
+    /**
+     * 成立日以来的数据
+     * @param code
+     * @param attr
+     * @return
+     */
+    private List<ValueDateBean> getAllGraphData(String code, String attr){
         if(!checkCodeExist(code)){
             return null;
         }
         List<ValueDateBean> res = new ArrayList<>();
-        String pyRes = PythonUser.usePy("graphData.py", fillCode(code)+" "+attr);
+        String pyRes = PythonUser.usePy("graphData.py", fillCode(code)+" "+"2000-01-01"+" "+sdf.format(new Date())+" "+attr);
+        for(String line:pyRes.split("\n")){
+            //处理每行
+            String attrs[] = line.split(" ");
+            res.add(new ValueDateBean(attrs[0], Double.valueOf(attrs[1])));
+        }
+        return res;
+    }
+
+    /**
+     * 近一年的数据
+     * @param code
+     * @param attr
+     * @return
+     */
+    private List<ValueDateBean> getYearGraphData(String code, String attr){
+        if(!checkCodeExist(code)){
+            return null;
+        }
+        List<ValueDateBean> res = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.YEAR,-1);
+
+        String pyRes = PythonUser.usePy("graphData.py", fillCode(code)+" "+sdf.format(calendar.getTime())+" "+sdf.format(new Date())+" "+attr);
         for(String line:pyRes.split("\n")){
             //处理每行
             String attrs[] = line.split(" ");

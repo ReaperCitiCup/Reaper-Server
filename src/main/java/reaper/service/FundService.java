@@ -131,20 +131,6 @@ public interface FundService {
     public List<FieldValueBean> findStyleAttributionRisk(String code);
 
     /**
-     * 基金风险走势
-     * @param code 代码
-     * @return
-     */
-    public List<ValueDateBean> findRiskTrend(String code);
-
-    /**
-     * 基金每日回撤
-     * @param code
-     * @return
-     */
-    public List<ValueDateBean> findDailyRetracement(String code);
-
-    /**
      * 基金波动率
      * @param code
      * @return

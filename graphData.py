@@ -126,6 +126,8 @@ def annualizedRate(dailyRate):
 
 #计算特雷诺比率，参数类型：前两个为列表，beta为数值
 def TreynorRatio(resultRate,rf,beta):
+     if(0==beta):
+          return 0
      Erp=sum(resultRate)/len(resultRate)
      Erf=sum(rf)/len(rf)
      return (Erp-Erf)/beta
@@ -157,29 +159,29 @@ def getCode():
     try:
         conn=pymysql.connect(host='106.15.203.173',user='reaper',passwd='reaper112233',db='reaper',port=3306,charset='utf8')
         cur=conn.cursor()#获取一个游标
-        cur.execute('SELECT  distinct id FROM reaper.fund_netValue')
+        cur.execute('SELECT  distinct code FROM reaper.fund_netValue')
         data=cur.fetchall()
-        id=[]
+        code=[]    
         for d in data :
-            id.append(str(d[0]))
+            code.append(str(d[0]))        
     except Exception :print("查询失败")
-    return id
+    return code
 
 #基金类
 class Fund:
-     def __init__(self,id):
-          self.id=id   #基金代码
+     def __init__(self,code):
+          self.code=code   #基金代码
           self.date=[]
           self.nav=[]   #单位净值
           self.dailyRate=[]   #日收益率       
 
 #根据基金代码从数据库里获取某个基金的信息
-def getFund(id):
-    fund=Fund(id)
+def getFund(code):
+    fund=Fund(code)
     try:
         conn=pymysql.connect(host='106.15.203.173',user='reaper',passwd='reaper112233',db='reaper',port=3306,charset='utf8')
         cur=conn.cursor()
-        cur.execute('SELECT  date,unitNetValue,dailyRate FROM reaper.fund_netValue WHERE id='+id)
+        cur.execute('SELECT  date,unitNetValue,dailyRate FROM reaper.fund_netValue WHERE code='+code)
         data=cur.fetchall()               
         for d in data :          
             fund.date.append((str(d[0]))[:10]) #去掉时分秒
@@ -208,7 +210,7 @@ def getFund(id):
             else:       
                 fund.dailyRate.append((float(dailyRate))/100) #数据库里的利率省略了百分号的，除回来
             #print (float(d[2]))/100
-    except Exception :print(id+"查询失败")
+    except Exception :print(code+"查询失败")
     return fund
     
 
@@ -292,106 +294,74 @@ class corrDate:
         self.rf=tempRf
           
 
-          
 
-
-#市场收益率对象，暂时是从csv文件读取数据，数据库里有该数据可修改成从数据库里读取
+#市场收益率对象，从数据库里读取数据（日更新）
 class Rm:
-     def __init__(self,fileName):
-          self.date=[]   
-          self.closingPrice=[]
-          self.dayRate=[]
-          self.monthRate=[]
+     def __init__(self):
+             self.date=[]   
+             self.closingPrice=[]
+             self.dayRate=[]
+             self.monthRate=[]
 
-          csv_reader = csv.reader(open(fileName))
-          firstRow=1
-          fundData=[]
-          for row in csv_reader:
-               if(1==firstRow):
-                         firstRow=0
-                         continue    
-               fundData.append(row)#读入每一行数据
-               
-          dataLen=len(fundData)
-          i=0
-          while(i+20<dataLen):     
-             self.date.append((filter(lambda ch: ch in '-0123456789',fundData[i][0])))
-             curPrice=(float)(filter(lambda ch: ch in '0123456789.', fundData[i][3]))
-             monthAgoPrice=(float)(filter(lambda ch: ch in '0123456789.', fundData[i+20][3]))#设每月20个交易日
-             self.closingPrice.append(curPrice)
-             dateRate=(filter(lambda ch: ch in '-0123456789.',fundData[i][4]))
-             if(''==dateRate):
-                 dateRate='0'
-             #print dateRate,self.date[-1]
-             self.dayRate.append(float(dateRate)/100)
-             self.monthRate.append((curPrice-monthAgoPrice)/monthAgoPrice/100)
-             i+=1
+             conn=pymysql.connect(host='106.15.203.173',user='reaper',passwd='reaper112233',db='reaper',port=3306,charset='utf8')
+             cur=conn.cursor()
+             cur.execute('SELECT  date,beforeClosePrice,closePrice FROM basic_stock_index where stockId="000001"')
+             data=cur.fetchall()
+             dataLen=len(data)
+             i=0               
+             
+             while(i+20<dataLen):
+                 d=data[i]       
+                 self.date.append((filter(lambda ch: ch in '-0123456789',str(d[0].strftime('%Y-%m-%d')))))
+                 beforePrice=(float)(filter(lambda ch: ch in '0123456789.', str(d[1])))
+                 curPrice=(float)(filter(lambda ch: ch in '0123456789.', str(d[2])))
+                 monthAgoPrice=(float)(filter(lambda ch: ch in '0123456789.', str(data[i+20][2])))#设每月20个交易日
+                 self.closingPrice.append(curPrice)
+                 dateRate=(curPrice-beforePrice)/beforePrice
+                 if(''==dateRate):
+                     dateRate='0'
+                     #print dateRate,self.date[-1]
+                 self.dayRate.append(float(dateRate))
+                 self.monthRate.append((curPrice-monthAgoPrice)/monthAgoPrice)
+                 i+=1
 
 
 #无风险收益率对象，暂时是从csv文件读取数据
 class Rf:
-     def __init__(self,fileName,Treasury=''):
+     def __init__(self):
           self.date=[]   
           self.rfDaily=[]
           self.rfWeekly=[]
           self.rfMonthly=[]
           self.rfYearly=[]
+
+          conn=pymysql.connect(host='106.15.203.173',user='reaper',passwd='reaper112233',db='reaper',port=3306,charset='utf8')
+          cur=conn.cursor()
+
+          cur.execute('SELECT date,closePrice,priceFluctuation from basic_stock_index where stockId="000012"')
+          data=cur.fetchall()
+          dataLen=len(data)
+          i=0
+          date=data[i][0].strftime('%Y-%m-%d')
+          while(date>'2016-12-30'):
+               self.date.append(date)
+               self.rfDaily.append(data[i][2])
+               self.rfWeekly.append((data[i][1]-data[i+5][1])/data[i+5][1])
+               self.rfMonthly.append((data[i][1]-data[i+20][1])/data[i+20][1])
+               self.rfYearly.append((data[i][1]-data[i+Number_Of_Trading_Days][1])/data[i+Number_Of_Trading_Days][1])
+               i+=1               
+               date=data[i][0].strftime('%Y-%m-%d')
           
-          if(Treasury!=''):
-              data = xlrd.open_workbook(Treasury)
-
-              table=data.sheets()[0]          
-              rm=[]
-              r=1
-              date=datetime(*xldate_as_tuple(table.row_values(r,0)[0],0)).strftime('%Y-%m-%d')
-              while (date>'2016-12-30'):  #用国债数据计算2016/12/30以后的无风险收益率（因为Fund_RiskFree.csv里没有）
-                  self.date.append(date)
-                  self.rfDaily.append(table.row_values(r,4)[0])
-                  self.rfWeekly.append((table.row_values(r,3)[0]-table.row_values(r+5,3)[0])/table.row_values(r+5,3)[0])
-                  self.rfMonthly.append((table.row_values(r,3)[0]-table.row_values(r+20,3)[0])/table.row_values(r+20,3)[0])
-                  self.rfYearly.append((table.row_values(r,3)[0]-table.row_values(r+246,3)[0])/table.row_values(r+246,3)[0])
-                  r+=1
-                  date=datetime(*xldate_as_tuple(table.row_values(r,0)[0],0)).strftime('%Y-%m-%d')
-                  #print date
-                  
-
-          with open(fileName, 'r') as f:
-               lines=f.readlines()
-               isFirstLine=1
-               lastLine=lines[-1]
-
-               lineLen=len(lines)
-               i=lineLen-1-1 #最后一行为空行，舍去
-               
-               while i>0:
-                    line=lines[i]
-                    i-=1
-                    if(1==isFirstLine):
-                         isFirstLine=0
-                         continue
-                    if(line==lastLine):
-                         break
-                    date=line[39:58]
-                    rfYearly = line[61:76]
-                    rfDaily = line[79:92]              
-                    rfWeekly = line[95:108]
-                    rfMonthly = line[111:125]
-                    
-                    self.date.append(filter(lambda ch: ch in '0123456789-', date))
-                    #print rfYearly
-                    self.rfYearly.append(((float)(filter(lambda ch: ch in '-0123456789.', rfYearly)))/100)
-                    self.rfDaily.append(((float)(filter(lambda ch: ch in '-0123456789.', rfDaily)))/100)
-                    self.rfWeekly.append( ((float)(filter(lambda ch: ch in '-0123456789.', rfWeekly)))/100)
-                    self.rfMonthly.append(((float)(filter(lambda ch: ch in '-0123456789.', rfMonthly)))/100)
-                 
-
-
-
-
-
-
-
-
+          
+          cur.execute('SELECT date,rfYearly,rfDaily,rfWeekly,rfMonthly from rf')
+          data=cur.fetchall()
+          dataLen=len(data)
+          for d in data:
+               self.date.append(filter(lambda ch: ch in '0123456789-', str(d[0])))
+               self.rfYearly.append(((float)(filter(lambda ch: ch in '-0123456789.', str(d[1]))))/100)
+               self.rfDaily.append(((float)(filter(lambda ch: ch in '-0123456789.', str(d[2]))))/100)
+               self.rfWeekly.append( ((float)(filter(lambda ch: ch in '-0123456789.', str(d[3]))))/100)
+               self.rfMonthly.append(((float)(filter(lambda ch: ch in '-0123456789.', str(d[4]))))/100)
 
 
 
@@ -401,8 +371,8 @@ def fundGroup():
      fundDict={}
      codeList=[]    #前端应该传来的用于构造基金组合的数据
      pencentage=[]  #codeList为用户所选的组合中所用基金的代码（列表类型），pencentage为组合中所用基金占组合的百分比（也为列表类型，与codeList通过下标对应，如pencentage[i]表示基金代码为codeList[i]的基金占组合的百分比）
-     for id in codeList:
-        fundDict[id]=getFund(id) #获取组合中各个基金的信息
+     for code in codeList:
+        fundDict[code]=getFund(code) #获取组合中各个基金的信息
         
      myFundGroup=Fund("myFundGroup")#创建一个空的基金组合对象，加权平均后的数据可放到这个对象中
      #。。。
@@ -413,19 +383,19 @@ def fundGroup():
 
 #测试函数
 def test():
-     rm=Rm('000001.csv')#读取市场数据
+     rm=Rm()#读取市场数据
      #print rm.monthRate
-     rf=Rf('Fund_RiskFree.csv','Treasury.xlsx')
+     rf=Rf()
      #print rf.date
      fundDict={} #基金字典，用于查询或管理基金，key为基金代码，value为Fund对象    
      #codeList=getCode()   
-     #for id in codeList:
-     #    fundDict[id]=getFund(id)
+     #for code in codeList:
+     #    fundDict[code]=getFund(code)
          
-     id='000003' #前端点击查看某只基金的信息后，传来该基金的代码，赋值到这里，便可获取该基金的信息并计算各种风险因子
-     fundDict[id]=getFund(id)
+     code='000003' #前端点击查看某只基金的信息后，传来该基金的代码，赋值到这里，便可获取该基金的信息并计算各种风险因子
+     fundDict[code]=getFund(code)
      
-     temp=corrDate(fundDict[id].date,fundDict[id].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly)
+     temp=corrDate(fundDict[code].date,fundDict[code].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly) 
         #统一日期，并返回统一后的日期序列和该日期序列对应的基金收益率序列/市场收益率序列/无风险利率序列,市场数据用的是日收益率，无风险利率用的是月收益率
 
      
@@ -433,14 +403,14 @@ def test():
      alpha=countAlpha(temp.fundRate,temp.rm,temp.rf,beta)
      
       
-     print "目标基金年化收益率=",annualizedRate(fundDict[id].dailyRate)
+     print "目标基金年化收益率=",annualizedRate(fundDict[code].dailyRate)
      print "目标基金年化波动率=",annualizedVolatility(temp.fundRate)
      print "目标基金在险价值=",countValue_at_risk(annualizedVolatility(temp.fundRate))
      print "目标基金收益率序列的下行标准差=",downsideStdDev(temp.fundRate,temp.rf)
      print "目标基金夏普比=",countSharpeRatio(temp.fundRate,temp.rf)
      print "beta=",beta
-     #for i in range(len(alpha)):
-     #    print temp.date[i]+"对应的alpha值为",alpha[i]   
+     for i in range(len(alpha)):
+         print temp.date[i]+"对应的alpha值为",alpha[i]   
      print "目标基金特雷诺指数=",TreynorRatio(temp.fundRate,temp.rf,beta)
 
      
@@ -464,15 +434,15 @@ def test():
 
 
      #计算某段时间内的各种基金指标
-     id='000003' #前端点击查看某只基金的信息后，传来该基金的代码，赋值到这里，便可获取该基金的信息并计算各种风险因子
-     fundDict[id]=getFund(id)
-     temp=corrDate(fundDict[id].date,fundDict[id].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly)
+     code='000003' #前端点击查看某只基金的信息后，传来该基金的代码，赋值到这里，便可获取该基金的信息并计算各种风险因子
+     fundDict[code]=getFund(code)    
+     temp=corrDate(fundDict[code].date,fundDict[code].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly) 
      temp.countByDate('2016-05-06','2017-08-01') #若要计算 某段时间内 的波动率，则要先调用这个函数，参数为开始和截至日期，类型为字符串，格式为'yyyy-mm-dd'(五月六号的5和6前的0不能省略）
      #然后用temp的属性计算出来的波动率就是这段时间内的了（前提是目标基金/市场收益率/无风险利率有这段时间内的数据）
      #计算方法同上
      beta=countBeta(temp.fundRate,temp.rm)
      alpha=countAlpha(temp.fundRate,temp.rm,temp.rf,beta)
-     print "目标基金收益率序列2016-05-06至2017-08-01的年化收益率=",annualizedRate(fundDict[id].dailyRate)
+     print "目标基金收益率序列2016-05-06至2017-08-01的年化收益率=",annualizedRate(fundDict[code].dailyRate)
      print "目标基金收益率序列2016-05-06至2017-08-01的年化波动率=",annualizedVolatility(temp.fundRate)
      print "目标基金收益率序列2016-05-06至2017-08-01的在险价值=",countValue_at_risk(annualizedVolatility(temp.fundRate))
      print "目标基金收益率序列2016-05-06至2017-08-01的收益率序列的下行标准差=",downsideStdDev(temp.fundRate,temp.rf)
@@ -504,17 +474,15 @@ def test():
 
 
 
-def test2(id,startTime,endTime,option):   #参数：基金的代码，查询的起始和结束日期（'yyyy-mm-dd'的字符串类型,option为字符串，选择查看哪一个因子
-     rm=Rm('000001.csv')#读取市场数据
-     #print rm.monthRate
-     rf=Rf('Fund_RiskFree.csv','Treasury.xlsx')
-     #print rf.date
+def test2(code,startTime,endTime,option):   #参数：基金的代码，查询的起始和结束日期（'yyyy-mm-dd'的字符串类型,option为字符串，选择查看哪一个因子
+     rm=Rm()#读取市场数据
+     rf=Rf()#读取无风险利率
      fundDict={}
 
      #计算某段时间内的各种基金指标
 
-     fundDict[id]=getFund(id)
-     temp=corrDate(fundDict[id].date,fundDict[id].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly)
+     fundDict[code]=getFund(code)
+     temp=corrDate(fundDict[code].date,fundDict[code].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly)
      
      
      startTime = datetime.strptime(startTime,'%Y-%m-%d')
@@ -537,14 +505,50 @@ def test2(id,startTime,endTime,option):   #参数：基金的代码，查询的�
           alpha=countAlpha(temp.fundRate,temp.rm,temp.rf,countBeta(temp.fundRate,temp.rm))
           for i in range(len(alpha)):
                print temp.date[i],alpha[i]
+          return
+
+     elif('stockSelectionCoefficient'==option or 'timeSelectionCoefficient'==option):
+          i=0
+          while(i<=days):
+               temp=corrDate(fundDict[code].date,fundDict[code].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly)
+ 
+               curEndTime = startTime + timedelta(days=i)
+               curStartTime=curEndTime - timedelta(days=30) #每隔一个月做一次回归
+               temp.countByDate(curStartTime.strftime('%Y-%m-%d'),curEndTime.strftime('%Y-%m-%d'))
+               
+               y=ListSub(temp.fundRate,temp.rf)
+               x1=ListSub(temp.rm,temp.rf)
+               x2=ListSubSqare(temp.rm,temp.rf)
+               obj_dict={'y':y,'x1':x1,'x2':x2}
+               data=pd.DataFrame(obj_dict)#通过字典创建dataframe
+               x=data[['x1','x2']]
+               y=data['y']
+               X_train,X_test, y_train, y_test = train_test_split(x, y, random_state=1)
+               linreg = LinearRegression()
+               if(0==len(X_train) or 0==len(y_train)):
+                    i+=30
+                    continue
+               model=linreg.fit(X_train, y_train)
+               
+               stockSelectionCoefficient.append(linreg.intercept_)
+               timeSelectionCoefficient.append(linreg.coef_[1])
+               if('stockSelectionCoefficient'==option):
+                    print curEndTime.strftime('%Y-%m-%d'),linreg.intercept_
+               else:
+                    print curEndTime.strftime('%Y-%m-%d'),linreg.coef_[1]
+               i+=30
+          return
      
-     i=0
+     i=0     
      while(i<=days):      
-          temp=corrDate(fundDict[id].date,fundDict[id].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly)
+          temp=corrDate(fundDict[code].date,fundDict[code].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly)  
           curEndTime = startTime + timedelta(days=i)
           curStartTime=curEndTime - timedelta(days=365) #拿每一天和一年前的数据来算
           #print curStartTime
           temp.countByDate(curStartTime.strftime('%Y-%m-%d'),curEndTime.strftime('%Y-%m-%d'))
+          if(0==len(temp.fundRate) or 0==len(temp.rm) or 0==len(temp.rf)):
+               i+=1
+               continue
           
           if('beta'==option):              
                beta.append(countBeta(temp.fundRate,temp.rm))
@@ -575,24 +579,7 @@ def test2(id,startTime,endTime,option):   #参数：基金的代码，查询的�
                treynorRatio.append(TreynorRatio(temp.fundRate,temp.rf,tempBeta))
                print curEndTime.strftime('%Y-%m-%d'),treynorRatio[-1]
                
-          elif('stockSelectionCoefficient'==option or 'timeSelectionCoefficient'==option):
-               y=ListSub(temp.fundRate,temp.rf)
-               x1=ListSub(temp.rm,temp.rf)
-               x2=ListSubSqare(temp.rm,temp.rf)
-               obj_dict={'y':y,'x1':x1,'x2':x2}
-               data=pd.DataFrame(obj_dict)#通过字典创建dataframe
-               x=data[['x1','x2']]
-               y=data['y']
-               X_train,X_test, y_train, y_test = train_test_split(x, y, random_state=1)
-               linreg = LinearRegression()  
-               model=linreg.fit(X_train, y_train)
-               
-               stockSelectionCoefficient.append(linreg.intercept_)
-               timeSelectionCoefficient.append(linreg.coef_[1])
-               if('stockSelectionCoefficient'==option):
-                    print curEndTime.strftime('%Y-%m-%d'),linreg.intercept_
-               else:
-                    print curEndTime.strftime('%Y-%m-%d'),linreg.coef_[1]
+          
                
           i+=1
 
@@ -600,7 +587,7 @@ def test2(id,startTime,endTime,option):   #参数：基金的代码，查询的�
          
                     
 optionList=['alpha','beta','annualizedRate','annualizedVolatility','countValue_at_risk','downsideStdDev','sharpeRatio','treynorRatio','stockSelectionCoefficient','timeSelectionCoefficient']
-test2(str(sys.argv[1]),'2013-03-22','2017-09-08',optionList[int(sys.argv[2])])
-
+test2(str(sys.argv[1]),str(sys.argv[2]),str(sys.argv[3]),optionList[int(sys.argv[4])])
+#test()
 
    

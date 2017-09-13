@@ -5,16 +5,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import reaper.model.Company;
-import reaper.model.FundCompany;
-import reaper.model.FundManager;
-import reaper.model.CRP;
-import reaper.repository.*;
+import reaper.model.CPR;
+import reaper.repository.CPRRepository;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -25,7 +19,7 @@ import java.util.regex.Pattern;
 public class CRPTest {
 
     @Autowired
-    CRPepository crPepository;
+    CPRRepository cprRepository;
 
 
     @Test
@@ -59,7 +53,7 @@ public class CRPTest {
                 Integer total=Integer.parseInt(temp[7]);
 
 
-                CRP crp=new CRP();
+                CPR crp=new CPR();
                 crp.setFundId(ID);
                 crp.setLL(LL);
                 crp.setWL(Wl);
@@ -69,7 +63,7 @@ public class CRPTest {
                 crp.setCRPProPortion(CRPProportion);
                 crp.setTotal(total);
 
-                crPepository.save(crp);
+                cprRepository.save(crp);
 
 
 

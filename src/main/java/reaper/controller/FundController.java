@@ -271,34 +271,6 @@ public class FundController {
     }
 
     /**
-     * 基金风险走势
-     * @param code 代码
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(
-            value = "/{code}/risk-trend",
-            method = RequestMethod.GET,
-            produces = {"application/json; charset=UTF-8"})
-    public List<ValueDateBean> findRiskTrendById(@PathVariable String code){
-        return fundService.findRiskTrend(code);
-    }
-
-    /**
-     * 基金每日回撤
-     * @param code
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(
-            value = "/{code}/daily-retracement",
-            method = RequestMethod.GET,
-            produces = {"application/json; charset=UTF-8"})
-    public List<ValueDateBean> findDailyRetracement(@PathVariable String code){
-        return fundService.findDailyRetracement(code);
-    }
-
-    /**
      * 基金在险价值
      * @param code
      * @return

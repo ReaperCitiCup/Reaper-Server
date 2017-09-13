@@ -5,9 +5,9 @@ package reaper.bean;
  */
 public class RankDataBean {
     /**
-     * 月份
+     * 类型
      */
-    public Integer month;
+    public String type;
 
     /**
      * 排名数
@@ -19,8 +19,8 @@ public class RankDataBean {
      */
     public Integer total;
 
-    public RankDataBean(Integer month, Integer rank, Integer total) {
-        this.month = month;
+    public RankDataBean(String type, Integer rank, Integer total) {
+        this.type = type;
         this.rank = rank;
         this.total = total;
     }
