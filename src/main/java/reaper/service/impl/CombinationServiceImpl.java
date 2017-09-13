@@ -342,9 +342,6 @@ public class CombinationServiceImpl implements CombinationService {
         }
         backtestReportBean.annualProfit = new BacktestValueComparisonBean(fundAnnualProfit, FormatData.fixToTwoAndPercent(baseAnnualProfit));
 
-        //TODO 最大月度收益
-
-
         /**
          * 盈利天占比
          */
@@ -469,10 +466,94 @@ public class CombinationServiceImpl implements CombinationService {
             FactorResult normal_factorResult = factorResultRepository.findByCodeAndFactorType(codes.get(i), 'N');
             FactorResult risk_factorResult = factorResultRepository.findByCodeAndFactorType(codes.get(i), 'R');
 
-            //TODO 孙泽嵩
 
+            if (i == 0) {
+                // 风格归因-收益
+                styleAttributionProfit = ToFieldBean.factorResultToStyleAttribution(normal_factorResult);
+                for(int j = 0; j < styleAttributionProfit.size(); j++) {
+                    styleAttributionProfit.get(j).value *= weights.get(i);
+                }
+
+                // 风格归因-风险
+                styleAttributionRisk = ToFieldBean.factorResultToStyleAttribution(risk_factorResult);
+                for(int j = 0; j < styleAttributionRisk.size(); j++) {
+                    styleAttributionRisk.get(j).value *= weights.get(i);
+                }
+
+                // 行业归因-收益
+                industryAttributionProfit = ToFieldBean.factorResultToIndustryAttribution(normal_factorResult);
+                for(int j = 0; j < industryAttributionProfit.size(); j++) {
+                    industryAttributionProfit.get(j).value *= weights.get(i);
+                }
+
+                // 行业归因-风险
+                industryAttributionRisk = ToFieldBean.factorResultToIndustryAttribution(risk_factorResult);
+                for(int j = 0; j < industryAttributionRisk.size(); j++) {
+                    industryAttributionRisk.get(j).value *= weights.get(i);
+                }
+
+                // 品种归因
+                varietyAttribution = ToFieldBean.brisonResultToVarietyAttribution(brisonResult);
+                for(int j = 0; j < varietyAttribution.size(); j++) {
+                    varietyAttribution.get(j).value *= weights.get(i);
+                }
+
+                // Brison归因-股票
+                brisonAttributionStock = ToFieldBean.stockBrisonResultToFieldValue(stockBrinsonResult);
+                for(int j = 0; j < brisonAttributionStock.size(); j++) {
+                    brisonAttributionStock.get(j).value *= weights.get(i);
+                }
+
+                // Brison归因-债券
+                brisonAttributionBond = ToFieldBean.brisonResultToFieldValue(brisonResult);
+                for(int j = 0; j < brisonAttributionBond.size(); j++) {
+                    brisonAttributionBond.get(j).value *= weights.get(i);
+                }
+
+            } else {
+                // 风格归因-收益
+                for(int j = 0; j < styleAttributionProfit.size(); j++) {
+                    styleAttributionProfit.get(j).value += ToFieldBean.factorResultToStyleAttribution(normal_factorResult).get(j).value * weights.get(i);
+                }
+
+                // 风格归因-风险
+                for(int j = 0; j < styleAttributionRisk.size(); j++) {
+                    styleAttributionRisk.get(j).value += ToFieldBean.factorResultToStyleAttribution(risk_factorResult).get(j).value * weights.get(i);
+                }
+
+                // 行业归因-收益
+                for(int j = 0; j < industryAttributionProfit.size(); j++) {
+                    industryAttributionProfit.get(j).value += ToFieldBean.factorResultToIndustryAttribution(normal_factorResult).get(j).value * weights.get(i);
+                }
+
+                // 行业归因-风险
+                for(int j = 0; j < industryAttributionRisk.size(); j++) {
+                    industryAttributionRisk.get(j).value += ToFieldBean.factorResultToIndustryAttribution(risk_factorResult).get(j).value * weights.get(i);
+                }
+
+                // 品种归因
+                for(int j = 0; j < varietyAttribution.size(); j++) {
+                    varietyAttribution.get(j).value += ToFieldBean.brisonResultToVarietyAttribution(brisonResult).get(j).value * weights.get(i);
+                }
+
+                // Brison归因-股票
+                for(int j = 0; j < brisonAttributionStock.size(); j++) {
+                    brisonAttributionStock.get(j).value += ToFieldBean.stockBrisonResultToFieldValue(stockBrinsonResult).get(j).value * weights.get(i);
+                }
+
+                // Brison归因-债券
+                for(int j = 0; j < brisonAttributionBond.size(); j++) {
+                    brisonAttributionBond.get(j).value += ToFieldBean.brisonResultToFieldValue(brisonResult).get(j).value * weights.get(i);
+                }
+            }
         }
-
+        backtestReportBean.styleAttributionProfit = styleAttributionProfit;
+        backtestReportBean.styleAttributionRisk = styleAttributionRisk;
+        backtestReportBean.industryAttributionProfit = industryAttributionProfit;
+        backtestReportBean.industryAttributionRisk = industryAttributionRisk;
+        backtestReportBean.varietyAttribution = varietyAttribution;
+        backtestReportBean.brisonAttributionBond = brisonAttributionBond;
+        backtestReportBean.brisonAttributionStock = brisonAttributionStock;
 
         return backtestReportBean;
     }

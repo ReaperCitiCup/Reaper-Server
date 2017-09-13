@@ -87,11 +87,6 @@ public class BacktestReportBean {
     public BacktestValueComparisonBean annualProfit;
 
     /**
-     * TODO 最大月度收益 比较
-     */
-    public BacktestValueComparisonBean maxMonthProfit;
-
-    /**
      * 盈利天占比 比较
      */
     public BacktestValueComparisonBean profitDaysRatio;
@@ -137,37 +132,37 @@ public class BacktestReportBean {
     public Double averageCorrelationCoefficient;
 
     /**
-     * TODO 风格归因-收益
+     * 风格归因-收益
      */
     public List<FieldValueBean> styleAttributionProfit;
 
     /**
-     * TODO 风格归因-风险
+     * 风格归因-风险
      */
     public List<FieldValueBean> styleAttributionRisk;
 
     /**
-     * TODO 行业归因-收益
+     * 行业归因-收益
      */
     public List<FieldValueBean> industryAttributionProfit;
 
     /**
-     * TODO 行业归因-风险
+     * 行业归因-风险
      */
     public List<FieldValueBean> industryAttributionRisk;
 
     /**
-     * TODO 品种归因
+     * 品种归因
      */
     public List<FieldValueBean> varietyAttribution;
 
     /**
-     * TODO Brison归因-股票
+     * Brison归因-股票
      */
     public List<FieldValueBean> brisonAttributionStock;
 
     /**
-     * TODO Brison归因-债券
+     * Brison归因-债券
      */
     public List<FieldValueBean> brisonAttributionBond;
 
@@ -176,7 +171,7 @@ public class BacktestReportBean {
                               Double volatility, List<String> mainFactors, BacktestComparisonBean cumulativeNetValueTrend,
                               BacktestComparisonBean profitRateTrend, BacktestValueComparisonBean totalProfitRate,
                               BacktestValueComparisonBean overProfitRate, BacktestValueComparisonBean annualProfit,
-                              BacktestValueComparisonBean maxMonthProfit, BacktestValueComparisonBean profitDaysRatio,
+                              BacktestValueComparisonBean profitDaysRatio,
                               BacktestComparisonBean dailyRetracementTrend, List<BacktestCorrelationTable> correlationCoefficientTrend,
                               Double maxDayDown, Integer maxDownDays, Double annualVolatility, Double beta, Double var,
                               Double averageCorrelationCoefficient, List<FieldValueBean> styleAttributionProfit,
@@ -200,7 +195,6 @@ public class BacktestReportBean {
         this.totalProfitRate = totalProfitRate;
         this.overProfitRate = overProfitRate;
         this.annualProfit = annualProfit;
-        this.maxMonthProfit = maxMonthProfit;
         this.profitDaysRatio = profitDaysRatio;
         this.dailyRetracementTrend = dailyRetracementTrend;
         this.correlationCoefficientTrend = correlationCoefficientTrend;
