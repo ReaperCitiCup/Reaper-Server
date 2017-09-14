@@ -44,11 +44,11 @@ public class CombinationServiceTest {
     public void backtestCombination() throws Exception {
         Integer combinationId = 3;
         String startDate = "2016-07-10";
-        String endDtae = "2016-09-26";
+        String endDate = "2016-09-26";
         String baseIndex = "国债指数";
 
 
-        BacktestReportBean reportBean = combinationService.backtestCombination(combinationId, startDate, endDtae, baseIndex);
+        BacktestReportBean reportBean = combinationService.backtestCombination(combinationId, startDate, endDate, baseIndex);
         if (reportBean == null) {
             System.out.println("null");
         } else {

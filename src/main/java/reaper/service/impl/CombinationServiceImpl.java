@@ -454,11 +454,11 @@ public class CombinationServiceImpl implements CombinationService {
         backtestReportBean.averageCorrelationCoefficient = FormatData.fixToTwo(sum / pyAnalysisResult.pjxgxs.size());
         backtestReportBean.correlationCoefficientTrend = backtestCorrelationTables;
 
-        double betasum = 0.0;
-        for (int i = 0; i < codes.size(); i++) {
-            betasum += pyAnalysisResult.beta.get(codes.get(i)) * weights.get(i);
-        }
-        backtestReportBean.beta = FormatData.fixToTwo(betasum / codes.size());
+//        double betasum = 0.0;
+//        for (int i = 0; i < codes.size(); i++) {
+//            betasum += pyAnalysisResult.beta.get(codes.get(i)) * weights.get(i);
+//        }
+//        backtestReportBean.beta = FormatData.fixToTwo(betasum / codes.size());
 
         /**
          * 最大单日跌幅、最大连跌天数
