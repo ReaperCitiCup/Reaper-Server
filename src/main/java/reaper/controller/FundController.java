@@ -431,7 +431,7 @@ public class FundController {
      */
     @ResponseBody
     @RequestMapping(
-            value = "/{code}/pubic-opinion",
+            value = "/{code}/public-opinion",
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"})
     public List<PublicOpinionBean> findPublicOpinion(@PathVariable String code){

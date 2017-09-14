@@ -8,16 +8,18 @@ import reaper.bean.*;
 import reaper.model.*;
 import reaper.repository.*;
 import reaper.service.FundService;
-import reaper.util.*;
+import reaper.util.DaysBetween;
+import reaper.util.FundModelToBean;
+import reaper.util.PythonUser;
+import reaper.util.ToFieldBean;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static reaper.util.FormatData.*;
+import static reaper.util.FormatData.fixToTwo;
 
 /**
  * Created by Sorumi on 17/8/21.
@@ -191,7 +193,7 @@ public class FundServiceImpl implements FundService {
             if(fundNetValue.getDailyRate()!=null) {
                 cumulativeValue += fundNetValue.getDailyRate();
             }
-            res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), cumulativeValue));
+            res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), fixToTwo(cumulativeValue)));
         }
 
         return res;
@@ -537,9 +539,6 @@ public class FundServiceImpl implements FundService {
 
             res.add(new PublicOpinionBean(sdf.format(fundRemark.getStartDate()),nums));
         }
-        if(res.size()==0){
-            return null;
-        }
 
         return res;
     }
@@ -582,9 +581,6 @@ public class FundServiceImpl implements FundService {
             links.add(new FundLinkDataBean(indexA,indexB,fundNetEdge.getWeight()));
         }
 
-        if(nodes.size()==0){
-            return null;
-        }
         //把id转化成name
         for(NodeDataBean node:nodes){
             try {
@@ -648,9 +644,9 @@ public class FundServiceImpl implements FundService {
             String attrs[] = line.split(" ");
             //判断是否是日期行
             List<FieldValueBean> data = new ArrayList<>();
-            data.add(new FieldValueBean("择股能力",fixToTwo(Double.valueOf(attrs[1]))));
-            data.add(new FieldValueBean("择时能力",fixToTwo(Double.valueOf(attrs[2]))));
-            data.add(new FieldValueBean("市场收益",fixToTwoAndPercent(Double.valueOf(attrs[3]))));
+            data.add(new FieldValueBean("择股能力", Double.valueOf(attrs[1])));
+            data.add(new FieldValueBean("择时能力", Double.valueOf(attrs[2])));
+            data.add(new FieldValueBean("市场收益", Double.valueOf(attrs[3])));
 
             res.add(new ChooseBean(attrs[0], data));
         }

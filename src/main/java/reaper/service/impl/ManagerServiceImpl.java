@@ -2,10 +2,6 @@ package reaper.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reaper.bean.CompanyMiniBean;
-import reaper.bean.FundHistoryBean;
-import reaper.bean.ManagerAbilityBean;
-import reaper.bean.ManagerBean;
 import reaper.bean.*;
 import reaper.model.*;
 import reaper.repository.*;
@@ -270,9 +266,6 @@ public class ManagerServiceImpl implements ManagerService {
             links.add(new ManagerLinkDataBean(indexA,indexB,managerEdge.getDays(),managerEdge.getTimes()));
         }
 
-        if(nodes.size()==0){
-            return null;
-        }
         //把id转化成name
         for(NodeDataBean node:nodes){
             node.name = managerRepository.findByManagerId(node.name).getName();
