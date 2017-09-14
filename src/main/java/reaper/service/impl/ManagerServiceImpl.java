@@ -269,7 +269,15 @@ public class ManagerServiceImpl implements ManagerService {
             }
             links.add(new ManagerLinkDataBean(indexA,indexB,managerEdge.getDays(),managerEdge.getTimes()));
         }
+
+        if(nodes.size()==0){
+            return null;
+        }
         //把id转化成name
+        for(NodeDataBean node:nodes){
+            node.name = managerRepository.findByManagerId(node.name).getName();
+        }
+
         return new ManagerNetworkBean(nodes,links);
     }
 

@@ -64,9 +64,11 @@ public class FundServiceImpl implements FundService {
     @Autowired
     FundNetEdgeRepository fundNetEdgeRepository;
 
+    @Autowired
+    FundRemarkRepository fundRemarkRepository;
+
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-    private DecimalFormat decimalFormat = new DecimalFormat("#.00");
 
     @Override
     public reaper.util.Page<FundMiniBean> findFundByKeyword(String keyword, String order, int size, int page) {
@@ -112,7 +114,8 @@ public class FundServiceImpl implements FundService {
 
     @Override
     public MiniBean findFundNameByCode(String code) {
-        Fund fund = fundRepository.findByCode(fillCode(code));
+        code = fillCode(code);
+        Fund fund = fundRepository.findByCode(code);
         return fund==null?null:new MiniBean(code,fund.getName());
     }
 
@@ -160,6 +163,7 @@ public class FundServiceImpl implements FundService {
 
     @Override
     public List<ValueDateBean> findCumulativeRateTrendByCode(String code, String month) {
+        code = fillCode(code);
         List<ValueDateBean> res = new ArrayList<>();
 
         //累加结果
@@ -168,7 +172,7 @@ public class FundServiceImpl implements FundService {
         List<FundNetValue> fundNetValues;
 
         if (month.equals("all")) {
-            fundNetValues = fundNetValueRepository.findAllByCodeOrderByDateAsc(fillCode(code));
+            fundNetValues = fundNetValueRepository.findAllByCodeOrderByDateAsc(code);
         } else {
             //获得n月前的日期
             Calendar calendar = Calendar.getInstance();
@@ -208,7 +212,7 @@ public class FundServiceImpl implements FundService {
     @Override
     public CurrentAssetBean findCurrentAssetByCode(String code) {
         AssetAllocation assetAllocation = assetAllocationRepository.findByCode(fillCode(code));
-        return assetAllocation==null?null:new CurrentAssetBean(Double.valueOf(decimalFormat.format(assetAllocation.bond)),Double.valueOf(decimalFormat.format(assetAllocation.stock)),Double.valueOf(decimalFormat.format(assetAllocation.bank)));
+        return assetAllocation==null?null:new CurrentAssetBean(Double.valueOf(fixToTwo(assetAllocation.bond)),Double.valueOf(fixToTwo(assetAllocation.stock)),Double.valueOf(fixToTwo(assetAllocation.bank)));
     }
 
     @Override
@@ -324,7 +328,7 @@ public class FundServiceImpl implements FundService {
 
         for (FundNetValue netValue : netValues) {
             if (countDate != 5 && netValue.getDate().before(dates[countDate])) {
-                rates[countDate] = Double.parseDouble(decimalFormat.format(rate));
+                rates[countDate] = fixToTwo(rate);
                 countDate++;
             }
             if(netValue.getDailyRate()!=null) {
@@ -332,7 +336,7 @@ public class FundServiceImpl implements FundService {
             }
         }
         //成立以来的收益率
-        rates[5] = Double.parseDouble(decimalFormat.format(rate));
+        rates[5] = fixToTwo(rate);
 
         return new RateBean(rates);
     }
@@ -343,6 +347,9 @@ public class FundServiceImpl implements FundService {
      * @return
      */
     private String fillCode(String code){
+        if(code==null){
+            return "";
+        }
         while (code.length()<6){
             code = "0"+code;
         }
@@ -495,7 +502,7 @@ public class FundServiceImpl implements FundService {
     public ManagerPerformanceBean findManagerPerformance(String code) {
         List<PerformanceDataBean> managers = new ArrayList<>();
         List<PerformanceDataBean> others = new ArrayList<>();
-        for(FundHistory fundManager:fundHistoryRepository.findAllByFundCodeAndAndEndDateIsNull(code)){
+        for(FundHistory fundManager:fundHistoryRepository.findAllByFundCodeAndAndEndDateIsNull(fillCode(code))){
             Manager manager = managerRepository.findByManagerId(fundManager.getManagerId());
             if(manager!=null)
                 managers.add(new PerformanceDataBean(manager));
@@ -516,8 +523,25 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public List<PublicOpinionBean> findPublicOpinion(String code) {
+        //TODO 目前是拿一年内的数据
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.YEAR,-1);
+        Date lastyear = calendar.getTime();
 
-        return null;
+        List<PublicOpinionBean> res = new ArrayList<>();
+        for(FundRemark fundRemark:fundRemarkRepository.findAllByCodeAndStartDateAfter(fillCode(code),lastyear)){
+            List<NumBean> nums = new ArrayList<>();
+            nums.add(new NumBean("正面评价",fundRemark.getPositive()));
+            nums.add(new NumBean("负面评价",fundRemark.getNegative()));
+
+            res.add(new PublicOpinionBean(sdf.format(fundRemark.getStartDate()),nums));
+        }
+        if(res.size()==0){
+            return null;
+        }
+
+        return res;
     }
 
     /**
@@ -529,6 +553,8 @@ public class FundServiceImpl implements FundService {
     public FundNetworkBean findPositionNetwork(String code) {
         List<NodeDataBean> nodes = new ArrayList<>();
         List<FundLinkDataBean> links = new ArrayList<>();
+
+        code = fillCode(code);
 
         for(FundNetEdge fundNetEdge:getInterfacingCode(code, new ArrayList<>())){
             //记录两个点在node数组中的位置
@@ -561,7 +587,11 @@ public class FundServiceImpl implements FundService {
         }
         //把id转化成name
         for(NodeDataBean node:nodes){
-
+            try {
+                node.name = fundRepository.findByCode(node.name).getName();
+            }catch (NullPointerException e){
+                System.out.println(node.name);
+            }
         }
 
         return new FundNetworkBean(nodes,links);

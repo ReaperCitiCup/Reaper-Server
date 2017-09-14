@@ -1,11 +1,11 @@
 package reaper.bean;
 
 public class NumBean {
-    String field;
-    Integer num;
+    public String field;
+    public Integer value;
 
-    public NumBean(String field, Integer num) {
+    public NumBean(String field, Integer value) {
         this.field = field;
-        this.num = num;
+        this.value = value;
     }
 }
