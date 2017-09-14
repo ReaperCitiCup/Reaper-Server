@@ -119,7 +119,7 @@ public class BacktestReportBean {
     /**
      * beta
      */
-    public Double beta;
+//    public Double beta;
 
     /**
      * var
@@ -173,7 +173,7 @@ public class BacktestReportBean {
                               BacktestValueComparisonBean overProfitRate, BacktestValueComparisonBean annualProfit,
                               BacktestValueComparisonBean profitDaysRatio,
                               BacktestComparisonBean dailyRetracementTrend, List<BacktestCorrelationTable> correlationCoefficientTrend,
-                              Double maxDayDown, Integer maxDownDays, Double annualVolatility, Double beta, Double var,
+                              Double maxDayDown, Integer maxDownDays, Double annualVolatility, Double var,
                               Double averageCorrelationCoefficient, List<FieldValueBean> styleAttributionProfit,
                               List<FieldValueBean> styleAttributionRisk, List<FieldValueBean> industryAttributionProfit,
                               List<FieldValueBean> industryAttributionRisk, List<FieldValueBean> varietyAttribution,
@@ -201,7 +201,7 @@ public class BacktestReportBean {
         this.maxDayDown = maxDayDown;
         this.maxDownDays = maxDownDays;
         this.annualVolatility = annualVolatility;
-        this.beta = beta;
+//        this.beta = beta;
         this.var = var;
         this.averageCorrelationCoefficient = averageCorrelationCoefficient;
         this.styleAttributionProfit = styleAttributionProfit;
@@ -297,7 +297,7 @@ public class BacktestReportBean {
                 ", maxDayDown=" + maxDayDown +
                 ", maxDownDays=" + maxDownDays +
                 ", annualVolatility=" + annualVolatility +
-                ", beta=" + beta +
+//                ", beta=" + beta +
                 ", var=" + var +
 //                ", averageCorrelationCoefficient=" + averageCorrelationCoefficient +
 //                ", styleAttributionProfit=" + styleAttributionProfit +
