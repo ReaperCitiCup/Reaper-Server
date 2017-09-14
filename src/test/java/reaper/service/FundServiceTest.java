@@ -1317,8 +1317,51 @@ public class FundServiceTest {
     }
 
     @Test
-    public void findVolatilityTest() throws Exception {
+    public void findVolatilityTest1() throws Exception {
         List<ValueDateBean> valueDateBeans=fundService.findVolatility("000005");
+        Assert.assertEquals(1653, valueDateBeans.size());
+        ValueDateBean valueDateBean1=valueDateBeans.get(0);
+        Assert.assertEquals("2013-03-08", valueDateBean1.date);
+        Assert.assertEquals(0.0, valueDateBean1.value.doubleValue());
+        ValueDateBean valueDateBean2=valueDateBeans.get(1652);
+        Assert.assertEquals("2017-09-15", valueDateBean2.date);
+        Assert.assertEquals(0.0120829564008, valueDateBean2.value.doubleValue());
+    }
+
+    @Test
+    public void findVolatilityTest2() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findVolatility("5");
+        Assert.assertEquals(1653, valueDateBeans.size());
+        ValueDateBean valueDateBean1=valueDateBeans.get(0);
+        Assert.assertEquals("2013-03-08", valueDateBean1.date);
+        Assert.assertEquals(0.0, valueDateBean1.value.doubleValue());
+        ValueDateBean valueDateBean2=valueDateBeans.get(1652);
+        Assert.assertEquals("2017-09-15", valueDateBean2.date);
+        Assert.assertEquals(0.0120829564008, valueDateBean2.value.doubleValue());
+    }
+
+    @Test
+    public void findVolatilityTest3() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findVolatility("005");
+        Assert.assertEquals(1653, valueDateBeans.size());
+        ValueDateBean valueDateBean1=valueDateBeans.get(0);
+        Assert.assertEquals("2013-03-08", valueDateBean1.date);
+        Assert.assertEquals(0.0, valueDateBean1.value.doubleValue());
+        ValueDateBean valueDateBean2=valueDateBeans.get(1652);
+        Assert.assertEquals("2017-09-15", valueDateBean2.date);
+        Assert.assertEquals(0.0120829564008, valueDateBean2.value.doubleValue());
+    }
+
+    @Test
+    public void findVolatilityTest4() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findVolatility("000006");
+        Assert.assertNull(valueDateBeans);
+    }
+
+    @Test
+    public void findVolatilityTest5() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findVolatility(null);
+        Assert.assertNull(valueDateBeans);
     }
 
     @Test
@@ -1327,24 +1370,198 @@ public class FundServiceTest {
     }
 
     @Test
-    public void findDownsideVolatilityTest() throws Exception {
+    public void findDownsideVolatilityTest1() throws Exception {
         List<ValueDateBean> valueDateBeans=fundService.findDownsideVolatility("000005");
+        Assert.assertEquals(1653, valueDateBeans.size());
+        ValueDateBean valueDateBean1=valueDateBeans.get(0);
+        Assert.assertEquals("2013-03-08", valueDateBean1.date);
+        Assert.assertEquals(0.0, valueDateBean1.value.doubleValue());
+        ValueDateBean valueDateBean2=valueDateBeans.get(1652);
+        Assert.assertEquals("2017-09-15", valueDateBean2.date);
+        Assert.assertEquals(0.00390415865188, valueDateBean2.value.doubleValue());
     }
 
     @Test
-    public void findSharpeIndexTest() throws Exception {
+    public void findDownsideVolatilityTest2() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findDownsideVolatility("5");
+        Assert.assertEquals(1653, valueDateBeans.size());
+        ValueDateBean valueDateBean1=valueDateBeans.get(0);
+        Assert.assertEquals("2013-03-08", valueDateBean1.date);
+        Assert.assertEquals(0.0, valueDateBean1.value.doubleValue());
+        ValueDateBean valueDateBean2=valueDateBeans.get(1652);
+        Assert.assertEquals("2017-09-15", valueDateBean2.date);
+        Assert.assertEquals(0.00390415865188, valueDateBean2.value.doubleValue());
+    }
+
+    @Test
+    public void findDownsideVolatilityTest3() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findDownsideVolatility("005");
+        Assert.assertEquals(1653, valueDateBeans.size());
+        ValueDateBean valueDateBean1=valueDateBeans.get(0);
+        Assert.assertEquals("2013-03-08", valueDateBean1.date);
+        Assert.assertEquals(0.0, valueDateBean1.value.doubleValue());
+        ValueDateBean valueDateBean2=valueDateBeans.get(1652);
+        Assert.assertEquals("2017-09-15", valueDateBean2.date);
+        Assert.assertEquals(0.00390415865188, valueDateBean2.value.doubleValue());
+    }
+
+    @Test
+    public void findDownsideVolatilityTest4() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findDownsideVolatility("000006");
+        Assert.assertNull(valueDateBeans);
+    }
+
+    @Test
+    public void findDownsideVolatilityTest5() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findDownsideVolatility(null);
+        Assert.assertNull(valueDateBeans);
+    }
+
+    @Test
+    public void findSharpeIndexTest1() throws Exception {
         List<ValueDateBean> valueDateBeans=fundService.findSharpeIndex("000005");
+        Assert.assertEquals(1653, valueDateBeans.size());
+        ValueDateBean valueDateBean1=valueDateBeans.get(0);
+        Assert.assertEquals("2013-03-08", valueDateBean1.date);
+        Assert.assertEquals(0.0, valueDateBean1.value.doubleValue());
+        ValueDateBean valueDateBean2=valueDateBeans.get(1652);
+        Assert.assertEquals("2017-09-15", valueDateBean2.date);
+        Assert.assertEquals(-0.710244936746, valueDateBean2.value.doubleValue());
     }
 
     @Test
-    public void findTreynorIndexTest() throws Exception {
+    public void findSharpeIndexTest2() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findSharpeIndex("5");
+        Assert.assertEquals(1653, valueDateBeans.size());
+        ValueDateBean valueDateBean1=valueDateBeans.get(0);
+        Assert.assertEquals("2013-03-08", valueDateBean1.date);
+        Assert.assertEquals(0.0, valueDateBean1.value.doubleValue());
+        ValueDateBean valueDateBean2=valueDateBeans.get(1652);
+        Assert.assertEquals("2017-09-15", valueDateBean2.date);
+        Assert.assertEquals(-0.710244936746, valueDateBean2.value.doubleValue());
+    }
+
+    @Test
+    public void findSharpeIndexTest3() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findSharpeIndex("005");
+        Assert.assertEquals(1653, valueDateBeans.size());
+        ValueDateBean valueDateBean1=valueDateBeans.get(0);
+        Assert.assertEquals("2013-03-08", valueDateBean1.date);
+        Assert.assertEquals(0.0, valueDateBean1.value.doubleValue());
+        ValueDateBean valueDateBean2=valueDateBeans.get(1652);
+        Assert.assertEquals("2017-09-15", valueDateBean2.date);
+        Assert.assertEquals(-0.710244936746, valueDateBean2.value.doubleValue());
+    }
+
+    @Test
+    public void findSharpeIndexTest4() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findSharpeIndex("000006");
+        Assert.assertNull(valueDateBeans);
+    }
+
+    @Test
+    public void findSharpeIndexTest5() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findSharpeIndex(null);
+        Assert.assertNull(valueDateBeans);
+    }
+
+    @Test
+    public void findTreynorIndexTest1() throws Exception {
         List<ValueDateBean> valueDateBeans=fundService.findTreynorIndex("000005");
+        Assert.assertEquals(1653, valueDateBeans.size());
+        ValueDateBean valueDateBean1=valueDateBeans.get(0);
+        Assert.assertEquals("2013-03-08", valueDateBean1.date);
+        Assert.assertEquals(0.0, valueDateBean1.value.doubleValue());
+        ValueDateBean valueDateBean2=valueDateBeans.get(1652);
+        Assert.assertEquals("2017-09-15", valueDateBean2.date);
+        Assert.assertEquals(-0.018293603251, valueDateBean2.value.doubleValue());
     }
 
-    //TODO
     @Test
-    public void findPerformanceIndexTest() throws Exception {
+    public void findTreynorIndexTest2() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findTreynorIndex("5");
+        Assert.assertEquals(1653, valueDateBeans.size());
+        ValueDateBean valueDateBean1=valueDateBeans.get(0);
+        Assert.assertEquals("2013-03-08", valueDateBean1.date);
+        Assert.assertEquals(0.0, valueDateBean1.value.doubleValue());
+        ValueDateBean valueDateBean2=valueDateBeans.get(1652);
+        Assert.assertEquals("2017-09-15", valueDateBean2.date);
+        Assert.assertEquals(-0.018293603251, valueDateBean2.value.doubleValue());
+    }
+
+    @Test
+    public void findTreynorIndexTest3() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findTreynorIndex("005");
+        Assert.assertEquals(1653, valueDateBeans.size());
+        ValueDateBean valueDateBean1=valueDateBeans.get(0);
+        Assert.assertEquals("2013-03-08", valueDateBean1.date);
+        Assert.assertEquals(0.0, valueDateBean1.value.doubleValue());
+        ValueDateBean valueDateBean2=valueDateBeans.get(1652);
+        Assert.assertEquals("2017-09-15", valueDateBean2.date);
+        Assert.assertEquals(-0.018293603251, valueDateBean2.value.doubleValue());
+    }
+
+    @Test
+    public void findTreynorIndexTest4() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findTreynorIndex("000006");
+        Assert.assertNull(valueDateBeans);
+    }
+
+    @Test
+    public void findTreynorIndexTest5() throws Exception {
+        List<ValueDateBean> valueDateBeans=fundService.findTreynorIndex(null);
+        Assert.assertNull(valueDateBeans);
+    }
+
+    @Test
+    public void findPerformanceIndexTest1() throws Exception {
         PerformanceIndexBean performanceIndexBean=fundService.findPerformanceIndex("000005");
+        assertArrayEquals(
+                new Double[]{
+                        0.44, 36.36, 9.09
+                },
+                new Double[]{
+                        performanceIndexBean.sustainabilityIndex, performanceIndexBean.loseDayRatio, performanceIndexBean.winDayRatio
+                }
+        );
+    }
+
+    @Test
+    public void findPerformanceIndexTest2() throws Exception {
+        PerformanceIndexBean performanceIndexBean=fundService.findPerformanceIndex("5");
+        assertArrayEquals(
+                new Double[]{
+                        0.44, 36.36, 9.09
+                },
+                new Double[]{
+                        performanceIndexBean.sustainabilityIndex, performanceIndexBean.loseDayRatio, performanceIndexBean.winDayRatio
+                }
+        );
+    }
+
+    @Test
+    public void findPerformanceIndexTest3() throws Exception {
+        PerformanceIndexBean performanceIndexBean=fundService.findPerformanceIndex("005");
+        assertArrayEquals(
+                new Double[]{
+                        0.44, 36.36, 9.09
+                },
+                new Double[]{
+                        performanceIndexBean.sustainabilityIndex, performanceIndexBean.loseDayRatio, performanceIndexBean.winDayRatio
+                }
+        );
+    }
+
+    @Test
+    public void findPerformanceIndexTest4() throws Exception {
+        PerformanceIndexBean performanceIndexBean=fundService.findPerformanceIndex("000006");
+        Assert.assertNull(performanceIndexBean);
+    }
+
+    @Test
+    public void findPerformanceIndexTest5() throws Exception {
+        PerformanceIndexBean performanceIndexBean=fundService.findPerformanceIndex(null);
+        Assert.assertNull(performanceIndexBean);
     }
 
     @Test
