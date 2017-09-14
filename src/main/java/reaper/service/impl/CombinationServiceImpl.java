@@ -108,8 +108,8 @@ public class CombinationServiceImpl implements CombinationService {
             CombinationMiniBean miniBean = new CombinationMiniBean();
             miniBean.id = combination.getId();
             miniBean.name = combination.getName();
-            String[] funds = combination.getFunds().split("|");
-            String[] weights = combination.getWeights().split("|");
+            String[] funds = combination.getFunds().split("\\|");
+            String[] weights = combination.getWeights().split("\\|");
             PyAnalysisResult result_withoutRange = getBasicFactors(Arrays.asList(funds));
 
             Date date = new Date();
@@ -217,8 +217,8 @@ public class CombinationServiceImpl implements CombinationService {
             fundRatioNameBean.code = combination.getFunds().split("\\|")[i];
             codes.add(fundRatioNameBean.code);
             fundRatioNameBean.name = fundService.findFundNameByCode(fundRatioNameBean.code).name;
-            fundRatioNameBean.weight = FormatData.fixToTwoAndPercent(Double.parseDouble(combination.getFunds().split("\\|")[i]));
-            weights.add(fundRatioNameBean.weight);
+            fundRatioNameBean.weight = FormatData.fixToTwoAndPercent(Double.parseDouble(combination.getWeights().split("\\|")[i]));
+            weights.add(fundRatioNameBean.weight / 100.00);
 
             backtestReportBean.combination.add(fundRatioNameBean);
         }
@@ -245,8 +245,16 @@ public class CombinationServiceImpl implements CombinationService {
         double startNetValue = 0.0;
         double[] netValues = new double[days];
         double[] dailyRates = new double[days];
+        backtestReportBean.sharpeRatio = 0.0;
 
         for (int i = 0; i < codes.size(); i++) {
+//            System.out.println(getBasicFactors(codes, startDate, endDate).sharpe == null);
+//            System.out.println(getBasicFactors(codes, startDate, endDate).sharpe.isEmpty());
+//            for (Map.Entry<String, Double> entry : getBasicFactors(codes, startDate, endDate).sharpe.entrySet()) {
+//                System.out.println(entry.getKey() + " " + entry.getValue());
+//            }
+//            System.out.println(getBasicFactors(codes, startDate, endDate).sharpe.get(codes.get(i)));
+//            System.out.println(weights.get(i));
             backtestReportBean.sharpeRatio += FormatData.fixToTwo(getBasicFactors(codes, startDate, endDate).sharpe.get(codes.get(i)) * weights.get(i));
 
             for (int j = 0; j < days; j++) {
@@ -419,7 +427,7 @@ public class CombinationServiceImpl implements CombinationService {
 
         double betasum = 0.0;
         for (int i = 0; i < codes.size(); i++) {
-            betasum += pyAnalysisResult.beta.get(codes.get(i)) * weights.get(i) / 100.00;
+            betasum += pyAnalysisResult.beta.get(codes.get(i)) * weights.get(i);
         }
         backtestReportBean.beta = FormatData.fixToTwo(betasum / codes.size());
 
@@ -440,7 +448,8 @@ public class CombinationServiceImpl implements CombinationService {
         /**
          * 年化波动率
          */
-        backtestReportBean.annualVolatility = FormatData.fixToTwo(backtestReportBean.volatility / 100.00 * Math.sqrt(252.0));
+        //TODO 检查要不要成100
+        backtestReportBean.annualVolatility = FormatData.fixToTwo(backtestReportBean.volatility * Math.sqrt(252.0));
 
         /**
          * VaR 在险价值
@@ -1003,43 +1012,43 @@ public class CombinationServiceImpl implements CombinationService {
                 continue;
             }
             Double beta = factor_sum.get("beta");
-            beta += fundRank.getRank1() * weights.get(0) / 100.00;
+            beta += fundRank.getRank1() * weights.get(0);
             factor_sum.put("beta", beta);
 
             Double btop = factor_sum.get("btop");
-            btop += fundRank.getRank2() * weights.get(1) / 100.00;
+            btop += fundRank.getRank2() * weights.get(1);
             factor_sum.put("btop", btop);
 
             Double profit = factor_sum.get("profit");
-            profit += fundRank.getRank3() * weights.get(2) / 100.00;
+            profit += fundRank.getRank3() * weights.get(2);
             factor_sum.put("profit", profit);
 
             Double growth = factor_sum.get("growth");
-            growth += fundRank.getRank4() * weights.get(3) / 100.00;
+            growth += fundRank.getRank4() * weights.get(3);
             factor_sum.put("growth", growth);
 
             Double leverage = factor_sum.get("leverage");
-            leverage += fundRank.getRank5() * weights.get(4) / 100.00;
+            leverage += fundRank.getRank5() * weights.get(4);
             factor_sum.put("leverage", leverage);
 
             Double liquidity = factor_sum.get("liquidity");
-            liquidity += fundRank.getRank6() * weights.get(5) / 100.00;
+            liquidity += fundRank.getRank6() * weights.get(5);
             factor_sum.put("liquidity", liquidity);
 
             Double momentum = factor_sum.get("momentum");
-            momentum += fundRank.getRank7() * weights.get(6) / 100.00;
+            momentum += fundRank.getRank7() * weights.get(6);
             factor_sum.put("momentum", momentum);
 
             Double nlsize = factor_sum.get("nlsize");
-            nlsize += fundRank.getRank8() * weights.get(7) / 100.00;
+            nlsize += fundRank.getRank8() * weights.get(7);
             factor_sum.put("nlsize", nlsize);
 
             Double residualvolatility = factor_sum.get("residualvolatility");
-            residualvolatility += fundRank.getRank9() * weights.get(8) / 100.00;
+            residualvolatility += fundRank.getRank9() * weights.get(8);
             factor_sum.put("residualvolatility", residualvolatility);
 
             Double size = factor_sum.get("size");
-            size += fundRank.getRank10() * weights.get(9) / 100.00;
+            size += fundRank.getRank10() * weights.get(9);
             factor_sum.put("size", size);
         }
 
