@@ -40,6 +40,21 @@ public class Combination {
      */
     private String weights;
 
+    /**
+     * 最新收益率
+     */
+    private Double newProfit;
+
+    /**
+     * 年化收益
+     */
+    private Double annualProfit;
+
+    /**
+     * 平均相关系数
+     */
+    private Double correlationCoefficient;
+
     public Combination() {
     }
 
@@ -91,12 +106,28 @@ public class Combination {
         this.risk_profit = risk_profit;
     }
 
-    public Combination(Integer risk_profit, Integer userid, String name, String funds, String weights) {
-        this.risk_profit = risk_profit;
-        this.userid = userid;
-        this.name = name;
-        this.funds = funds;
-        this.weights = weights;
+    public Double getNewProfit() {
+        return newProfit;
+    }
+
+    public void setNewProfit(Double newProfit) {
+        this.newProfit = newProfit;
+    }
+
+    public Double getAnnualProfit() {
+        return annualProfit;
+    }
+
+    public void setAnnualProfit(Double annualProfit) {
+        this.annualProfit = annualProfit;
+    }
+
+    public Double getCorrelationCoefficient() {
+        return correlationCoefficient;
+    }
+
+    public void setCorrelationCoefficient(Double correlationCoefficient) {
+        this.correlationCoefficient = correlationCoefficient;
     }
 
     @Override
@@ -108,6 +139,28 @@ public class Combination {
                 ", name='" + name + '\'' +
                 ", funds='" + funds + '\'' +
                 ", weights='" + weights + '\'' +
+                ", newProfit=" + newProfit +
+                ", annualProfit=" + annualProfit +
+                ", correlationCoefficient=" + correlationCoefficient +
                 '}';
+    }
+
+    public Combination(Integer risk_profit, Integer userid, String name, String funds, String weights, Double newProfit, Double annualProfit, Double correlationCoefficient) {
+        this.risk_profit = risk_profit;
+        this.userid = userid;
+        this.name = name;
+        this.funds = funds;
+        this.weights = weights;
+        this.newProfit = newProfit;
+        this.annualProfit = annualProfit;
+        this.correlationCoefficient = correlationCoefficient;
+    }
+
+    public Combination(Integer risk_profit, Integer userid, String name, String funds, String weights) {
+        this.risk_profit = risk_profit;
+        this.userid = userid;
+        this.name = name;
+        this.funds = funds;
+        this.weights = weights;
     }
 }

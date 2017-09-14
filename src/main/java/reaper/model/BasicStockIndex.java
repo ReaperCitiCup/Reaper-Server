@@ -155,5 +155,6 @@ public class BasicStockIndex {
         this.stockName = stockName;
     }
 
-
+    public BasicStockIndex() {
+    }
 }

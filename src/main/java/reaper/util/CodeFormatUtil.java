@@ -47,8 +47,15 @@ public class CodeFormatUtil {
      * @return
      */
     public static List<String> getCodeList(String output) {
-        String rmv = output.substring(1, output.length() - 1);
+        String rmv;
+        if (output.endsWith("\n")) {
+            rmv = output.substring(1, output.length() - 2);
+        } else {
+            rmv = output.substring(1, output.length() - 1);
+        }
+
         String[] codes = rmv.split(", ");
+
         List<String> res = new ArrayList<>();
         for (String code : codes) {
             res.add(fillCode(String.valueOf(Double.valueOf(code).intValue())));

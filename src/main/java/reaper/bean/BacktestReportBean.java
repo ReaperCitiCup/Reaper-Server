@@ -215,4 +215,43 @@ public class BacktestReportBean {
 
     public BacktestReportBean() {
     }
+
+    @Override
+    public String toString() {
+        return "BacktestReportBean{" +
+                "startDate='" + startDate + '\'' +
+                ", endDate='" + endDate + '\'' +
+                ", baseIndex='" + baseIndex + '\'' +
+                ", combination=" + combination +
+                ", investmentGoal='" + investmentGoal + '\'' +
+                ", intervalAnnualProfit=" + intervalAnnualProfit +
+                ", cumulativeProfit=" + cumulativeProfit +
+                ", finalNetValue=" + finalNetValue +
+                ", maxRetracement=" + maxRetracement +
+                ", sharpeRatio=" + sharpeRatio +
+                ", volatility=" + volatility +
+                ", mainFactors=" + mainFactors +
+                ", cumulativeNetValueTrend=" + cumulativeNetValueTrend +
+                ", profitRateTrend=" + profitRateTrend +
+                ", totalProfitRate=" + totalProfitRate +
+                ", overProfitRate=" + overProfitRate +
+                ", annualProfit=" + annualProfit +
+                ", profitDaysRatio=" + profitDaysRatio +
+                ", dailyRetracementTrend=" + dailyRetracementTrend +
+                ", correlationCoefficientTrend=" + correlationCoefficientTrend +
+                ", maxDayDown=" + maxDayDown +
+                ", maxDownDays=" + maxDownDays +
+                ", annualVolatility=" + annualVolatility +
+                ", beta=" + beta +
+                ", var=" + var +
+                ", averageCorrelationCoefficient=" + averageCorrelationCoefficient +
+                ", styleAttributionProfit=" + styleAttributionProfit +
+                ", styleAttributionRisk=" + styleAttributionRisk +
+                ", industryAttributionProfit=" + industryAttributionProfit +
+                ", industryAttributionRisk=" + industryAttributionRisk +
+                ", varietyAttribution=" + varietyAttribution +
+                ", brisonAttributionStock=" + brisonAttributionStock +
+                ", brisonAttributionBond=" + brisonAttributionBond +
+                '}';
+    }
 }

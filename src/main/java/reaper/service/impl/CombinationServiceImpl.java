@@ -80,6 +80,62 @@ public class CombinationServiceImpl implements CombinationService {
         }
 
         Combination combination = new Combination(0, user.getId(), name, fundsBuilder.toString(), weightsBuilder.toString());
+
+        String[] fundsArray = combination.getFunds().split("\\|");
+        String[] weights = combination.getWeights().split("\\|");
+        PyAnalysisResult result_withoutRange = getBasicFactors(Arrays.asList(fundsArray));
+
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        calendar.set(year - 1, month, day);
+        Date newday = calendar.getTime();
+        PyAnalysisResult result_withRange = getBasicFactors(Arrays.asList(fundsArray), simpleDateFormat.format(newday), simpleDateFormat.format(date));
+
+        /**
+         * 年化收益率
+         */
+        try {
+            double annualProfit = 0.0;
+            for (int i = 0; i < fundsArray.length; i++) {
+                String code = fundsArray[i];
+                annualProfit += (result_withoutRange.nhsyl.get(code) * Double.valueOf(weights[i]));
+            }
+            combination.setAnnualProfit(FormatData.fixToTwoAndPercent(annualProfit));
+        } catch (Exception e) {
+            combination.setAnnualProfit(0.0);
+        }
+
+
+        /**
+         * 平均相关系数
+         */
+        try {
+            double sum = 0.0;
+            for (PyAnalysisResult.CorrelationCoefficient c : result_withRange.pjxgxs) {
+                sum += c.getCc();
+            }
+            double correlationCoefficient = sum / result_withRange.pjxgxs.size();
+            combination.setCorrelationCoefficient(FormatData.fixToTwo(correlationCoefficient));
+        } catch (Exception e) {
+            combination.setCorrelationCoefficient(0.0);
+        }
+
+        /**
+         * 最新收益率
+         */
+        try {
+            double newProfit = 0.0;
+            for (int i = 0; i < fundsArray.length; i++) {
+                newProfit += (fundNetValueRepository.findFirstByCodeOrderByDateDesc(fundsArray[i]).getDailyRate() * Double.valueOf(weights[i]));
+            }
+            combination.setNewProfit(FormatData.fixToTwoAndPercent(newProfit));
+        } catch (Exception e) {
+            combination.setNewProfit(0.0);
+        }
+
         try {
             combinationRepository.save(combination);
             return ResultMessage.SUCCESS;
@@ -95,7 +151,6 @@ public class CombinationServiceImpl implements CombinationService {
      * @return
      */
     @Override
-    //TODO 考虑每天存起来
     public List<CombinationMiniBean> findCombinations() {
         User user = userService.getCurrentUser();
         if (user == null) {
@@ -108,47 +163,9 @@ public class CombinationServiceImpl implements CombinationService {
             CombinationMiniBean miniBean = new CombinationMiniBean();
             miniBean.id = combination.getId();
             miniBean.name = combination.getName();
-            String[] funds = combination.getFunds().split("|");
-            String[] weights = combination.getWeights().split("|");
-            PyAnalysisResult result_withoutRange = getBasicFactors(Arrays.asList(funds));
-
-            Date date = new Date();
-            Calendar calendar = Calendar.getInstance();
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH);
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            calendar.set(year - 1, month, day);
-            Date newday = calendar.getTime();
-            PyAnalysisResult result_withRange = getBasicFactors(Arrays.asList(funds), simpleDateFormat.format(newday), simpleDateFormat.format(date));
-
-            /**
-             * 年化收益率
-             */
-            double annualProfit = 0.0;
-            for (int i = 0; i < funds.length; i++) {
-                String code = funds[i];
-                annualProfit += (result_withoutRange.nhsyl.get(code) * Double.valueOf(weights[i]));
-            }
-            miniBean.annualProfit = FormatData.fixToTwoAndPercent(annualProfit);
-
-            /**
-             * 平均相关系数
-             */
-            double sum = 0.0;
-            for (PyAnalysisResult.CorrelationCoefficient c : result_withRange.pjxgxs) {
-                sum += c.getCc();
-            }
-            double correlationCoefficient = sum / result_withRange.pjxgxs.size();
-            miniBean.correlationCoefficient = FormatData.fixToTwoAndPercent(correlationCoefficient);
-
-            /**
-             * 最新收益率
-             */
-            double newProfit = 0.0;
-            for (int i = 0; i < funds.length; i++) {
-                newProfit += (fundNetValueRepository.findFirstByCodeOrderByDateDesc(funds[i]).getDailyRate() * Double.valueOf(weights[i]));
-            }
-            miniBean.newProfit = FormatData.fixToTwoAndPercent(newProfit);
+            miniBean.newProfit = combination.getNewProfit();
+            miniBean.correlationCoefficient = combination.getCorrelationCoefficient();
+            miniBean.annualProfit = combination.getAnnualProfit();
 
             combinationMiniBeans.add(miniBean);
         }
@@ -191,6 +208,10 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public BacktestReportBean backtestCombination(Integer combinationId, String startDate, String endDate, String baseIndex) throws java.text.ParseException {
+//        if (userService.getCurrentUser() == null) {
+//            return null;
+//        }
+
         BacktestReportBean backtestReportBean = new BacktestReportBean();
         int days = DaysBetween.daysOfTwo(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
 
@@ -207,13 +228,14 @@ public class CombinationServiceImpl implements CombinationService {
         Combination combination = combinationRepository.findOne(combinationId);
         List<String> codes = new ArrayList<>();
         List<Double> weights = new ArrayList<>();
+        backtestReportBean.combination = new ArrayList<>();
         for (int i = 0; i < combination.getFunds().split("\\|").length; i++) {
             FundRatioNameBean fundRatioNameBean = new FundRatioNameBean();
             fundRatioNameBean.code = combination.getFunds().split("\\|")[i];
             codes.add(fundRatioNameBean.code);
             fundRatioNameBean.name = fundService.findFundNameByCode(fundRatioNameBean.code).name;
-            fundRatioNameBean.weight = FormatData.fixToTwoAndPercent(Double.parseDouble(combination.getFunds().split("\\|")[i]));
-            weights.add(fundRatioNameBean.weight);
+            fundRatioNameBean.weight = FormatData.fixToTwoAndPercent(Double.parseDouble(combination.getWeights().split("\\|")[i]));
+            weights.add(fundRatioNameBean.weight / 100.00);
 
             backtestReportBean.combination.add(fundRatioNameBean);
         }
@@ -240,13 +262,24 @@ public class CombinationServiceImpl implements CombinationService {
         double startNetValue = 0.0;
         double[] netValues = new double[days];
         double[] dailyRates = new double[days];
+        backtestReportBean.sharpeRatio = 0.0;
 
         for (int i = 0; i < codes.size(); i++) {
+//            System.out.println(getBasicFactors(codes, startDate, endDate).sharpe == null);
+//            System.out.println(getBasicFactors(codes, startDate, endDate).sharpe.isEmpty());
+//            for (Map.Entry<String, Double> entry : getBasicFactors(codes, startDate, endDate).sharpe.entrySet()) {
+//                System.out.println(entry.getKey() + " " + entry.getValue());
+//            }
+//            System.out.println(getBasicFactors(codes, startDate, endDate).sharpe.get(codes.get(i)));
+//            System.out.println(weights.get(i));
             backtestReportBean.sharpeRatio += FormatData.fixToTwo(getBasicFactors(codes, startDate, endDate).sharpe.get(codes.get(i)) * weights.get(i));
 
+            List<FundNetValue> fundNetValues = fundNetValueRepository.findAllByCodeAndDateBetween(codes.get(i), simpleDateFormat.parse(startDate), simpleDateFormat.parse((endDate)));
             for (int j = 0; j < days; j++) {
-                netValues[j] += fundNetValueRepository.findAllByCodeAndDateBetween(codes.get(i), simpleDateFormat.parse(startDate), simpleDateFormat.parse((endDate))).get(j).getUnitNetValue() * weights.get(i);
-                dailyRates[j] += fundNetValueRepository.findAllByCodeAndDateBetween(codes.get(i), simpleDateFormat.parse(startDate), simpleDateFormat.parse((endDate))).get(j).getDailyRate() * weights.get(i);
+                netValues[j] += fundNetValues.get(j).getUnitNetValue() * weights.get(i);
+                System.out.println("@ " + netValues[j]);
+                dailyRates[j] += fundNetValues.get(j).getDailyRate() * weights.get(i);
+                System.out.println("@ " + dailyRates[j]);
             }
         }
 
@@ -292,7 +325,10 @@ public class CombinationServiceImpl implements CombinationService {
 
             ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndex.getDate()), FormatData.fixToTwo(netValues[check]));
             check++;
-            fundNetValueList.add(fundValueDateBean);
+//            fundNetValueList.add(fundValueDateBean);
+            if (check < basicStockIndexList.size()) {
+                fundNetValueList.add(fundValueDateBean);
+            }
         }
 
         backtestReportBean.cumulativeNetValueTrend = new BacktestComparisonBean(fundNetValueList, baseNetValueList);
@@ -414,7 +450,7 @@ public class CombinationServiceImpl implements CombinationService {
 
         double betasum = 0.0;
         for (int i = 0; i < codes.size(); i++) {
-            betasum += pyAnalysisResult.beta.get(codes.get(i)) * weights.get(i) / 100.00;
+            betasum += pyAnalysisResult.beta.get(codes.get(i)) * weights.get(i);
         }
         backtestReportBean.beta = FormatData.fixToTwo(betasum / codes.size());
 
@@ -435,7 +471,8 @@ public class CombinationServiceImpl implements CombinationService {
         /**
          * 年化波动率
          */
-        backtestReportBean.annualVolatility = FormatData.fixToTwo(backtestReportBean.volatility / 100.00 * Math.sqrt(252.0));
+        //TODO 检查要不要成100
+        backtestReportBean.annualVolatility = FormatData.fixToTwo(backtestReportBean.volatility * Math.sqrt(252.0));
 
         /**
          * VaR 在险价值
@@ -470,79 +507,79 @@ public class CombinationServiceImpl implements CombinationService {
             if (i == 0) {
                 // 风格归因-收益
                 styleAttributionProfit = ToFieldBean.factorResultToStyleAttribution(normal_factorResult);
-                for(int j = 0; j < styleAttributionProfit.size(); j++) {
+                for (int j = 0; j < styleAttributionProfit.size(); j++) {
                     styleAttributionProfit.get(j).value *= weights.get(i);
                 }
 
                 // 风格归因-风险
                 styleAttributionRisk = ToFieldBean.factorResultToStyleAttribution(risk_factorResult);
-                for(int j = 0; j < styleAttributionRisk.size(); j++) {
+                for (int j = 0; j < styleAttributionRisk.size(); j++) {
                     styleAttributionRisk.get(j).value *= weights.get(i);
                 }
 
                 // 行业归因-收益
                 industryAttributionProfit = ToFieldBean.factorResultToIndustryAttribution(normal_factorResult);
-                for(int j = 0; j < industryAttributionProfit.size(); j++) {
+                for (int j = 0; j < industryAttributionProfit.size(); j++) {
                     industryAttributionProfit.get(j).value *= weights.get(i);
                 }
 
                 // 行业归因-风险
                 industryAttributionRisk = ToFieldBean.factorResultToIndustryAttribution(risk_factorResult);
-                for(int j = 0; j < industryAttributionRisk.size(); j++) {
+                for (int j = 0; j < industryAttributionRisk.size(); j++) {
                     industryAttributionRisk.get(j).value *= weights.get(i);
                 }
 
                 // 品种归因
                 varietyAttribution = ToFieldBean.brisonResultToVarietyAttribution(brisonResult);
-                for(int j = 0; j < varietyAttribution.size(); j++) {
+                for (int j = 0; j < varietyAttribution.size(); j++) {
                     varietyAttribution.get(j).value *= weights.get(i);
                 }
 
                 // Brison归因-股票
                 brisonAttributionStock = ToFieldBean.stockBrisonResultToFieldValue(stockBrinsonResult);
-                for(int j = 0; j < brisonAttributionStock.size(); j++) {
+                for (int j = 0; j < brisonAttributionStock.size(); j++) {
                     brisonAttributionStock.get(j).value *= weights.get(i);
                 }
 
                 // Brison归因-债券
                 brisonAttributionBond = ToFieldBean.brisonResultToFieldValue(brisonResult);
-                for(int j = 0; j < brisonAttributionBond.size(); j++) {
+                for (int j = 0; j < brisonAttributionBond.size(); j++) {
                     brisonAttributionBond.get(j).value *= weights.get(i);
                 }
 
             } else {
                 // 风格归因-收益
-                for(int j = 0; j < styleAttributionProfit.size(); j++) {
+                for (int j = 0; j < styleAttributionProfit.size(); j++) {
                     styleAttributionProfit.get(j).value += ToFieldBean.factorResultToStyleAttribution(normal_factorResult).get(j).value * weights.get(i);
                 }
 
                 // 风格归因-风险
-                for(int j = 0; j < styleAttributionRisk.size(); j++) {
+                for (int j = 0; j < styleAttributionRisk.size(); j++) {
                     styleAttributionRisk.get(j).value += ToFieldBean.factorResultToStyleAttribution(risk_factorResult).get(j).value * weights.get(i);
                 }
 
                 // 行业归因-收益
-                for(int j = 0; j < industryAttributionProfit.size(); j++) {
+                for (int j = 0; j < industryAttributionProfit.size(); j++) {
                     industryAttributionProfit.get(j).value += ToFieldBean.factorResultToIndustryAttribution(normal_factorResult).get(j).value * weights.get(i);
                 }
 
                 // 行业归因-风险
-                for(int j = 0; j < industryAttributionRisk.size(); j++) {
+                for (int j = 0; j < industryAttributionRisk.size(); j++) {
                     industryAttributionRisk.get(j).value += ToFieldBean.factorResultToIndustryAttribution(risk_factorResult).get(j).value * weights.get(i);
                 }
 
                 // 品种归因
-                for(int j = 0; j < varietyAttribution.size(); j++) {
+                for (int j = 0; j < varietyAttribution.size(); j++) {
                     varietyAttribution.get(j).value += ToFieldBean.brisonResultToVarietyAttribution(brisonResult).get(j).value * weights.get(i);
                 }
 
                 // Brison归因-股票
-                for(int j = 0; j < brisonAttributionStock.size(); j++) {
+                for (int j = 0; j < brisonAttributionStock.size(); j++) {
                     brisonAttributionStock.get(j).value += ToFieldBean.stockBrisonResultToFieldValue(stockBrinsonResult).get(j).value * weights.get(i);
                 }
 
                 // Brison归因-债券
-                for(int j = 0; j < brisonAttributionBond.size(); j++) {
+                for (int j = 0; j < brisonAttributionBond.size(); j++) {
                     brisonAttributionBond.get(j).value += ToFieldBean.brisonResultToFieldValue(brisonResult).get(j).value * weights.get(i);
                 }
             }
@@ -619,9 +656,29 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public ResultMessage createCombinationByAssetAllocation(FundCombinationBean fundCombination) {
-        User user = userService.getCurrentUser();
-        if (user == null) {
-            return ResultMessage.WRONG;
+//        User user = userService.getCurrentUser();
+//        if (user == null) {
+//            return ResultMessage.WRONG;
+//        }
+
+        /**
+         * 静态比例配置要特别处理
+         */
+        if (fundCombination.method == 1) {
+            List<String> funds = new ArrayList<>();
+            for (FundCategoryBean categoryBean : fundCombination.funds) {
+                funds.addAll(categoryBean.codes);
+            }
+
+            int size = funds.size();
+            double ration = 1.0 / size;
+
+            List<FundRatioBean> fundRatioBeans = new ArrayList<>();
+            for (String s : funds) {
+                fundRatioBeans.add(new FundRatioBean(s, ration));
+            }
+
+            return createCombinationByUser(fundCombination.name, fundRatioBeans);
         }
 
         Map<String, Double> result = new HashMap<>();
@@ -648,7 +705,7 @@ public class CombinationServiceImpl implements CombinationService {
                 }
             }
 
-            result = calComponentWeight(codes, portfolioType, input_kind, input_weight, uncentralize_type);
+            result = calComponentWeight(codes, portfolioType, input_kind, input_weight, uncentralize_type, fundCombination.profitRate);
         }
         /**
          * 因子间分散
@@ -662,7 +719,7 @@ public class CombinationServiceImpl implements CombinationService {
                 }
             }
 
-            result = calComponentWeight(codes, portfolioType, input_kind, null, uncentralize_type);
+            result = calComponentWeight(codes, portfolioType, input_kind, null, uncentralize_type, fundCombination.profitRate);
         } else return ResultMessage.INVALID;
 
         if (result == null || result.isEmpty()) {
@@ -672,6 +729,11 @@ public class CombinationServiceImpl implements CombinationService {
         for (Map.Entry<String, Double> entry : result.entrySet()) {
             beans.add(new FundRatioBean(entry.getKey(), entry.getValue()));
         }
+
+        for (FundRatioBean bean : beans) {
+            System.out.println("&\t" + bean.id + " " + bean.ratio);
+        }
+
         return createCombinationByUser(fundCombination.name, beans);
     }
 
@@ -682,7 +744,7 @@ public class CombinationServiceImpl implements CombinationService {
      * @param portfolioType 分散化方法类型
      * @return <基金代码, 权重(未百分化的double)>
      */
-    private Map<String, Double> calComponentWeight(List<String> codes, int portfolioType, List<Double> input_kind, List<Double> input_weight, int uncentralize_type) {
+    private Map<String, Double> calComponentWeight(List<String> codes, int portfolioType, List<Double> input_kind, List<Double> input_weight, int uncentralize_type, double profitRate) {
         Map<String, Double> resultMap = new HashMap<>();
         List<String> sorted = new ArrayList<>(codes);
         Collections.sort(sorted);
@@ -718,8 +780,11 @@ public class CombinationServiceImpl implements CombinationService {
                 inputKind = new MWNumericArray(input_kind_array);
                 inputWeight = new MWNumericArray(input_weight_array);
                 assetAllocation = new Asset_Allocation();
-
-                result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight);
+                if (portfolioType == 2) {
+                    result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight, new MWNumericArray(profitRate));
+                } else {
+                    result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight);
+                }
                 String[] res = null;
                 if (result != null && result.length != 0) {
                     res = result[0].toString().replaceAll("[ ]+", " ").split(" ");
@@ -774,7 +839,11 @@ public class CombinationServiceImpl implements CombinationService {
                 inputKind = new MWNumericArray(input_kind_array);
                 inputFactorNum = new MWNumericArray(input_factor_num);
 
-                result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum);
+                if (portfolioType == 2) {
+                    result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum, new MWNumericArray(profitRate));
+                } else {
+                    result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum);
+                }
                 String[] res = null;
                 if (result != null && result.length != 0) {
                     res = result[0].toString().replaceAll("[ ]+", " ").split(" ");
@@ -960,49 +1029,51 @@ public class CombinationServiceImpl implements CombinationService {
         factor_sum.put("nlsize", 0.0);
         factor_sum.put("residualvolatility", 0.0);
         factor_sum.put("size", 0.0);
-        for (String code : codes) {
+        for (int i = 0; i < codes.size(); i++) {
+            String code = codes.get(i);
+            double weight = weights.get(i);
             FundRank fundRank = fundRankRepository.findOne(code);
             if (fundRank == null) {
                 continue;
             }
             Double beta = factor_sum.get("beta");
-            beta += fundRank.getRank1() * weights.get(0) / 100.00;
+            beta += fundRank.getRank1() * weight;
             factor_sum.put("beta", beta);
 
             Double btop = factor_sum.get("btop");
-            btop += fundRank.getRank2() * weights.get(1) / 100.00;
+            btop += fundRank.getRank2() * weight;
             factor_sum.put("btop", btop);
 
             Double profit = factor_sum.get("profit");
-            profit += fundRank.getRank3() * weights.get(2) / 100.00;
+            profit += fundRank.getRank3() * weight;
             factor_sum.put("profit", profit);
 
             Double growth = factor_sum.get("growth");
-            growth += fundRank.getRank4() * weights.get(3) / 100.00;
+            growth += fundRank.getRank4() * weight;
             factor_sum.put("growth", growth);
 
             Double leverage = factor_sum.get("leverage");
-            leverage += fundRank.getRank5() * weights.get(4) / 100.00;
+            leverage += fundRank.getRank5() * weight;
             factor_sum.put("leverage", leverage);
 
             Double liquidity = factor_sum.get("liquidity");
-            liquidity += fundRank.getRank6() * weights.get(5) / 100.00;
+            liquidity += fundRank.getRank6() * weight;
             factor_sum.put("liquidity", liquidity);
 
             Double momentum = factor_sum.get("momentum");
-            momentum += fundRank.getRank7() * weights.get(6) / 100.00;
+            momentum += fundRank.getRank7() * weight;
             factor_sum.put("momentum", momentum);
 
             Double nlsize = factor_sum.get("nlsize");
-            nlsize += fundRank.getRank8() * weights.get(7) / 100.00;
+            nlsize += fundRank.getRank8() * weight;
             factor_sum.put("nlsize", nlsize);
 
             Double residualvolatility = factor_sum.get("residualvolatility");
-            residualvolatility += fundRank.getRank9() * weights.get(8) / 100.00;
+            residualvolatility += fundRank.getRank9() * weight;
             factor_sum.put("residualvolatility", residualvolatility);
 
             Double size = factor_sum.get("size");
-            size += fundRank.getRank10() * weights.get(9) / 100.00;
+            size += fundRank.getRank10() * weight;
             factor_sum.put("size", size);
         }
 
