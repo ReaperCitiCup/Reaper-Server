@@ -44,9 +44,6 @@ public class ManagerServiceImpl implements ManagerService {
     FundNetValueRepository fundNetValueRepository;
 
     @Autowired
-    FundManagerRepository fundManagerRepository;
-
-    @Autowired
     FundRankByTypeRepository fundRankByTypeRepository;
 
     @Autowired
@@ -130,8 +127,8 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public List<RankBean> findFundRankByManagerId(String managerId) {
         List<RankBean> res=new ArrayList<>();
-        List<FundManager> fundManagers = fundManagerRepository.findByManagerId(managerId);
-        for(FundManager fundManager : fundManagers){
+        List<FundHistory> fundManagers = fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId);
+        for(FundHistory fundManager : fundManagers){
             String code = fundManager.getFundCode();
             List<RankDataBean> ranks = new ArrayList<>();
             for(FundRankByType fundRankByType:fundRankByTypeRepository.findAllByCode(code)){
@@ -277,7 +274,7 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     private List<PerformanceDataBean> addFundPerformOfManager(List<PerformanceDataBean> list,String managerId){
-        for(FundManager fundManager:fundManagerRepository.findByManagerId(managerId)){
+        for(FundHistory fundManager:fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId)){
             Fund fund = fundRepository.findByCode(fundManager.getFundCode());
             PerformanceDataBean res = new PerformanceDataBean(fund);
             if(fund!=null&&fund.getAnnualProfit()!=null&&!list.contains(res)) {

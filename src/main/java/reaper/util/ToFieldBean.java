@@ -7,6 +7,8 @@ import reaper.model.StockBrinsonResult;
 
 import java.util.*;
 
+import static reaper.util.FormatData.*;
+
 public class ToFieldBean {
     /**
      * 行业归因
@@ -101,16 +103,16 @@ public class ToFieldBean {
             return null;
         }
         List<FieldValueBean> res = new ArrayList<>();
-        res.add(new FieldValueBean("beta", factorResult.getBeta()));
-        res.add(new FieldValueBean("价值", factorResult.getBtop()));
-        res.add(new FieldValueBean("盈利能力", factorResult.getEarningsYield()));
-        res.add(new FieldValueBean("成长性", factorResult.getGrowth()));
-        res.add(new FieldValueBean("杠杆率", factorResult.getLeverage()));
-        res.add(new FieldValueBean("流动性", factorResult.getLiquidity()));
-        res.add(new FieldValueBean("动量", factorResult.getMomentum()));
-        res.add(new FieldValueBean("非线性市值", factorResult.getNlsize()));
-        res.add(new FieldValueBean("波动率", factorResult.getResidualvolatility()));
-        res.add(new FieldValueBean("市值", factorResult.getSize()));
+        res.add(new FieldValueBean("beta", fixToTwoAndPercent(factorResult.getBeta())));
+        res.add(new FieldValueBean("价值", fixToTwoAndPercent(factorResult.getBtop())));
+        res.add(new FieldValueBean("盈利能力", fixToTwoAndPercent(factorResult.getEarningsYield())));
+        res.add(new FieldValueBean("成长性", fixToTwoAndPercent(factorResult.getGrowth())));
+        res.add(new FieldValueBean("杠杆率", fixToTwoAndPercent(factorResult.getLeverage())));
+        res.add(new FieldValueBean("流动性", fixToTwoAndPercent(factorResult.getLiquidity())));
+        res.add(new FieldValueBean("动量", fixToTwoAndPercent(factorResult.getMomentum())));
+        res.add(new FieldValueBean("非线性市值", fixToTwoAndPercent(factorResult.getNlsize())));
+        res.add(new FieldValueBean("波动率", fixToTwoAndPercent(factorResult.getResidualvolatility())));
+        res.add(new FieldValueBean("市值", fixToTwoAndPercent(factorResult.getSize())));
         return res;
     }
 
@@ -143,10 +145,10 @@ public class ToFieldBean {
             return null;
         }
         List<FieldValueBean> res = new ArrayList<>();
-        res.add(new FieldValueBean("资产配置效益", FormatData.fixToTwoAndPercent(brisonResult.getAllocationEffect())));
-        res.add(new FieldValueBean("债券选择效益", FormatData.fixToTwoAndPercent(brisonResult.getSelectionEffect())));
-        res.add(new FieldValueBean("交叉效益", FormatData.fixToTwoAndPercent(brisonResult.getInteractionEffect())));
-        res.add(new FieldValueBean("总超额效益", FormatData.fixToTwoAndPercent(brisonResult.getActiveReturn())));
+        res.add(new FieldValueBean("资产配置效益", fixToTwoAndPercent(brisonResult.getAllocationEffect())));
+        res.add(new FieldValueBean("债券选择效益", fixToTwoAndPercent(brisonResult.getSelectionEffect())));
+        res.add(new FieldValueBean("交叉效益", fixToTwoAndPercent(brisonResult.getInteractionEffect())));
+        res.add(new FieldValueBean("总超额效益", fixToTwoAndPercent(brisonResult.getActiveReturn())));
         return res;
     }
 
@@ -173,10 +175,10 @@ public class ToFieldBean {
             return null;
         }
         List<FieldValueBean> res = new ArrayList<>();
-        res.add(new FieldValueBean("资产配置效益", FormatData.fixToTwoAndPercent(stockBrinsonResult.getAllocationEffect())));
-        res.add(new FieldValueBean("债券选择效益", FormatData.fixToTwoAndPercent(stockBrinsonResult.getSelectionEffect())));
-        res.add(new FieldValueBean("交叉效益", FormatData.fixToTwoAndPercent(stockBrinsonResult.getInteractionEffect())));
-        res.add(new FieldValueBean("总超额效益", FormatData.fixToTwoAndPercent(stockBrinsonResult.getActiveReturn())));
+        res.add(new FieldValueBean("资产配置效益", fixToTwoAndPercent(stockBrinsonResult.getAllocationEffect())));
+        res.add(new FieldValueBean("债券选择效益", fixToTwoAndPercent(stockBrinsonResult.getSelectionEffect())));
+        res.add(new FieldValueBean("交叉效益", fixToTwoAndPercent(stockBrinsonResult.getInteractionEffect())));
+        res.add(new FieldValueBean("总超额效益", fixToTwoAndPercent(stockBrinsonResult.getActiveReturn())));
         return res;
     }
 
@@ -185,10 +187,10 @@ public class ToFieldBean {
             return Collections.EMPTY_MAP;
         }
         Map<String, Double> res = new HashMap<>();
-        res.put("资产配置效益", FormatData.fixToTwoAndPercent(brisonResult.getAllocationEffect()));
-        res.put("债券选择效益", FormatData.fixToTwoAndPercent(brisonResult.getSelectionEffect()));
-        res.put("交叉效益", FormatData.fixToTwoAndPercent(brisonResult.getInteractionEffect()));
-        res.put("总超额效益", FormatData.fixToTwoAndPercent(brisonResult.getActiveReturn()));
+        res.put("资产配置效益", fixToTwoAndPercent(brisonResult.getAllocationEffect()));
+        res.put("债券选择效益", fixToTwoAndPercent(brisonResult.getSelectionEffect()));
+        res.put("交叉效益", fixToTwoAndPercent(brisonResult.getInteractionEffect()));
+        res.put("总超额效益", fixToTwoAndPercent(brisonResult.getActiveReturn()));
         return res;
     }
 
@@ -203,15 +205,15 @@ public class ToFieldBean {
             return null;
         }
         List<FieldValueBean> res = new ArrayList<>();
-        res.add(new FieldValueBean("国债", brisonResult.getGzExposure()));
-        res.add(new FieldValueBean("地方政府债", brisonResult.getDfzfzExposure()));
-        res.add(new FieldValueBean("金融债", brisonResult.getJrzExposure()));
-        res.add(new FieldValueBean("企业债", brisonResult.getQyzExposure()));
-        res.add(new FieldValueBean("公司债", brisonResult.getGszExposure()));
-        res.add(new FieldValueBean("中期票据", brisonResult.getZqpjExposure()));
-        res.add(new FieldValueBean("短期融资券", brisonResult.getDqrzqExposure()));
-        res.add(new FieldValueBean("定向工具", brisonResult.getDxgjExposure()));
-        res.add(new FieldValueBean("其他", brisonResult.getOtherExposure()));
+        res.add(new FieldValueBean("国债", fixToTwoAndPercent(brisonResult.getGzExposure())));
+        res.add(new FieldValueBean("地方政府债", fixToTwoAndPercent(brisonResult.getDfzfzExposure())));
+        res.add(new FieldValueBean("金融债", fixToTwoAndPercent(brisonResult.getJrzExposure())));
+        res.add(new FieldValueBean("企业债", fixToTwoAndPercent(brisonResult.getQyzExposure())));
+        res.add(new FieldValueBean("公司债", fixToTwoAndPercent(brisonResult.getGszExposure())));
+        res.add(new FieldValueBean("中期票据", fixToTwoAndPercent(brisonResult.getZqpjExposure())));
+        res.add(new FieldValueBean("短期融资券", fixToTwoAndPercent(brisonResult.getDqrzqExposure())));
+        res.add(new FieldValueBean("定向工具", fixToTwoAndPercent(brisonResult.getDxgjExposure())));
+        res.add(new FieldValueBean("其他", fixToTwoAndPercent(brisonResult.getOtherExposure())));
         return res;
     }
 

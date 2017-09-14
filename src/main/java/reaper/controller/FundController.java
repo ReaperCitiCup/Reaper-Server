@@ -383,31 +383,17 @@ public class FundController {
     }
 
     /**
-     * 基金择时能力
-     * @param code
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(
-            value = "/{code}/choose-time",
-            method = RequestMethod.GET,
-            produces = {"application/json; charset=UTF-8"})
-    public ChooseBean findChooseTime(@PathVariable String code){
-        return fundService.findChooseTime(code);
-    }
-
-    /**
      * 基金择股能力
      * @param code
      * @return
      */
     @ResponseBody
     @RequestMapping(
-            value = "/{code}/choose-stock",
+            value = "/{code}/choose-time-stock",
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"})
-    public ChooseBean findChooseStock(@PathVariable String code){
-        return fundService.findChooseStock(code);
+    public List<ChooseBean> findChooseStock(@PathVariable String code){
+        return fundService.findChooseStockTime(code);
     }
 
     /**

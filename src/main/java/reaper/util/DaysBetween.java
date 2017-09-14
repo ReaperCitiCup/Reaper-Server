@@ -1,5 +1,7 @@
 package reaper.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -9,19 +11,10 @@ import java.util.List;
  * 计算两天之间相差天数
  */
 public class DaysBetween {
-    public static int daysOfTwo(Date fDate, Date oDate) {
+    public static int daysOfTwo(Date date1, Date date2) {
 
-        Calendar aCalendar = Calendar.getInstance();
-
-        aCalendar.setTime(fDate);
-
-        int day1 = aCalendar.get(Calendar.DAY_OF_YEAR);
-
-        aCalendar.setTime(oDate);
-
-        int day2 = aCalendar.get(Calendar.DAY_OF_YEAR);
-
-        return day2 - day1;
+        int days = (int) ((date2.getTime() - date1.getTime()) / (1000*3600*24));
+        return days;
 
     }
 

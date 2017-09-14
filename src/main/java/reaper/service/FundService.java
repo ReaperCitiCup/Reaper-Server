@@ -194,18 +194,11 @@ public interface FundService {
     public List<FieldValueBean> findBrisonAttributionBond(String code);
 
     /**
-     * 基金择时能力
+     * 基金择时择股能力
      * @param code
      * @return
      */
-    public ChooseBean findChooseTime(String code);
-
-    /**
-     * 基金择股能力
-     * @param code
-     * @return
-     */
-    public ChooseBean findChooseStock(String code);
+    public List<ChooseBean> findChooseStockTime(String code);
 
     /**
      * 当前基金经理历任基金表现

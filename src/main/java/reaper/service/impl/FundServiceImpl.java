@@ -8,10 +8,7 @@ import reaper.bean.*;
 import reaper.model.*;
 import reaper.repository.*;
 import reaper.service.FundService;
-import reaper.util.DaysBetween;
-import reaper.util.FundModelToBean;
-import reaper.util.PythonUser;
-import reaper.util.ToFieldBean;
+import reaper.util.*;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -19,7 +16,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
+
+import static reaper.util.FormatData.*;
 
 /**
  * Created by Sorumi on 17/8/21.
@@ -44,9 +42,6 @@ public class FundServiceImpl implements FundService {
 
     @Autowired
     CompanyRepository companyRepository;
-
-    @Autowired
-    FundManagerRepository fundManagerRepository;
 
     @Autowired
     FundCompanyRepository fundCompanyRepository;
@@ -91,10 +86,10 @@ public class FundServiceImpl implements FundService {
         List<FundMiniBean> miniBeans = new ArrayList<>();
         for (Fund fund : fundPage.getContent()) {
             //根据基金代码找到经理代码
-            List<FundManager> fundManagers = fundManagerRepository.findByFundCode(fund.getCode());
+            List<FundHistory> fundManagers = fundHistoryRepository.findAllByFundCodeAndAndEndDateIsNull(fund.getCode());
             //根据经理代码找到经理名
             List<MiniBean> managerList = new ArrayList<>();
-            for(FundManager fundManager:fundManagers){
+            for(FundHistory fundManager:fundManagers){
                 managerList.add(new MiniBean(fundManager.getManagerId(),managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
             }
             miniBeans.add(new FundMiniBean(fund.getCode(), fund.getName(), fund.getAnnualProfit(), fund.getVolatility(), managerList));
@@ -135,7 +130,7 @@ public class FundServiceImpl implements FundService {
         RateBean rateBean = getFundRate(code);
 
         List<IdNameBean> managers = new ArrayList<>();
-        for(FundManager fundManager:fundManagerRepository.findByFundCode(code)){
+        for(FundHistory fundManager:fundHistoryRepository.findAllByFundCodeAndAndEndDateIsNull(code)){
             managers.add(new IdNameBean(fundManager.getManagerId(), managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
         }
         String id = fundCompanyRepository.findByFundId(code).getCompanyId();
@@ -148,7 +143,7 @@ public class FundServiceImpl implements FundService {
         List<ValueDateBean> res = new ArrayList<>();
 
         for (FundNetValue fundNetValue : fundNetValueRepository.findAllByCodeOrderByDateAsc(fillCode(code))) {
-            res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), fundNetValue.getUnitNetValue()));
+            res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), fixToTwo(fundNetValue.getUnitNetValue())));
         }
         return res;
     }
@@ -158,7 +153,7 @@ public class FundServiceImpl implements FundService {
         List<ValueDateBean> res = new ArrayList<>();
 
         for (FundNetValue fundNetValue : fundNetValueRepository.findAllByCodeOrderByDateAsc(fillCode(code))) {
-            res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), fundNetValue.getCumulativeNetValue()));
+            res.add(new ValueDateBean(sdf.format(fundNetValue.getDate()), fixToTwo(fundNetValue.getCumulativeNetValue())));
         }
         return res;
     }
@@ -220,7 +215,7 @@ public class FundServiceImpl implements FundService {
     public List<IdNameBean> findCurrentManagers(String code) {
         List<IdNameBean> res = new ArrayList<>();
 
-        for(FundManager fundManager:fundManagerRepository.findByFundCode(fillCode(code))){
+        for(FundHistory fundManager:fundHistoryRepository.findAllByFundCodeAndAndEndDateIsNull(fillCode(code))){
             try {
                 Manager manager = managerRepository.findByManagerId(fundManager.getManagerId());
                 res.add(new IdNameBean(manager.getManagerId(),manager.getName()));
@@ -445,24 +440,15 @@ public class FundServiceImpl implements FundService {
         return ToFieldBean.brisonResultToFieldValue(brisonResult);
     }
 
-    /**
-     * 基金择时能力
-     * @param code
-     * @return
-     */
-    @Override
-    public ChooseBean findChooseTime(String code) {
-        return null;
-    }
 
     /**
-     * 基金择股能力
+     * 基金择时择股能力
      * @param code
      * @return
      */
     @Override
-    public ChooseBean findChooseStock(String code) {
-        return null;
+    public List<ChooseBean> findChooseStockTime(String code) {
+        return getStockTimeGraphData(code);
     }
 
     /**
@@ -475,7 +461,7 @@ public class FundServiceImpl implements FundService {
         List<PerformanceDataBean> funds = new ArrayList<>();
         List<PerformanceDataBean> others = new ArrayList<>();
         //现任基金经理
-        for(FundManager fundManager:fundManagerRepository.findByFundCode(code)){
+        for(FundHistory fundManager:fundHistoryRepository.findAllByFundCodeAndAndEndDateIsNull(code)){
             try{
                 funds = addFundPerformOfManager(funds,fundManager.getManagerId());
             }catch (NullPointerException e){
@@ -509,7 +495,7 @@ public class FundServiceImpl implements FundService {
     public ManagerPerformanceBean findManagerPerformance(String code) {
         List<PerformanceDataBean> managers = new ArrayList<>();
         List<PerformanceDataBean> others = new ArrayList<>();
-        for(FundManager fundManager:fundManagerRepository.findByFundCode(code)){
+        for(FundHistory fundManager:fundHistoryRepository.findAllByFundCodeAndAndEndDateIsNull(code)){
             Manager manager = managerRepository.findByManagerId(fundManager.getManagerId());
             if(manager!=null)
                 managers.add(new PerformanceDataBean(manager));
@@ -530,6 +516,7 @@ public class FundServiceImpl implements FundService {
      */
     @Override
     public List<PublicOpinionBean> findPublicOpinion(String code) {
+
         return null;
     }
 
@@ -568,12 +555,20 @@ public class FundServiceImpl implements FundService {
             }
             links.add(new FundLinkDataBean(indexA,indexB,fundNetEdge.getWeight()));
         }
+
+        if(nodes.size()==0){
+            return null;
+        }
         //把id转化成name
+        for(NodeDataBean node:nodes){
+
+        }
+
         return new FundNetworkBean(nodes,links);
     }
 
     private List<PerformanceDataBean> addFundPerformOfManager(List<PerformanceDataBean> list,String managerId){
-        for(FundManager fundManager:fundManagerRepository.findByManagerId(managerId)){
+        for(FundHistory fundManager:fundHistoryRepository.findAllByFundCodeAndAndEndDateIsNull(managerId)){
             Fund fund = fundRepository.findByCode(fundManager.getFundCode());
             PerformanceDataBean res = new PerformanceDataBean(fund);
             if(fund!=null&&fund.getAnnualProfit()!=null&&!list.contains(res)) {
@@ -604,26 +599,30 @@ public class FundServiceImpl implements FundService {
     }
 
     /**
-     * 近一年的数据
+     * 择时择股能力的数据
      * @param code
-     * @param attr
      * @return
      */
-    private List<ValueDateBean> getYearGraphData(String code, String attr){
+    private List<ChooseBean> getStockTimeGraphData(String code){
         if(!checkCodeExist(code)){
             return null;
         }
-        List<ValueDateBean> res = new ArrayList<>();
+        List<ChooseBean> res = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         calendar.add(Calendar.YEAR,-1);
 
-        String pyRes = PythonUser.usePy("graphData.py", fillCode(code)+" "+sdf.format(calendar.getTime())+" "+sdf.format(new Date())+" "+attr);
+        String pyRes = PythonUser.usePy("graphData.py", fillCode(code)+" "+sdf.format(calendar.getTime())+" "+sdf.format(new Date())+" 8");
         for(String line:pyRes.split("\n")){
             //处理每行
             String attrs[] = line.split(" ");
             //判断是否是日期行
-            res.add(new ValueDateBean(attrs[0], Double.valueOf(attrs[1])));
+            List<FieldValueBean> data = new ArrayList<>();
+            data.add(new FieldValueBean("择股能力",fixToTwo(Double.valueOf(attrs[1]))));
+            data.add(new FieldValueBean("择时能力",fixToTwo(Double.valueOf(attrs[2]))));
+            data.add(new FieldValueBean("市场收益",fixToTwoAndPercent(Double.valueOf(attrs[3]))));
+
+            res.add(new ChooseBean(attrs[0], data));
         }
         return res;
     }

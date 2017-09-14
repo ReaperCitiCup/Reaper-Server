@@ -15,19 +15,14 @@ public class PublicOpinionBean {
      * 好中坏的数量
      * 注：
      * 其中，
-     * field：好、中、坏
+     * field：好、坏
      * value：{Integer/double未定}， 数量
      */
-    public List<FieldValueBean> quantity;
+    public List<NumBean> quantity;
 
-    /**
-     * 舆情指标
-     */
-    public Double index;
 
-    public PublicOpinionBean(String date, List<FieldValueBean> quantity, Double index) {
+    public PublicOpinionBean(String date, List<NumBean> quantity) {
         this.date = date;
         this.quantity = quantity;
-        this.index = index;
     }
 }

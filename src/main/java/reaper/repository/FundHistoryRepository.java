@@ -14,4 +14,8 @@ public interface FundHistoryRepository extends JpaRepository<FundHistory,Integer
     public List<FundHistory> findAllByFundCode(String fundCode);
 
     public List<FundHistory> findAllByManagerIdAndStartDateBefore(String managerId, Date startDate);
+
+    public List<FundHistory> findAllByFundCodeAndAndEndDateIsNull(String fundCode);
+
+    public List<FundHistory> findAllByManagerIdAndAndEndDateIsNull(String managerId);
 }

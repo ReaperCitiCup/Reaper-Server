@@ -1366,13 +1366,7 @@ public class FundServiceTest {
     //TODO
     @Test
     public void findChooseTimeTest() throws Exception {
-        ChooseBean chooseBean=fundService.findChooseTime("000005");
-    }
-
-    //TODO
-    @Test
-    public void findChooseStockTest() throws Exception {
-        ChooseBean chooseBean=fundService.findChooseStock("000005");
+        List<ChooseBean> chooseBean=fundService.findChooseStockTime("000005");
     }
 
     @Test
