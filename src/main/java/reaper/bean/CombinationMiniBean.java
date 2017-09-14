@@ -17,19 +17,19 @@ public class CombinationMiniBean {
     /**
      * 最新收益率
      */
-    public double newProfit;
+    public Double newProfit;
 
     /**
      * 年化收益
      */
-    public double annualProfit;
+    public Double annualProfit;
 
     /**
      * 平均相关系数
      */
-    public double correlationCoefficient;
+    public Double correlationCoefficient;
 
-    public CombinationMiniBean(Integer id, String name, double newProfit, double annualProfit, double correlationCoefficient) {
+    public CombinationMiniBean(Integer id, String name, Double newProfit, Double annualProfit, Double correlationCoefficient) {
         this.id = id;
         this.name = name;
         this.newProfit = newProfit;

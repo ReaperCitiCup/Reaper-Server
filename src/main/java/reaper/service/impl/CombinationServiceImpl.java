@@ -80,6 +80,47 @@ public class CombinationServiceImpl implements CombinationService {
         }
 
         Combination combination = new Combination(0, user.getId(), name, fundsBuilder.toString(), weightsBuilder.toString());
+
+        String[] fundsArray = combination.getFunds().split("\\|");
+        String[] weights = combination.getWeights().split("\\|");
+        PyAnalysisResult result_withoutRange = getBasicFactors(Arrays.asList(fundsArray));
+
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        calendar.set(year - 1, month, day);
+        Date newday = calendar.getTime();
+        PyAnalysisResult result_withRange = getBasicFactors(Arrays.asList(fundsArray), simpleDateFormat.format(newday), simpleDateFormat.format(date));
+
+        /**
+         * 年化收益率
+         */
+        double annualProfit = 0.0;
+        for (int i = 0; i < fundsArray.length; i++) {
+            String code = fundsArray[i];
+            annualProfit += (result_withoutRange.nhsyl.get(code) * Double.valueOf(weights[i]));
+        }
+        combination.setAnnualProfit(FormatData.fixToTwoAndPercent(annualProfit));
+
+        /**
+         * 平均相关系数
+         */
+        double sum = 0.0;
+        for (PyAnalysisResult.CorrelationCoefficient c : result_withRange.pjxgxs) {
+            sum += c.getCc();
+        }
+        double correlationCoefficient = sum / result_withRange.pjxgxs.size();
+        combination.setCorrelationCoefficient(FormatData.fixToTwoAndPercent(correlationCoefficient));
+        /**
+         * 最新收益率
+         */
+        double newProfit = 0.0;
+        for (int i = 0; i < fundsArray.length; i++) {
+            newProfit += (fundNetValueRepository.findFirstByCodeOrderByDateDesc(fundsArray[i]).getDailyRate() * Double.valueOf(weights[i]));
+        }
+        combination.setNewProfit(FormatData.fixToTwoAndPercent(newProfit));
         try {
             combinationRepository.save(combination);
             return ResultMessage.SUCCESS;
@@ -95,7 +136,6 @@ public class CombinationServiceImpl implements CombinationService {
      * @return
      */
     @Override
-    //TODO 考虑每天存起来
     public List<CombinationMiniBean> findCombinations() {
         User user = userService.getCurrentUser();
         if (user == null) {
@@ -108,47 +148,9 @@ public class CombinationServiceImpl implements CombinationService {
             CombinationMiniBean miniBean = new CombinationMiniBean();
             miniBean.id = combination.getId();
             miniBean.name = combination.getName();
-            String[] funds = combination.getFunds().split("\\|");
-            String[] weights = combination.getWeights().split("\\|");
-            PyAnalysisResult result_withoutRange = getBasicFactors(Arrays.asList(funds));
-
-            Date date = new Date();
-            Calendar calendar = Calendar.getInstance();
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH);
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            calendar.set(year - 1, month, day);
-            Date newday = calendar.getTime();
-            PyAnalysisResult result_withRange = getBasicFactors(Arrays.asList(funds), simpleDateFormat.format(newday), simpleDateFormat.format(date));
-
-            /**
-             * 年化收益率
-             */
-            double annualProfit = 0.0;
-            for (int i = 0; i < funds.length; i++) {
-                String code = funds[i];
-                annualProfit += (result_withoutRange.nhsyl.get(code) * Double.valueOf(weights[i]));
-            }
-            miniBean.annualProfit = FormatData.fixToTwoAndPercent(annualProfit);
-
-            /**
-             * 平均相关系数
-             */
-            double sum = 0.0;
-            for (PyAnalysisResult.CorrelationCoefficient c : result_withRange.pjxgxs) {
-                sum += c.getCc();
-            }
-            double correlationCoefficient = sum / result_withRange.pjxgxs.size();
-            miniBean.correlationCoefficient = FormatData.fixToTwoAndPercent(correlationCoefficient);
-
-            /**
-             * 最新收益率
-             */
-            double newProfit = 0.0;
-            for (int i = 0; i < funds.length; i++) {
-                newProfit += (fundNetValueRepository.findFirstByCodeOrderByDateDesc(funds[i]).getDailyRate() * Double.valueOf(weights[i]));
-            }
-            miniBean.newProfit = FormatData.fixToTwoAndPercent(newProfit);
+            miniBean.newProfit = combination.getNewProfit();
+            miniBean.correlationCoefficient = combination.getCorrelationCoefficient();
+            miniBean.annualProfit = combination.getAnnualProfit();
 
             combinationMiniBeans.add(miniBean);
         }
@@ -308,7 +310,10 @@ public class CombinationServiceImpl implements CombinationService {
 
             ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndex.getDate()), FormatData.fixToTwo(netValues[check]));
             check++;
-            fundNetValueList.add(fundValueDateBean);
+//            fundNetValueList.add(fundValueDateBean);
+            if (check < basicStockIndexList.size()) {
+                fundNetValueList.add(fundValueDateBean);
+            }
         }
 
         backtestReportBean.cumulativeNetValueTrend = new BacktestComparisonBean(fundNetValueList, baseNetValueList);
