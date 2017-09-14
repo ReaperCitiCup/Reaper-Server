@@ -507,7 +507,7 @@ def test2(code,startTime,endTime,option):   #参数：基金的代码，查询�
                print temp.date[i],alpha[i]
           return
 
-     elif('stockSelectionCoefficient'==option or 'timeSelectionCoefficient'==option):
+     elif('stockTimeSelectionCoefficient'==option):
           i=0
           while(i<=days):
                temp=corrDate(fundDict[code].date,fundDict[code].dailyRate,rm.date,rm.dayRate,rf.date,rf.rfMonthly)
@@ -532,10 +532,8 @@ def test2(code,startTime,endTime,option):   #参数：基金的代码，查询�
                
                stockSelectionCoefficient.append(linreg.intercept_)
                timeSelectionCoefficient.append(linreg.coef_[1])
-               if('stockSelectionCoefficient'==option):
-                    print curEndTime.strftime('%Y-%m-%d'),linreg.intercept_
-               else:
-                    print curEndTime.strftime('%Y-%m-%d'),linreg.coef_[1]
+               if('stockTimeSelectionCoefficient'==option):
+                    print curEndTime.strftime('%Y-%m-%d'),linreg.intercept_,linreg.coef_[1],sum(temp.rm)
                i+=30
           return
      
@@ -586,7 +584,7 @@ def test2(code,startTime,endTime,option):   #参数：基金的代码，查询�
 
          
                     
-optionList=['alpha','beta','annualizedRate','annualizedVolatility','countValue_at_risk','downsideStdDev','sharpeRatio','treynorRatio','stockSelectionCoefficient','timeSelectionCoefficient']
+optionList=['alpha','beta','annualizedRate','annualizedVolatility','countValue_at_risk','downsideStdDev','sharpeRatio','treynorRatio','stockTimeSelectionCoefficient']
 test2(str(sys.argv[1]),str(sys.argv[2]),str(sys.argv[3]),optionList[int(sys.argv[4])])
 #test()
 
