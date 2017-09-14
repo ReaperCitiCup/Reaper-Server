@@ -257,10 +257,11 @@ public class CombinationServiceImpl implements CombinationService {
 //            System.out.println(weights.get(i));
             backtestReportBean.sharpeRatio += FormatData.fixToTwo(getBasicFactors(codes, startDate, endDate).sharpe.get(codes.get(i)) * weights.get(i));
 
+            List<FundNetValue> fundNetValues = fundNetValueRepository.findAllByCodeAndDateBetween(codes.get(i), simpleDateFormat.parse(startDate), simpleDateFormat.parse((endDate)));
             for (int j = 0; j < days; j++) {
-                netValues[j] += fundNetValueRepository.findAllByCodeAndDateBetween(codes.get(i), simpleDateFormat.parse(startDate), simpleDateFormat.parse((endDate))).get(j).getUnitNetValue() * weights.get(i);
+                netValues[j] += fundNetValues.get(j).getUnitNetValue() * weights.get(i);
                 System.out.println("@ " + netValues[j]);
-                dailyRates[j] += fundNetValueRepository.findAllByCodeAndDateBetween(codes.get(i), simpleDateFormat.parse(startDate), simpleDateFormat.parse((endDate))).get(j).getDailyRate() * weights.get(i);
+                dailyRates[j] += fundNetValues.get(j).getDailyRate() * weights.get(i);
                 System.out.println("@ " + dailyRates[j]);
             }
         }
