@@ -97,30 +97,45 @@ public class CombinationServiceImpl implements CombinationService {
         /**
          * 年化收益率
          */
-        double annualProfit = 0.0;
-        for (int i = 0; i < fundsArray.length; i++) {
-            String code = fundsArray[i];
-            annualProfit += (result_withoutRange.nhsyl.get(code) * Double.valueOf(weights[i]));
+        try {
+            double annualProfit = 0.0;
+            for (int i = 0; i < fundsArray.length; i++) {
+                String code = fundsArray[i];
+                annualProfit += (result_withoutRange.nhsyl.get(code) * Double.valueOf(weights[i]));
+            }
+            combination.setAnnualProfit(FormatData.fixToTwoAndPercent(annualProfit));
+        } catch (Exception e) {
+            combination.setAnnualProfit(0.0);
         }
-        combination.setAnnualProfit(FormatData.fixToTwoAndPercent(annualProfit));
+
 
         /**
          * 平均相关系数
          */
-        double sum = 0.0;
-        for (PyAnalysisResult.CorrelationCoefficient c : result_withRange.pjxgxs) {
-            sum += c.getCc();
+        try {
+            double sum = 0.0;
+            for (PyAnalysisResult.CorrelationCoefficient c : result_withRange.pjxgxs) {
+                sum += c.getCc();
+            }
+            double correlationCoefficient = sum / result_withRange.pjxgxs.size();
+            combination.setCorrelationCoefficient(FormatData.fixToTwo(correlationCoefficient));
+        } catch (Exception e) {
+            combination.setCorrelationCoefficient(0.0);
         }
-        double correlationCoefficient = sum / result_withRange.pjxgxs.size();
-        combination.setCorrelationCoefficient(FormatData.fixToTwoAndPercent(correlationCoefficient));
+
         /**
          * 最新收益率
          */
-        double newProfit = 0.0;
-        for (int i = 0; i < fundsArray.length; i++) {
-            newProfit += (fundNetValueRepository.findFirstByCodeOrderByDateDesc(fundsArray[i]).getDailyRate() * Double.valueOf(weights[i]));
+        try {
+            double newProfit = 0.0;
+            for (int i = 0; i < fundsArray.length; i++) {
+                newProfit += (fundNetValueRepository.findFirstByCodeOrderByDateDesc(fundsArray[i]).getDailyRate() * Double.valueOf(weights[i]));
+            }
+            combination.setNewProfit(FormatData.fixToTwoAndPercent(newProfit));
+        } catch (Exception e) {
+            combination.setNewProfit(0.0);
         }
-        combination.setNewProfit(FormatData.fixToTwoAndPercent(newProfit));
+
         try {
             combinationRepository.save(combination);
             return ResultMessage.SUCCESS;
