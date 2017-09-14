@@ -191,9 +191,9 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public BacktestReportBean backtestCombination(Integer combinationId, String startDate, String endDate, String baseIndex) throws java.text.ParseException {
-        if (userService.getCurrentUser() == null) {
-            return null;
-        }
+//        if (userService.getCurrentUser() == null) {
+//            return null;
+//        }
 
         BacktestReportBean backtestReportBean = new BacktestReportBean();
         int days = DaysBetween.daysOfTwo(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
@@ -211,6 +211,7 @@ public class CombinationServiceImpl implements CombinationService {
         Combination combination = combinationRepository.findOne(combinationId);
         List<String> codes = new ArrayList<>();
         List<Double> weights = new ArrayList<>();
+        backtestReportBean.combination = new ArrayList<>();
         for (int i = 0; i < combination.getFunds().split("\\|").length; i++) {
             FundRatioNameBean fundRatioNameBean = new FundRatioNameBean();
             fundRatioNameBean.code = combination.getFunds().split("\\|")[i];
@@ -623,10 +624,10 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public ResultMessage createCombinationByAssetAllocation(FundCombinationBean fundCombination) {
-        User user = userService.getCurrentUser();
-        if (user == null) {
-            return ResultMessage.WRONG;
-        }
+//        User user = userService.getCurrentUser();
+//        if (user == null) {
+//            return ResultMessage.WRONG;
+//        }
 
         /**
          * 静态比例配置要特别处理
@@ -696,6 +697,11 @@ public class CombinationServiceImpl implements CombinationService {
         for (Map.Entry<String, Double> entry : result.entrySet()) {
             beans.add(new FundRatioBean(entry.getKey(), entry.getValue()));
         }
+
+        for (FundRatioBean bean : beans) {
+            System.out.println("&\t" + bean.id + " " + bean.ratio);
+        }
+
         return createCombinationByUser(fundCombination.name, beans);
     }
 

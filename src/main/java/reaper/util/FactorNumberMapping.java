@@ -71,11 +71,11 @@ public class FactorNumberMapping {
     }
 
     public static Double fundType2No(String fundType) {
-        if (fundType.equals("债券型")) {
+        if (fundType.equals("bond")) {
             return 1.0;
-        } else if (fundType.equals("股票型")) {
+        } else if (fundType.equals("stock")) {
             return 2.0;
-        } else if (fundType.equals("混合型")) {
+        } else if (fundType.equals("hybrid")) {
             return 3.0;
         } else {
             return 0.0;
@@ -84,11 +84,11 @@ public class FactorNumberMapping {
 
     public static String no2FundType(Double no) {
         if (no.equals(1.0)) {
-            return "债券型";
+            return "bond";
         } else if (no.equals(2.0)) {
-            return "股票型";
+            return "stock";
         } else if (no.equals(3.0)) {
-            return "混合型";
+            return "hybrid";
         } else {
             return "";
         }
