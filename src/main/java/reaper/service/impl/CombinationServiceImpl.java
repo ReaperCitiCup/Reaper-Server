@@ -323,12 +323,12 @@ public class CombinationServiceImpl implements CombinationService {
             ValueDateBean baseValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndex.getDate()), FormatData.fixToTwo(basicStockIndex.getClosePrice()));
             baseNetValueList.add(baseValueDateBean);
 
-            ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndex.getDate()), FormatData.fixToTwo(netValues[check]));
-            check++;
-//            fundNetValueList.add(fundValueDateBean);
             if (check < basicStockIndexList.size()) {
+                ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndex.getDate()), FormatData.fixToTwo(netValues[check]));
+                check++;
                 fundNetValueList.add(fundValueDateBean);
             }
+
         }
 
         backtestReportBean.cumulativeNetValueTrend = new BacktestComparisonBean(fundNetValueList, baseNetValueList);

@@ -32,7 +32,7 @@ public class CombinationServiceTest {
 
     @Test
     public void backtestCombination() throws Exception {
-        Integer combinationId = 1;
+        Integer combinationId = 3;
         String startDate = "2015-08-10";
         String endDtae = "2016-09-26";
         String baseIndex = "上证指数";
