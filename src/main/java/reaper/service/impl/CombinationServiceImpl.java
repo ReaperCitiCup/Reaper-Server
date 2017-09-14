@@ -25,8 +25,6 @@ import static reaper.util.CodeFormatUtil.getCodeList;
 /**
  * @author keenan on 08/09/2017
  */
-//TODO 看一下如果未登录会怎么办，需不需要写验证登录的部分
-
 @SuppressWarnings("Duplicates")
 @Service
 public class CombinationServiceImpl implements CombinationService {
@@ -66,8 +64,8 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public ResultMessage createCombinationByUser(String name, List<FundRatioBean> funds) {
-//        User user = userService.getCurrentUser();
-//        if (user == null) return ResultMessage.WRONG;
+        User user = userService.getCurrentUser();
+        if (user == null) return ResultMessage.WRONG;
         StringBuilder fundsBuilder = new StringBuilder();
         StringBuilder weightsBuilder = new StringBuilder();
 
@@ -79,8 +77,8 @@ public class CombinationServiceImpl implements CombinationService {
             weightsBuilder.append(ratio);
         }
 
-//        Combination combination = new Combination(0, user.getId(), name, fundsBuilder.toString(), weightsBuilder.toString());
-        Combination combination = new Combination(0, 123, name, fundsBuilder.toString(), weightsBuilder.toString());
+        Combination combination = new Combination(0, user.getId(), name, fundsBuilder.toString(), weightsBuilder.toString());
+//        Combination combination = new Combination(0, 123, name, fundsBuilder.toString(), weightsBuilder.toString());
 
         String[] fundsArray = combination.getFunds().split("\\|");
         String[] weights = combination.getWeights().split("\\|");
@@ -106,6 +104,7 @@ public class CombinationServiceImpl implements CombinationService {
             }
             combination.setAnnualProfit(FormatData.fixToTwoAndPercent(annualProfit));
         } catch (Exception e) {
+            e.printStackTrace();
             combination.setAnnualProfit(0.0);
         }
 
@@ -121,6 +120,7 @@ public class CombinationServiceImpl implements CombinationService {
             double correlationCoefficient = sum / result_withRange.pjxgxs.size();
             combination.setCorrelationCoefficient(FormatData.fixToTwo(correlationCoefficient));
         } catch (Exception e) {
+            e.printStackTrace();
             combination.setCorrelationCoefficient(0.0);
         }
 
@@ -134,6 +134,7 @@ public class CombinationServiceImpl implements CombinationService {
             }
             combination.setNewProfit(FormatData.fixToTwoAndPercent(newProfit));
         } catch (Exception e) {
+            e.printStackTrace();
             combination.setNewProfit(0.0);
         }
 
@@ -141,6 +142,7 @@ public class CombinationServiceImpl implements CombinationService {
             combinationRepository.save(combination);
             return ResultMessage.SUCCESS;
         } catch (Exception e) {
+            e.printStackTrace();
             return ResultMessage.FAILED;
         }
     }
@@ -209,9 +211,9 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public BacktestReportBean backtestCombination(Integer combinationId, String startDate, String endDate, String baseIndex) throws java.text.ParseException {
-//        if (userService.getCurrentUser() == null) {
-//            return null;
-//        }
+        if (userService.getCurrentUser() == null) {
+            return null;
+        }
 
         BacktestReportBean backtestReportBean = new BacktestReportBean();
         int days = DaysBetween.daysOfTwo(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
@@ -647,9 +649,9 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public List<CategoryFundBean> findFundsByTargetAndPath(AssetTargetPathBean targetPath) {
-//        if (userService.getCurrentUser() == null) {
-//            return Collections.EMPTY_LIST;
-//        }
+        if (userService.getCurrentUser() == null) {
+            return Collections.EMPTY_LIST;
+        }
 
         Integer lamda = targetPath.profitRiskTarget;
         Integer path = targetPath.path;
@@ -698,12 +700,11 @@ public class CombinationServiceImpl implements CombinationService {
      * @return
      */
     @Override
-    //TODO 测试
     public ResultMessage createCombinationByAssetAllocation(FundCombinationBean fundCombination) {
-//        User user = userService.getCurrentUser();
-//        if (user == null) {
-//            return ResultMessage.WRONG;
-//        }
+        User user = userService.getCurrentUser();
+        if (user == null) {
+            return ResultMessage.WRONG;
+        }
 
         /**
          * 静态比例配置要特别处理
@@ -773,12 +774,12 @@ public class CombinationServiceImpl implements CombinationService {
         }
         List<FundRatioBean> beans = new ArrayList<>();
         for (Map.Entry<String, Double> entry : result.entrySet()) {
-            beans.add(new FundRatioBean(entry.getKey(), entry.getValue()));
+            beans.add(new FundRatioBean(entry.getKey(), FormatData.fixToTwoAndPercent(entry.getValue())));
         }
 
-        for (FundRatioBean bean : beans) {
-            System.out.println("&\t" + bean.id + " " + bean.ratio);
-        }
+//        for (FundRatioBean bean : beans) {
+//            System.out.println("&\t" + bean./id + " " + bean.ratio);
+//        }
 
         return createCombinationByUser(fundCombination.name, beans);
     }
@@ -795,8 +796,21 @@ public class CombinationServiceImpl implements CombinationService {
         List<String> sorted = new ArrayList<>(codes);
         Collections.sort(sorted);
         String[] strings = codes.toArray(new String[codes.size()]);
+//        for(int i=0;i<strings.length;i++){
+//            System.out.print(strings[i]+"\t");
+//        }
+//        System.out.println();
         Double[] input_kind_array = input_kind.toArray(new Double[input_kind.size()]);
+//        for(int i=0;i<input_kind_array.length;i++){
+//            System.out.print(input_kind_array[i]+"\t");
+//        }
+//        System.out.println();
+
         Double[] input_weight_array = input_weight.toArray(new Double[input_weight.size()]);
+//        for(int i=0;i<input_weight_array.length;i++){
+//            System.out.print(input_weight_array[i]+"\t");
+//        }
+//        System.out.println();
 
         /**
          * 资产间分散需要的参数
@@ -833,7 +847,9 @@ public class CombinationServiceImpl implements CombinationService {
                 }
                 String[] res = null;
                 if (result != null && result.length != 0) {
-                    res = result[0].toString().replaceAll("[ ]+", " ").split(" ");
+                    System.out.println(result[0].toString());
+//                    res = result[0].toString().replaceAll("[ ]+", " ").split(" ");
+                    res=result[0].toString().split("\n");
                 } else {
                     return Collections.EMPTY_MAP;
                 }
@@ -844,6 +860,7 @@ public class CombinationServiceImpl implements CombinationService {
 
                 for (int i = 0; i < sorted.size(); i++) {
                     resultMap.put(sorted.get(i), Double.valueOf(res[i]));
+                    System.out.println(sorted.get(i)+"\t\t"+Double.valueOf(res[i]));
                 }
 
                 return resultMap;
@@ -892,7 +909,8 @@ public class CombinationServiceImpl implements CombinationService {
                 }
                 String[] res = null;
                 if (result != null && result.length != 0) {
-                    res = result[0].toString().replaceAll("[ ]+", " ").split(" ");
+//                    res = result[0].toString().replaceAll("[ ]+", " ").split(" ");
+                    res=result[0].toString().split("\n");
                 } else {
                     return Collections.EMPTY_MAP;
                 }
@@ -903,6 +921,7 @@ public class CombinationServiceImpl implements CombinationService {
 
                 for (int i = 0; i < sorted.size(); i++) {
                     resultMap.put(sorted.get(i), Double.valueOf(res[i]));
+                    System.out.println(sorted.get(i)+"\t\t"+Double.valueOf(res[i]));
                 }
 
                 return resultMap;
@@ -938,6 +957,8 @@ public class CombinationServiceImpl implements CombinationService {
     private PyAnalysisResult getBasicFactors(List<String> codes, String startDate, String endDate) {
         PyAnalysisResult result = new PyAnalysisResult();
         String pyRes = PythonUser.usePy(FILE_BACK_ANALYSIS, "1" + " " + startDate + " " + endDate + " " + fillBlank(codes));
+        System.out.println("pyRes :" +pyRes);
+
         String[] lines = pyRes.split("\n");
         List<String> useful = new ArrayList<>();
         for (String line : lines) {
@@ -985,6 +1006,7 @@ public class CombinationServiceImpl implements CombinationService {
     private PyAnalysisResult getBasicFactors(List<String> codes) {
         PyAnalysisResult result = new PyAnalysisResult();
         String pyRes = PythonUser.usePy(FILE_BACK_ANALYSIS, "0" + " " + fillBlank(codes));
+        System.out.println(pyRes);
         String[] lines = pyRes.split("\n");
         List<String> useful = new ArrayList<>();
         for (String line : lines) {

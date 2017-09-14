@@ -94,5 +94,19 @@ public class FactorNumberMapping {
         }
     }
 
+    public static String baseIndexMapping(String eng){
+        if(eng.equals("szzz")){
+            return "上证指数";
+        }else if(eng.equals("sz180")){
+            return "上证180";
+        }else if(eng.equals("sz50")){
+            return "上证50";
+        }else if(eng.equals("zz500")){
+            return "中正500";
+        }else {
+            return "国债指数";
+        }
+    }
+
 
 }

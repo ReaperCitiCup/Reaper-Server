@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import reaper.bean.*;
 import reaper.service.CombinationService;
+import reaper.util.FactorNumberMapping;
 import reaper.util.ResultMessage;
 
 import java.text.ParseException;
@@ -103,7 +104,7 @@ public class CombinationController {
                                                   @RequestParam(value = "endDate") String endDate,
                                                   @RequestParam(value = "baseIndex") String baseIndex) {
         try {
-            return combinationService.backtestCombination(combinationId, startDate, endDate, baseIndex);
+            return combinationService.backtestCombination(combinationId, startDate, endDate, FactorNumberMapping.baseIndexMapping(baseIndex));
         } catch (ParseException exception) {
             return null;
         }

@@ -30,6 +30,7 @@ public class CombinationServiceTest {
         funds.add(new FundRatioBean("000085", 0.04));
         funds.add(new FundRatioBean("000091", 0.34));
 
+        combinationService.createCombinationByUser(name,funds);
     }
 
     @Test
@@ -45,7 +46,7 @@ public class CombinationServiceTest {
         Integer combinationId = 3;
         String startDate = "2016-07-10";
         String endDate = "2016-09-26";
-        String baseIndex = "国债指数";
+        String baseIndex = "gzzs";
 
 
         BacktestReportBean reportBean = combinationService.backtestCombination(combinationId, startDate, endDate, baseIndex);
