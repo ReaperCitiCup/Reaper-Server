@@ -16,7 +16,7 @@ public class RightNowMessage {
         String allmessage = myBug.sendGet("http://fund.eastmoney.com/"+fundCode+".html?spm=001.2.swh", "");
 
         // System.out.println(allmessage);
-        Pattern pattern = Pattern.compile("<span class=\"ui-font-large ui-color-(green|red) ui-num\" id=\"gz_gsz\">(.*?)</span>");
+        Pattern pattern = Pattern.compile("<span class=\"ui-font-large ui-color-(.*?) ui-num\" id=\"gz_gsz\">(.*?)</span>");
 
         Matcher matcher = pattern.matcher(allmessage);
 
@@ -28,35 +28,45 @@ public class RightNowMessage {
 
         while (matcher.find()) {
 
+            String color=matcher.group(1);
+
+
 
             String code = matcher.group(2);
 
             net_now = Double.parseDouble(code);
+            if(color.contains("red")){
+                net_now=-net_now;
+            }
 
 
         }
 
-        Pattern pattern1 = Pattern.compile("<span class=\"ui-font-middle ui-color-(green|red) ui-num\" id=\"gz_gszze\">(.*?)</span>");
+        Pattern pattern1 = Pattern.compile("<span class=\"ui-font-middle ui-color-(.*?) ui-num\" id=\"gz_gszze\">(.*?)</span>");
         Matcher matcher1 = pattern1.matcher(allmessage);
         while (matcher1.find()) {
-
+            String color=matcher.group(1);
 
             String code = matcher1.group(2);
             change = Double.parseDouble(code);
 
-
+            if(color.contains("red")){
+               change=-change;
+            }
         }
 
 
-        Pattern pattern2 = Pattern.compile("<span class=\"ui-font-middle ui-color-(green|red) ui-num\" id=\"gz_gszzl\">(.*?)%</span>");
+        Pattern pattern2 = Pattern.compile("<span class=\"ui-font-middle ui-color-(.*?) ui-num\" id=\"gz_gszzl\">(.*?)%</span>");
         Matcher matcher2 = pattern2.matcher(allmessage);
         while (matcher2.find()) {
 
-
+            String color=matcher.group(1);
             String fundup = matcher2.group(2);
             //
             poportion = Double.parseDouble(fundup);
-
+            if(color.contains("red")){
+              poportion=-poportion;
+            }
 
         }
 
