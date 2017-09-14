@@ -44,6 +44,9 @@ public class RightNowMessage {
             String color=matcher1.group(1);
 
             String code = matcher1.group(2);
+            if (code.startsWith("+-") || code.startsWith("-+")) {
+                code = code.substring(0, 1) + code.substring(2);
+            }
             change = Double.parseDouble(code);
         }
 

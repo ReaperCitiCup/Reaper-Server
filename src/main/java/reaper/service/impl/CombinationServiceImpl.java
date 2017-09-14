@@ -102,7 +102,7 @@ public class CombinationServiceImpl implements CombinationService {
             double annualProfit = 0.0;
             for (int i = 0; i < fundsArray.length; i++) {
                 String code = fundsArray[i];
-                annualProfit += (result_withoutRange.nhsyl.get(code) * Double.valueOf(weights[i]));
+                annualProfit += (result_withoutRange.nhsyl.get(code) * Double.valueOf(weights[i]) / 100.00);
             }
             combination.setAnnualProfit(FormatData.fixToTwoAndPercent(annualProfit));
         } catch (Exception e) {
@@ -130,7 +130,7 @@ public class CombinationServiceImpl implements CombinationService {
         try {
             double newProfit = 0.0;
             for (int i = 0; i < fundsArray.length; i++) {
-                newProfit += (fundNetValueRepository.findFirstByCodeOrderByDateDesc(fundsArray[i]).getDailyRate() * Double.valueOf(weights[i]));
+                newProfit += (fundNetValueRepository.findFirstByCodeOrderByDateDesc(fundsArray[i]).getDailyRate() * Double.valueOf(weights[i]) / 100.00);
             }
             combination.setNewProfit(FormatData.fixToTwoAndPercent(newProfit));
         } catch (Exception e) {
@@ -280,7 +280,7 @@ public class CombinationServiceImpl implements CombinationService {
             System.out.println(fundNetValues.size());
 
             for (int j = 0; j < fundNetValues.size(); j++) {
-                if (fundNetValues.get(j) != null){
+                if (fundNetValues.get(j) != null) {
                     netValues[j] += fundNetValues.get(j).getUnitNetValue() * weights.get(i);
                     dailyRates[j] += fundNetValues.get(j).getDailyRate() * weights.get(i);
                 }
@@ -445,7 +445,7 @@ public class CombinationServiceImpl implements CombinationService {
                 fundRetracementList.add(fundValueDateBean);
             }
         }
-        
+
         backtestReportBean.dailyRetracementTrend = new BacktestComparisonBean(fundRetracementList, baseRetracementList);
         backtestReportBean.maxRetracement = FormatData.fixToTwoAndPercent(maxRetracement);
 
@@ -687,7 +687,9 @@ public class CombinationServiceImpl implements CombinationService {
             }
 
             int size = funds.size();
-            double ration = 1.0 / size;
+            double ration = 100.0 / size;
+
+            //TODO 下面的100没改
 
             List<FundRatioBean> fundRatioBeans = new ArrayList<>();
             for (String s : funds) {

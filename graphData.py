@@ -2,20 +2,14 @@
 #!/usr/bin/env python
 #@author: xiexian
 
-import csv
-import pymysql
-import xlrd
-import time
-from datetime import datetime, timedelta
-from xlrd import xldate_as_tuple
-from xlutils.copy import copy
+import math
 import numpy
 import pandas as pd
-import math
-from sklearn.cross_validation import train_test_split  #引用交叉验证
-from sklearn.linear_model import LinearRegression
+import pymysql
 import sys
-
+from datetime import datetime, timedelta
+from sklearn.cross_validation import train_test_split  # 引用交叉验证
+from sklearn.linear_model import LinearRegression
 
 Number_Of_Trading_Days=245#一年的交易日个数
 
@@ -531,9 +525,11 @@ def test2(code,startTime,endTime,option):   #参数：基金的代码，查询�
                model=linreg.fit(X_train, y_train)
                
                stockSelectionCoefficient.append(linreg.intercept_)
-               timeSelectionCoefficient.append(linreg.coef_[1])
+               rmSubSqareRfAvg = sum(x2) / len(x2)
+               timeSelectionCoefficient.append(linreg.coef_[1] * rmSubSqareRfAvg)
                if('stockTimeSelectionCoefficient'==option):
-                    print curEndTime.strftime('%Y-%m-%d'),linreg.intercept_,linreg.coef_[1],sum(temp.rm)
+                   print curEndTime.strftime('%Y-%m-%d'), linreg.intercept_, linreg.coef_[1] * rmSubSqareRfAvg, sum(
+                       temp.rm)
                i+=30
           return
      
