@@ -259,7 +259,9 @@ public class CombinationServiceImpl implements CombinationService {
 
             for (int j = 0; j < days; j++) {
                 netValues[j] += fundNetValueRepository.findAllByCodeAndDateBetween(codes.get(i), simpleDateFormat.parse(startDate), simpleDateFormat.parse((endDate))).get(j).getUnitNetValue() * weights.get(i);
+                System.out.println("@ " + netValues[j]);
                 dailyRates[j] += fundNetValueRepository.findAllByCodeAndDateBetween(codes.get(i), simpleDateFormat.parse(startDate), simpleDateFormat.parse((endDate))).get(j).getDailyRate() * weights.get(i);
+                System.out.println("@ " + dailyRates[j]);
             }
         }
 
@@ -1006,49 +1008,51 @@ public class CombinationServiceImpl implements CombinationService {
         factor_sum.put("nlsize", 0.0);
         factor_sum.put("residualvolatility", 0.0);
         factor_sum.put("size", 0.0);
-        for (String code : codes) {
+        for (int i = 0; i < codes.size(); i++) {
+            String code = codes.get(i);
+            double weight = weights.get(i);
             FundRank fundRank = fundRankRepository.findOne(code);
             if (fundRank == null) {
                 continue;
             }
             Double beta = factor_sum.get("beta");
-            beta += fundRank.getRank1() * weights.get(0);
+            beta += fundRank.getRank1() * weight;
             factor_sum.put("beta", beta);
 
             Double btop = factor_sum.get("btop");
-            btop += fundRank.getRank2() * weights.get(1);
+            btop += fundRank.getRank2() * weight;
             factor_sum.put("btop", btop);
 
             Double profit = factor_sum.get("profit");
-            profit += fundRank.getRank3() * weights.get(2);
+            profit += fundRank.getRank3() * weight;
             factor_sum.put("profit", profit);
 
             Double growth = factor_sum.get("growth");
-            growth += fundRank.getRank4() * weights.get(3);
+            growth += fundRank.getRank4() * weight;
             factor_sum.put("growth", growth);
 
             Double leverage = factor_sum.get("leverage");
-            leverage += fundRank.getRank5() * weights.get(4);
+            leverage += fundRank.getRank5() * weight;
             factor_sum.put("leverage", leverage);
 
             Double liquidity = factor_sum.get("liquidity");
-            liquidity += fundRank.getRank6() * weights.get(5);
+            liquidity += fundRank.getRank6() * weight;
             factor_sum.put("liquidity", liquidity);
 
             Double momentum = factor_sum.get("momentum");
-            momentum += fundRank.getRank7() * weights.get(6);
+            momentum += fundRank.getRank7() * weight;
             factor_sum.put("momentum", momentum);
 
             Double nlsize = factor_sum.get("nlsize");
-            nlsize += fundRank.getRank8() * weights.get(7);
+            nlsize += fundRank.getRank8() * weight;
             factor_sum.put("nlsize", nlsize);
 
             Double residualvolatility = factor_sum.get("residualvolatility");
-            residualvolatility += fundRank.getRank9() * weights.get(8);
+            residualvolatility += fundRank.getRank9() * weight;
             factor_sum.put("residualvolatility", residualvolatility);
 
             Double size = factor_sum.get("size");
-            size += fundRank.getRank10() * weights.get(9);
+            size += fundRank.getRank10() * weight;
             factor_sum.put("size", size);
         }
 
