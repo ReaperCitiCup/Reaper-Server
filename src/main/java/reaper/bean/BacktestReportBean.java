@@ -218,11 +218,66 @@ public class BacktestReportBean {
 
     @Override
     public String toString() {
+
+        for (FundRatioNameBean fundRatioNameBean : combination) {
+            System.out.print("Some specific values: combination=");
+            System.out.println(fundRatioNameBean.code + "," + fundRatioNameBean.name + "," + fundRatioNameBean.weight);
+        }
+
+        for (ValueDateBean valueDateBean: cumulativeNetValueTrend.base) {
+            System.out.print("cumulativeNetValueTrend.base=");
+            System.out.println(valueDateBean.date + "," +  valueDateBean.value);
+        }
+
+        for (ValueDateBean valueDateBean: cumulativeNetValueTrend.fund) {
+            System.out.print("cumulativeNetValueTrend.fund=");
+            System.out.println(valueDateBean.date + "," +  valueDateBean.value);
+        }
+
+        for (ValueDateBean valueDateBean: profitRateTrend.base) {
+            System.out.print("profitRateTrend.base=");
+            System.out.println(valueDateBean.date + "," +  valueDateBean.value);
+        }
+
+        for (ValueDateBean valueDateBean: profitRateTrend.fund) {
+            System.out.print("profitRateTrend.fund=");
+            System.out.println(valueDateBean.date + "," +  valueDateBean.value);
+        }
+
+        System.out.println("totalProfitRate.base=" + totalProfitRate.baseIndex);
+        System.out.println("totalProfitRate.fund=" + totalProfitRate.combination);
+
+        System.out.println("overProfitRate.base=" + overProfitRate.baseIndex);
+        System.out.println("overProfitRate.fund=" + overProfitRate.combination);
+
+        System.out.println("annualProfit.base=" + annualProfit.baseIndex);
+        System.out.println("annualProfit.fund=" + annualProfit.combination);
+
+        System.out.println("profitDaysRatio.base=" + profitDaysRatio.baseIndex);
+        System.out.println("profitDaysRatio.fund=" + profitDaysRatio.combination);
+
+        for (ValueDateBean valueDateBean: dailyRetracementTrend.base) {
+            System.out.print("dailyRetracementTrend.base=");
+            System.out.println(valueDateBean.date + "," +  valueDateBean.value);
+        }
+
+        for (ValueDateBean valueDateBean: dailyRetracementTrend.fund) {
+            System.out.print("dailyRetracementTrend.fund=");
+            System.out.println(valueDateBean.date + "," +  valueDateBean.value);
+        }
+
+        for (BacktestCorrelationTable backtestCorrelationTable: correlationCoefficientTrend) {
+            System.out.print("correlationCoefficientTrend=");
+            System.out.println(backtestCorrelationTable.fund1 + "," + backtestCorrelationTable.fund2 + "," + backtestCorrelationTable.value);
+        }
+
+
+
         return "BacktestReportBean{" +
                 "startDate='" + startDate + '\'' +
                 ", endDate='" + endDate + '\'' +
                 ", baseIndex='" + baseIndex + '\'' +
-                ", combination=" + combination +
+//                ", combination=" + combination +
                 ", investmentGoal='" + investmentGoal + '\'' +
                 ", intervalAnnualProfit=" + intervalAnnualProfit +
                 ", cumulativeProfit=" + cumulativeProfit +
@@ -231,27 +286,27 @@ public class BacktestReportBean {
                 ", sharpeRatio=" + sharpeRatio +
                 ", volatility=" + volatility +
                 ", mainFactors=" + mainFactors +
-                ", cumulativeNetValueTrend=" + cumulativeNetValueTrend +
-                ", profitRateTrend=" + profitRateTrend +
-                ", totalProfitRate=" + totalProfitRate +
-                ", overProfitRate=" + overProfitRate +
-                ", annualProfit=" + annualProfit +
-                ", profitDaysRatio=" + profitDaysRatio +
-                ", dailyRetracementTrend=" + dailyRetracementTrend +
-                ", correlationCoefficientTrend=" + correlationCoefficientTrend +
+//                ", cumulativeNetValueTrend=" + cumulativeNetValueTrend +
+//                ", profitRateTrend=" + profitRateTrend +
+//                ", totalProfitRate=" + totalProfitRate +
+//                ", overProfitRate=" + overProfitRate +
+//                ", annualProfit=" + annualProfit +
+//                ", profitDaysRatio=" + profitDaysRatio +
+//                ", dailyRetracementTrend=" + dailyRetracementTrend +
+//                ", correlationCoefficientTrend=" + correlationCoefficientTrend +
                 ", maxDayDown=" + maxDayDown +
                 ", maxDownDays=" + maxDownDays +
                 ", annualVolatility=" + annualVolatility +
                 ", beta=" + beta +
                 ", var=" + var +
-                ", averageCorrelationCoefficient=" + averageCorrelationCoefficient +
-                ", styleAttributionProfit=" + styleAttributionProfit +
-                ", styleAttributionRisk=" + styleAttributionRisk +
-                ", industryAttributionProfit=" + industryAttributionProfit +
-                ", industryAttributionRisk=" + industryAttributionRisk +
-                ", varietyAttribution=" + varietyAttribution +
-                ", brisonAttributionStock=" + brisonAttributionStock +
-                ", brisonAttributionBond=" + brisonAttributionBond +
+//                ", averageCorrelationCoefficient=" + averageCorrelationCoefficient +
+//                ", styleAttributionProfit=" + styleAttributionProfit +
+//                ", styleAttributionRisk=" + styleAttributionRisk +
+//                ", industryAttributionProfit=" + industryAttributionProfit +
+//                ", industryAttributionRisk=" + industryAttributionRisk +
+//                ", varietyAttribution=" + varietyAttribution +
+//                ", brisonAttributionStock=" + brisonAttributionStock +
+//                ", brisonAttributionBond=" + brisonAttributionBond +
                 '}';
     }
 }

@@ -275,6 +275,10 @@ public class CombinationServiceImpl implements CombinationService {
             backtestReportBean.sharpeRatio += FormatData.fixToTwo(getBasicFactors(codes, startDate, endDate).sharpe.get(codes.get(i)) * weights.get(i));
 
             List<FundNetValue> fundNetValues = fundNetValueRepository.findAllByCodeAndDateBetween(codes.get(i), simpleDateFormat.parse(startDate), simpleDateFormat.parse((endDate)));
+
+            System.out.println(days);
+            System.out.println(fundNetValues.size());
+
             for (int j = 0; j < fundNetValues.size(); j++) {
                 if (fundNetValues.get(j) != null){
                     netValues[j] += fundNetValues.get(j).getUnitNetValue() * weights.get(i);
@@ -418,7 +422,7 @@ public class CombinationServiceImpl implements CombinationService {
                     }
                 }
                 ValueDateBean baseValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndexList.get(i).getDate()),
-                        FormatData.fixToTwoAndPercent((basicStockIndexList.get(i).getClosePrice() - lastLargerPrice) / basicStockIndexList.get(i).getClosePrice()));
+                        FormatData.fixToTwoAndPercent((lastLargerPrice - basicStockIndexList.get(i).getClosePrice()) / basicStockIndexList.get(i).getClosePrice()));
                 baseRetracementList.add(baseValueDateBean);
             }
 
@@ -434,7 +438,7 @@ public class CombinationServiceImpl implements CombinationService {
                         break;
                     }
                 }
-                double retracement = (netValues[i] - lastLargerNetValue) / netValues[i];
+                double retracement = (lastLargerNetValue - netValues[i]) / netValues[i];
                 maxRetracement = (retracement < maxRetracement) ? retracement : maxRetracement;
                 ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(dateList.get(i)),
                         FormatData.fixToTwoAndPercent(retracement));
