@@ -4,7 +4,7 @@ package reaper.util;
  * 建立因子与序号间的映射关系
  * 1 beta beta
  * 2 btop 价值
- * 3 earningsyield 盈利能力 profit
+ * 3 盈利能力 profit
  * 4 growth 成长性
  * 5 leverage 杠杆率
  * 6 liquidity 流动性

@@ -191,6 +191,10 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public BacktestReportBean backtestCombination(Integer combinationId, String startDate, String endDate, String baseIndex) throws java.text.ParseException {
+        if (userService.getCurrentUser() == null) {
+            return null;
+        }
+
         BacktestReportBean backtestReportBean = new BacktestReportBean();
         int days = DaysBetween.daysOfTwo(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
 
@@ -470,79 +474,79 @@ public class CombinationServiceImpl implements CombinationService {
             if (i == 0) {
                 // 风格归因-收益
                 styleAttributionProfit = ToFieldBean.factorResultToStyleAttribution(normal_factorResult);
-                for(int j = 0; j < styleAttributionProfit.size(); j++) {
+                for (int j = 0; j < styleAttributionProfit.size(); j++) {
                     styleAttributionProfit.get(j).value *= weights.get(i);
                 }
 
                 // 风格归因-风险
                 styleAttributionRisk = ToFieldBean.factorResultToStyleAttribution(risk_factorResult);
-                for(int j = 0; j < styleAttributionRisk.size(); j++) {
+                for (int j = 0; j < styleAttributionRisk.size(); j++) {
                     styleAttributionRisk.get(j).value *= weights.get(i);
                 }
 
                 // 行业归因-收益
                 industryAttributionProfit = ToFieldBean.factorResultToIndustryAttribution(normal_factorResult);
-                for(int j = 0; j < industryAttributionProfit.size(); j++) {
+                for (int j = 0; j < industryAttributionProfit.size(); j++) {
                     industryAttributionProfit.get(j).value *= weights.get(i);
                 }
 
                 // 行业归因-风险
                 industryAttributionRisk = ToFieldBean.factorResultToIndustryAttribution(risk_factorResult);
-                for(int j = 0; j < industryAttributionRisk.size(); j++) {
+                for (int j = 0; j < industryAttributionRisk.size(); j++) {
                     industryAttributionRisk.get(j).value *= weights.get(i);
                 }
 
                 // 品种归因
                 varietyAttribution = ToFieldBean.brisonResultToVarietyAttribution(brisonResult);
-                for(int j = 0; j < varietyAttribution.size(); j++) {
+                for (int j = 0; j < varietyAttribution.size(); j++) {
                     varietyAttribution.get(j).value *= weights.get(i);
                 }
 
                 // Brison归因-股票
                 brisonAttributionStock = ToFieldBean.stockBrisonResultToFieldValue(stockBrinsonResult);
-                for(int j = 0; j < brisonAttributionStock.size(); j++) {
+                for (int j = 0; j < brisonAttributionStock.size(); j++) {
                     brisonAttributionStock.get(j).value *= weights.get(i);
                 }
 
                 // Brison归因-债券
                 brisonAttributionBond = ToFieldBean.brisonResultToFieldValue(brisonResult);
-                for(int j = 0; j < brisonAttributionBond.size(); j++) {
+                for (int j = 0; j < brisonAttributionBond.size(); j++) {
                     brisonAttributionBond.get(j).value *= weights.get(i);
                 }
 
             } else {
                 // 风格归因-收益
-                for(int j = 0; j < styleAttributionProfit.size(); j++) {
+                for (int j = 0; j < styleAttributionProfit.size(); j++) {
                     styleAttributionProfit.get(j).value += ToFieldBean.factorResultToStyleAttribution(normal_factorResult).get(j).value * weights.get(i);
                 }
 
                 // 风格归因-风险
-                for(int j = 0; j < styleAttributionRisk.size(); j++) {
+                for (int j = 0; j < styleAttributionRisk.size(); j++) {
                     styleAttributionRisk.get(j).value += ToFieldBean.factorResultToStyleAttribution(risk_factorResult).get(j).value * weights.get(i);
                 }
 
                 // 行业归因-收益
-                for(int j = 0; j < industryAttributionProfit.size(); j++) {
+                for (int j = 0; j < industryAttributionProfit.size(); j++) {
                     industryAttributionProfit.get(j).value += ToFieldBean.factorResultToIndustryAttribution(normal_factorResult).get(j).value * weights.get(i);
                 }
 
                 // 行业归因-风险
-                for(int j = 0; j < industryAttributionRisk.size(); j++) {
+                for (int j = 0; j < industryAttributionRisk.size(); j++) {
                     industryAttributionRisk.get(j).value += ToFieldBean.factorResultToIndustryAttribution(risk_factorResult).get(j).value * weights.get(i);
                 }
 
                 // 品种归因
-                for(int j = 0; j < varietyAttribution.size(); j++) {
+                for (int j = 0; j < varietyAttribution.size(); j++) {
                     varietyAttribution.get(j).value += ToFieldBean.brisonResultToVarietyAttribution(brisonResult).get(j).value * weights.get(i);
                 }
 
                 // Brison归因-股票
-                for(int j = 0; j < brisonAttributionStock.size(); j++) {
+                for (int j = 0; j < brisonAttributionStock.size(); j++) {
                     brisonAttributionStock.get(j).value += ToFieldBean.stockBrisonResultToFieldValue(stockBrinsonResult).get(j).value * weights.get(i);
                 }
 
                 // Brison归因-债券
-                for(int j = 0; j < brisonAttributionBond.size(); j++) {
+                for (int j = 0; j < brisonAttributionBond.size(); j++) {
                     brisonAttributionBond.get(j).value += ToFieldBean.brisonResultToFieldValue(brisonResult).get(j).value * weights.get(i);
                 }
             }
@@ -624,6 +628,26 @@ public class CombinationServiceImpl implements CombinationService {
             return ResultMessage.WRONG;
         }
 
+        /**
+         * 静态比例配置要特别处理
+         */
+        if (fundCombination.method == 1) {
+            List<String> funds = new ArrayList<>();
+            for (FundCategoryBean categoryBean : fundCombination.funds) {
+                funds.addAll(categoryBean.codes);
+            }
+
+            int size = funds.size();
+            double ration = 1.0 / size;
+
+            List<FundRatioBean> fundRatioBeans = new ArrayList<>();
+            for (String s : funds) {
+                fundRatioBeans.add(new FundRatioBean(s, ration));
+            }
+
+            return createCombinationByUser(fundCombination.name, fundRatioBeans);
+        }
+
         Map<String, Double> result = new HashMap<>();
         int uncentralize_type = fundCombination.path;
         int portfolioType = fundCombination.method;
@@ -648,7 +672,7 @@ public class CombinationServiceImpl implements CombinationService {
                 }
             }
 
-            result = calComponentWeight(codes, portfolioType, input_kind, input_weight, uncentralize_type);
+            result = calComponentWeight(codes, portfolioType, input_kind, input_weight, uncentralize_type, fundCombination.profitRate);
         }
         /**
          * 因子间分散
@@ -662,7 +686,7 @@ public class CombinationServiceImpl implements CombinationService {
                 }
             }
 
-            result = calComponentWeight(codes, portfolioType, input_kind, null, uncentralize_type);
+            result = calComponentWeight(codes, portfolioType, input_kind, null, uncentralize_type, fundCombination.profitRate);
         } else return ResultMessage.INVALID;
 
         if (result == null || result.isEmpty()) {
@@ -682,7 +706,7 @@ public class CombinationServiceImpl implements CombinationService {
      * @param portfolioType 分散化方法类型
      * @return <基金代码, 权重(未百分化的double)>
      */
-    private Map<String, Double> calComponentWeight(List<String> codes, int portfolioType, List<Double> input_kind, List<Double> input_weight, int uncentralize_type) {
+    private Map<String, Double> calComponentWeight(List<String> codes, int portfolioType, List<Double> input_kind, List<Double> input_weight, int uncentralize_type, double profitRate) {
         Map<String, Double> resultMap = new HashMap<>();
         List<String> sorted = new ArrayList<>(codes);
         Collections.sort(sorted);
@@ -718,8 +742,11 @@ public class CombinationServiceImpl implements CombinationService {
                 inputKind = new MWNumericArray(input_kind_array);
                 inputWeight = new MWNumericArray(input_weight_array);
                 assetAllocation = new Asset_Allocation();
-
-                result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight);
+                if (portfolioType == 2) {
+                    result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight, new MWNumericArray(profitRate));
+                } else {
+                    result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight);
+                }
                 String[] res = null;
                 if (result != null && result.length != 0) {
                     res = result[0].toString().replaceAll("[ ]+", " ").split(" ");
@@ -774,7 +801,11 @@ public class CombinationServiceImpl implements CombinationService {
                 inputKind = new MWNumericArray(input_kind_array);
                 inputFactorNum = new MWNumericArray(input_factor_num);
 
-                result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum);
+                if (portfolioType == 2) {
+                    result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum, new MWNumericArray(profitRate));
+                } else {
+                    result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum);
+                }
                 String[] res = null;
                 if (result != null && result.length != 0) {
                     res = result[0].toString().replaceAll("[ ]+", " ").split(" ");

@@ -59,7 +59,7 @@ def sqlOrder(data_code, lamda=5, count=8):
     conn = pymysql.connect(host='106.15.203.173', user='reaper', passwd='reaper112233', db='reaper', port=3306,
                            charset='utf8')
     cur = conn.cursor()  # 获取一个游标
-    cur.execute('SELECT code,rank' + str(int(lamda)) + ' FROM reaper.fund_score WHERE 1')
+    cur.execute('SELECT code,rank' + str(int(lamda)) + ' FROM reaper.fund_rank WHERE 1')
     data = cur.fetchall()
     data_score = []
     for d in data:
