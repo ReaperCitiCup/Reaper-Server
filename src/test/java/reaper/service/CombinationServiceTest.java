@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reaper.bean.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,6 +21,15 @@ public class CombinationServiceTest {
 
     @Test
     public void createCombinationByUser() throws Exception {
+        String name = "szs测试用的";
+        List<FundRatioBean> funds = new ArrayList<>();
+        funds.add(new FundRatioBean("000022", 0.23));
+        funds.add(new FundRatioBean("000067", 0.12));
+        funds.add(new FundRatioBean("000069", 0.09));
+        funds.add(new FundRatioBean("000075", 0.18));
+        funds.add(new FundRatioBean("000085", 0.04));
+        funds.add(new FundRatioBean("000091", 0.34));
+
     }
 
     @Test
@@ -33,9 +43,9 @@ public class CombinationServiceTest {
     @Test
     public void backtestCombination() throws Exception {
         Integer combinationId = 3;
-        String startDate = "2015-08-10";
+        String startDate = "2016-07-10";
         String endDtae = "2016-09-26";
-        String baseIndex = "上证指数";
+        String baseIndex = "国债指数";
 
 
         BacktestReportBean reportBean = combinationService.backtestCombination(combinationId, startDate, endDtae, baseIndex);
@@ -48,22 +58,24 @@ public class CombinationServiceTest {
 
     @Test
     public void findFundsByTargetAndPath() throws Exception {
-//        AssetTargetPathBean assetTargetPathBean = new AssetTargetPathBean();
-//        assetTargetPathBean.profitRiskTarget = 7;
-//        assetTargetPathBean.path = 2;
-//        List<String> factors = new ArrayList<>();
+        AssetTargetPathBean assetTargetPathBean = new AssetTargetPathBean();
+        assetTargetPathBean.profitRiskTarget = 5;
+        assetTargetPathBean.path = 2;
+        List<String> factors = new ArrayList<>();
 //        factors.add("beta");
 //        factors.add("btop");
-//        factors.add("momentum");
-//        assetTargetPathBean.factor = factors;
-//
-//        List<CategoryFundBean> result = combinationService.findFundsByTargetAndPath(assetTargetPathBean);
-//        for (CategoryFundBean categoryFundBean : result) {
-//            System.out.println(categoryFundBean.name);
-//            for (MiniBean miniBean : categoryFundBean.funds) {
-//                System.out.println("\t" + miniBean.code + " " + miniBean.name);
-//            }
-//        }
+
+        factors.add("momentum");
+        factors.add("liquidity");
+        assetTargetPathBean.factor = factors;
+
+        List<CategoryFundBean> result = combinationService.findFundsByTargetAndPath(assetTargetPathBean);
+        for (CategoryFundBean categoryFundBean : result) {
+            System.out.println(categoryFundBean.name);
+            for (MiniBean miniBean : categoryFundBean.funds) {
+                System.out.println("\t" + miniBean.code + " " + miniBean.name);
+            }
+        }
 //
 //        /**
 //         * 1 beta beta
@@ -78,22 +90,22 @@ public class CombinationServiceTest {
 //         * 10 size 市值
 //         */
 
-        AssetTargetPathBean assetTargetPathBean = new AssetTargetPathBean();
-        assetTargetPathBean.profitRiskTarget = 4;
-        assetTargetPathBean.path = 1;
-        AssetWeightBean assetWeightBean = new AssetWeightBean();
-        assetWeightBean.bond = 0.3;
-        assetWeightBean.stock = 0.7;
-        assetWeightBean.stock = 0.0;
-        assetTargetPathBean.weight = assetWeightBean;
-
-        List<CategoryFundBean> result = combinationService.findFundsByTargetAndPath(assetTargetPathBean);
-        for (CategoryFundBean categoryFundBean : result) {
-            System.out.println(categoryFundBean.name);
-            for (MiniBean miniBean : categoryFundBean.funds) {
-                System.out.println("\t" + miniBean.code + " " + miniBean.name);
-            }
-        }
+//        AssetTargetPathBean assetTargetPathBean = new AssetTargetPathBean();
+//        assetTargetPathBean.profitRiskTarget = 4;
+//        assetTargetPathBean.path = 1;
+//        AssetWeightBean assetWeightBean = new AssetWeightBean();
+//        assetWeightBean.bond = 0.3;
+//        assetWeightBean.stock = 0.7;
+//        assetWeightBean.stock = 0.0;
+//        assetTargetPathBean.weight = assetWeightBean;
+//
+//        List<CategoryFundBean> result = combinationService.findFundsByTargetAndPath(assetTargetPathBean);
+//        for (CategoryFundBean categoryFundBean : result) {
+//            System.out.println(categoryFundBean.name);
+//            for (MiniBean miniBean : categoryFundBean.funds) {
+//                System.out.println("\t" + miniBean.code + " " + miniBean.name);
+//            }
+//        }
     }
 
     @Test
@@ -101,5 +113,6 @@ public class CombinationServiceTest {
         FundCombinationBean combinationBean = new FundCombinationBean();
 
     }
+
 
 }
