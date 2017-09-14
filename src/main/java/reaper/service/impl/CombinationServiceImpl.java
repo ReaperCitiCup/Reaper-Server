@@ -214,6 +214,7 @@ public class CombinationServiceImpl implements CombinationService {
 
         BacktestReportBean backtestReportBean = new BacktestReportBean();
         int days = DaysBetween.daysOfTwo(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
+        List<Date> dateList = DaysBetween.getDatesBetweenTwoDate(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
 
         /**
          * 基本信息
@@ -276,10 +277,11 @@ public class CombinationServiceImpl implements CombinationService {
 
             List<FundNetValue> fundNetValues = fundNetValueRepository.findAllByCodeAndDateBetween(codes.get(i), simpleDateFormat.parse(startDate), simpleDateFormat.parse((endDate)));
             for (int j = 0; j < days; j++) {
-                netValues[j] += fundNetValues.get(j).getUnitNetValue() * weights.get(i);
-                System.out.println("@ " + netValues[j]);
-                dailyRates[j] += fundNetValues.get(j).getDailyRate() * weights.get(i);
-                System.out.println("@ " + dailyRates[j]);
+                if (fundNetValues.get(j) != null){
+                    netValues[j] += fundNetValues.get(j).getUnitNetValue() * weights.get(i);
+                    dailyRates[j] += fundNetValues.get(j).getDailyRate() * weights.get(i);
+
+                }
             }
         }
 
@@ -316,19 +318,16 @@ public class CombinationServiceImpl implements CombinationService {
          */
         List<ValueDateBean> baseNetValueList = new ArrayList<>();
         List<ValueDateBean> fundNetValueList = new ArrayList<>();
-        int check = 0;
 
         List<BasicStockIndex> basicStockIndexList = basicStockIndexRepository.findAllByStockNameAndDateBetweenOrderByDateAsc(baseIndex, simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
         for (BasicStockIndex basicStockIndex : basicStockIndexList) {
             ValueDateBean baseValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndex.getDate()), FormatData.fixToTwo(basicStockIndex.getClosePrice()));
             baseNetValueList.add(baseValueDateBean);
+        }
 
-            if (check < basicStockIndexList.size()) {
-                ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndex.getDate()), FormatData.fixToTwo(netValues[check]));
-                check++;
-                fundNetValueList.add(fundValueDateBean);
-            }
-
+        for (int i = 0; i < netValues.length; i++) {
+            ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(dateList.get(i)), FormatData.fixToTwo(netValues[i]));
+            fundNetValueList.add(fundValueDateBean);
         }
 
         backtestReportBean.cumulativeNetValueTrend = new BacktestComparisonBean(fundNetValueList, baseNetValueList);
@@ -343,10 +342,12 @@ public class CombinationServiceImpl implements CombinationService {
             ValueDateBean baseValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndexList.get(i + 1).getDate()),
                     FormatData.fixToTwoAndPercent((basicStockIndexList.get(i + 1).getClosePrice() - basicStockIndexList.get(i).getClosePrice()) / basicStockIndexList.get(i).getClosePrice()));
             baseProfitList.add(baseValueDateBean);
-            ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndexList.get(i + 1).getDate()),
-                    FormatData.fixToTwoAndPercent((netValues[i + 1] - netValues[i]) / netValues[i]));
-            fundProfitList.add(fundValueDateBean);
+        }
 
+        for (int i = 0; i < netValues.length - 1; i++) {
+            ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(dateList.get(i + 1)),
+                    FormatData.fixToTwo(netValues[i + 1] - netValues[i]) / netValues[i]);
+            fundProfitList.add(fundValueDateBean);
         }
 
         backtestReportBean.profitRateTrend = new BacktestComparisonBean(fundProfitList, baseNetValueList);
@@ -357,7 +358,6 @@ public class CombinationServiceImpl implements CombinationService {
         double finalBaseValue = basicStockIndexList.get(basicStockIndexList.size() - 1).getClosePrice();
         double startBaseValue = basicStockIndexList.get(0).getClosePrice();
         double baseProfit = FormatData.fixToTwoAndPercent((finalBaseValue - startBaseValue) / startBaseValue);
-
         double fundProfit = FormatData.fixToTwoAndPercent((finalNetValue - startNetValue) / startNetValue);
         backtestReportBean.totalProfitRate = new BacktestValueComparisonBean(FormatData.fixToTwoAndPercent(fundProfit), FormatData.fixToTwoAndPercent(baseProfit));
 
@@ -388,10 +388,14 @@ public class CombinationServiceImpl implements CombinationService {
             if (basicStockIndexList.get(i + 1).getClosePrice() > basicStockIndexList.get(i).getClosePrice()) {
                 baseProfitDays++;
             }
+        }
+
+        for (int i = 0; i < netValues.length - 1; i++) {
             if (netValues[i + 1] > netValues[i]) {
                 fundProfitDays++;
             }
         }
+
         backtestReportBean.profitDaysRatio = new BacktestValueComparisonBean(FormatData.fixToTwoAndPercent(fundProfitDays / days), FormatData.fixToTwoAndPercent(baseProfitDays / days));
 
         /**
@@ -413,7 +417,9 @@ public class CombinationServiceImpl implements CombinationService {
             ValueDateBean baseValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndexList.get(i).getDate()),
                     FormatData.fixToTwoAndPercent((basicStockIndexList.get(i).getClosePrice() - lastLargerPrice) / basicStockIndexList.get(i).getClosePrice()));
             baseRetracementList.add(baseValueDateBean);
+        }
 
+        for (int i = netValues.length - 1; i > 1; i--) {
             double lastLargerNetValue = netValues[i];
 
             for (int j = i - 1; j > 0; j--) {
@@ -428,8 +434,8 @@ public class CombinationServiceImpl implements CombinationService {
             ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(basicStockIndexList.get(i).getDate()),
                     FormatData.fixToTwoAndPercent(retracement));
             fundRetracementList.add(fundValueDateBean);
-
         }
+        
         backtestReportBean.dailyRetracementTrend = new BacktestComparisonBean(fundRetracementList, baseRetracementList);
         backtestReportBean.maxRetracement = FormatData.fixToTwoAndPercent(maxRetracement);
 
@@ -471,7 +477,7 @@ public class CombinationServiceImpl implements CombinationService {
         /**
          * 年化波动率
          */
-        //TODO 检查要不要成100
+        //TODO 检查要不要*100
         backtestReportBean.annualVolatility = FormatData.fixToTwo(backtestReportBean.volatility * Math.sqrt(252.0));
 
         /**
