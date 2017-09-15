@@ -191,7 +191,7 @@ public class CombinationServiceImpl implements CombinationService {
             return ResultMessage.WRONG;
         }
         Combination combination = combinationRepository.findOne(id);
-        if (!combination.getId().equals(user.getId())) {
+        if (!combination.getUserid().equals(user.getId())) {
             return ResultMessage.INVALID;
         }
         try {

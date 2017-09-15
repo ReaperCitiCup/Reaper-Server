@@ -21,14 +21,24 @@ public class CombinationServiceTest {
 
     @Test
     public void createCombinationByUser() throws Exception {
-        String name = "qzh测试用的";
+        String name = "zqh测试20190915";
         List<FundRatioBean> funds = new ArrayList<>();
-        funds.add(new FundRatioBean("000022", 0.23));
-        funds.add(new FundRatioBean("000067", 0.12));
-        funds.add(new FundRatioBean("000069", 0.09));
-        funds.add(new FundRatioBean("000075", 0.18));
-        funds.add(new FundRatioBean("000085", 0.04));
-        funds.add(new FundRatioBean("000091", 0.34));
+//        "000003|000001|000011|000007|000017|000004|000309";
+        funds.add(new FundRatioBean("000003", 11.00));
+        funds.add(new FundRatioBean("000001", 12.00));
+        funds.add(new FundRatioBean("000011", 13.00));
+        funds.add(new FundRatioBean("000007", 14.00));
+        funds.add(new FundRatioBean("000017", 15.00));
+        funds.add(new FundRatioBean("000004", 16.00));
+        funds.add(new FundRatioBean("000309", 19.00));
+
+
+//        funds.add(new FundRatioBean("000022", 23.00));
+//        funds.add(new FundRatioBean("000067", 12.00));
+//        funds.add(new FundRatioBean("000069", 9.00));
+//        funds.add(new FundRatioBean("000003", 18.00));
+//        funds.add(new FundRatioBean("000085", 4.00));
+//        funds.add(new FundRatioBean("000091", 34.00));
 
         combinationService.createCombinationByUser(name,funds);
     }
