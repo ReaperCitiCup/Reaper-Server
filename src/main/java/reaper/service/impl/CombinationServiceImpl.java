@@ -267,7 +267,12 @@ public class CombinationServiceImpl implements CombinationService {
         backtestReportBean.sharpeRatio = 0.0;
 
         for (int i = 0; i < codes.size(); i++) {
-            backtestReportBean.sharpeRatio += FormatData.fixToTwo(getBasicFactors(codes, startDate, endDate).sharpe.get(codes.get(i)) * weights.get(i));
+
+            try {
+                backtestReportBean.sharpeRatio += FormatData.fixToTwo(getBasicFactors(codes, startDate, endDate).sharpe.get(codes.get(i)) * weights.get(i));
+            } catch (NullPointerException e) {
+                backtestReportBean.sharpeRatio += 0;
+            }
 
             List<FundNetValue> fundNetValues = fundNetValueRepository.findAllByCodeAndDateBetween(codes.get(i), simpleDateFormat.parse(startDate), simpleDateFormat.parse((endDate)));
 
@@ -340,8 +345,8 @@ public class CombinationServiceImpl implements CombinationService {
             }
         }
 
-        for (int i = 0; i < netValues.length - 2; i++) {
-            if (netValues[i] != 0) {
+        for (int i = 0; i < netValues.length - 1; i++) {
+            if ((netValues[i] != 0) && (netValues[i + 1] != 0)) {
                 ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(dateList.get(i + 1)),
                         FormatData.fixToTwoAndPercent((netValues[i + 1] - netValues[i]) / netValues[i]));
                 fundProfitList.add(fundValueDateBean);
@@ -453,7 +458,14 @@ public class CombinationServiceImpl implements CombinationService {
             sum += coefficient.getCc();
             backtestCorrelationTables.add(new BacktestCorrelationTable(coefficient.getCode1(), coefficient.getCode2(), coefficient.getCc()));
         }
-        backtestReportBean.averageCorrelationCoefficient = FormatData.fixToTwo(sum / pyAnalysisResult.pjxgxs.size());
+        System.out.println(sum);
+        System.out.println(pyAnalysisResult.pjxgxs.size());
+        if (pyAnalysisResult.pjxgxs.size() == 0) {
+            backtestReportBean.averageCorrelationCoefficient = 0.0;
+        } else {
+            backtestReportBean.averageCorrelationCoefficient = FormatData.fixToTwo(sum / pyAnalysisResult.pjxgxs.size());
+        }
+
         backtestReportBean.correlationCoefficientTable = backtestCorrelationTables;
 
 //        double betasum = 0.0;
@@ -600,46 +612,6 @@ public class CombinationServiceImpl implements CombinationService {
                     brisonAttributionBond.get(j).value += ToFieldBean.brisonResultToFieldValue(brisonResult).get(j).value * weights.get(i);
                 }
             }
-
-            /*
-            if (i == codes.size() - 1) {
-                // 风格归因-收益
-                for (int j = 0; j < styleAttributionProfit.size(); j++) {
-                    styleAttributionProfit.get(j).value = FormatData.fixToTwoAndPercent(styleAttributionProfit.get(j).value);
-                }
-
-                // 风格归因-风险
-                for (int j = 0; j < styleAttributionRisk.size(); j++) {
-                    styleAttributionRisk.get(j).value = FormatData.fixToTwoAndPercent(styleAttributionRisk.get(j).value);
-                }
-
-                // 行业归因-收益
-                for (int j = 0; j < industryAttributionProfit.size(); j++) {
-                    industryAttributionProfit.get(j).value = FormatData.fixToTwoAndPercent(industryAttributionProfit.get(j).value);
-                }
-
-                // 行业归因-风险
-                for (int j = 0; j < industryAttributionRisk.size(); j++) {
-                    industryAttributionRisk.get(j).value = FormatData.fixToTwoAndPercent(industryAttributionRisk.get(j).value);
-                }
-
-                // 品种归因
-                for (int j = 0; j < varietyAttribution.size(); j++) {
-                    varietyAttribution.get(j).value = FormatData.fixToTwoAndPercent(varietyAttribution.get(j).value);
-                }
-
-                // Brison归因-股票
-                for (int j = 0; j < brisonAttributionStock.size(); j++) {
-                    brisonAttributionStock.get(j).value = FormatData.fixToTwoAndPercent(brisonAttributionStock.get(j).value);
-                }
-
-                // Brison归因-债券
-                for (int j = 0; j < brisonAttributionBond.size(); j++) {
-                    brisonAttributionBond.get(j).value = FormatData.fixToTwoAndPercent(brisonAttributionBond.get(j).value);
-                }
-
-            }
-            */
         }
 
         backtestReportBean.styleAttributionProfit = styleAttributionProfit;
