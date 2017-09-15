@@ -64,23 +64,21 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public ResultMessage createCombinationByUser(String name, List<FundRatioBean> funds, Integer profitRisk) {
-//        User user = userService.getCurrentUser();
-//        if (user == null) return ResultMessage.WRONG;
+        User user = userService.getCurrentUser();
+        if (user == null) return ResultMessage.WRONG;
         StringBuilder fundsBuilder = new StringBuilder();
         StringBuilder weightsBuilder = new StringBuilder();
 
         for (int i = 0; i < funds.size(); i++) {
             FundRatioBean fundRatioBean = funds.get(i);
             String id = (i == funds.size() - 1) ? fundRatioBean.id : fundRatioBean.id + "|";
-            System.out.println("= - = " + id);
             String ratio = (i == funds.size() - 1) ? String.valueOf(fundRatioBean.ratio) : fundRatioBean.ratio + "|";
-            System.out.println("= - = " + ratio);
             fundsBuilder.append(id);
             weightsBuilder.append(ratio);
         }
 
-//        Combination combination = new Combination(0, user.getId(), name, fundsBuilder.toString(), weightsBuilder.toString());
-        Combination combination = new Combination(0, 8, name, fundsBuilder.toString(), weightsBuilder.toString());
+        Combination combination = new Combination(profitRisk, user.getId(), name, fundsBuilder.toString(), weightsBuilder.toString());
+//        Combination combination = new Combination(0, 8, name, fundsBuilder.toString(), weightsBuilder.toString());
 
         String[] fundsArray = combination.getFunds().split("\\|");
         String[] weights = combination.getWeights().split("\\|");
@@ -732,8 +730,6 @@ public class CombinationServiceImpl implements CombinationService {
 
             int size = funds.size();
             double ration = 100.0 / size;
-
-            //TODO 下面的100没改
 
             List<FundRatioBean> fundRatioBeans = new ArrayList<>();
             for (String s : funds) {
