@@ -99,7 +99,7 @@ public class BacktestReportBean {
     /**
      * 【表】相关系数
      */
-    public List<BacktestCorrelationTable> correlationCoefficientTrend;
+    public List<BacktestCorrelationTable> correlationCoefficientTable;
 
     /**
      * 最大单日跌幅
@@ -172,7 +172,7 @@ public class BacktestReportBean {
                               BacktestComparisonBean profitRateTrend, BacktestValueComparisonBean totalProfitRate,
                               BacktestValueComparisonBean overProfitRate, BacktestValueComparisonBean annualProfit,
                               BacktestValueComparisonBean profitDaysRatio,
-                              BacktestComparisonBean dailyRetracementTrend, List<BacktestCorrelationTable> correlationCoefficientTrend,
+                              BacktestComparisonBean dailyRetracementTrend, List<BacktestCorrelationTable> correlationCoefficientTable,
                               Double maxDayDown, Integer maxDownDays, Double annualVolatility, Double var,
                               Double averageCorrelationCoefficient, List<FieldValueBean> styleAttributionProfit,
                               List<FieldValueBean> styleAttributionRisk, List<FieldValueBean> industryAttributionProfit,
@@ -197,7 +197,7 @@ public class BacktestReportBean {
         this.annualProfit = annualProfit;
         this.profitDaysRatio = profitDaysRatio;
         this.dailyRetracementTrend = dailyRetracementTrend;
-        this.correlationCoefficientTrend = correlationCoefficientTrend;
+        this.correlationCoefficientTable = correlationCoefficientTable;
         this.maxDayDown = maxDayDown;
         this.maxDownDays = maxDownDays;
         this.annualVolatility = annualVolatility;
@@ -266,7 +266,7 @@ public class BacktestReportBean {
             System.out.println(valueDateBean.date + "," +  valueDateBean.value);
         }
 
-        for (BacktestCorrelationTable backtestCorrelationTable: correlationCoefficientTrend) {
+        for (BacktestCorrelationTable backtestCorrelationTable: correlationCoefficientTable) {
             System.out.print("correlationCoefficientTrend=");
             System.out.println(backtestCorrelationTable.fund1 + "," + backtestCorrelationTable.fund2 + "," + backtestCorrelationTable.value);
         }

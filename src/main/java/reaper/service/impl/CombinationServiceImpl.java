@@ -63,7 +63,7 @@ public class CombinationServiceImpl implements CombinationService {
      * @return
      */
     @Override
-    public ResultMessage createCombinationByUser(String name, List<FundRatioBean> funds) {
+    public ResultMessage createCombinationByUser(String name, List<FundRatioBean> funds, Integer profitRisk) {
 //        User user = userService.getCurrentUser();
 //        if (user == null) return ResultMessage.WRONG;
         StringBuilder fundsBuilder = new StringBuilder();
@@ -72,9 +72,9 @@ public class CombinationServiceImpl implements CombinationService {
         for (int i = 0; i < funds.size(); i++) {
             FundRatioBean fundRatioBean = funds.get(i);
             String id = (i == funds.size() - 1) ? fundRatioBean.id : fundRatioBean.id + "|";
-            System.out.println("= - = "+id);
+            System.out.println("= - = " + id);
             String ratio = (i == funds.size() - 1) ? String.valueOf(fundRatioBean.ratio) : fundRatioBean.ratio + "|";
-            System.out.println("= - = "+ratio);
+            System.out.println("= - = " + ratio);
             fundsBuilder.append(id);
             weightsBuilder.append(ratio);
         }
@@ -512,6 +512,16 @@ public class CombinationServiceImpl implements CombinationService {
             FactorResult normal_factorResult = factorResultRepository.findByCodeAndFactorType(codes.get(i), 'N');
             FactorResult risk_factorResult = factorResultRepository.findByCodeAndFactorType(codes.get(i), 'R');
 
+            if (brisonResult == null || stockBrinsonResult == null || normal_factorResult == null || risk_factorResult ==null) {
+                styleAttributionProfit.clear();
+                styleAttributionProfit.clear();
+                industryAttributionProfit.clear();
+                industryAttributionRisk.clear();
+                varietyAttribution.clear();
+                brisonAttributionBond.clear();
+                brisonAttributionStock.clear();
+                break;
+            }
 
             if (i == 0) {
                 // 风格归因-收益
@@ -727,7 +737,7 @@ public class CombinationServiceImpl implements CombinationService {
                 fundRatioBeans.add(new FundRatioBean(s, ration));
             }
 
-            return createCombinationByUser(fundCombination.name, fundRatioBeans);
+            return createCombinationByUser(fundCombination.name, fundRatioBeans, fundCombination.profitRiskTarget);
         }
 
         Map<String, Double> result = new HashMap<>();
@@ -783,7 +793,7 @@ public class CombinationServiceImpl implements CombinationService {
             System.out.println("&&&\t" + bean.id + " " + bean.ratio);
         }
 
-        return createCombinationByUser(fundCombination.name, beans);
+        return createCombinationByUser(fundCombination.name, beans, fundCombination.profitRiskTarget);
     }
 
     /**
@@ -851,7 +861,7 @@ public class CombinationServiceImpl implements CombinationService {
                 if (result != null && result.length != 0) {
                     System.out.println(result[0].toString());
 //                    res = result[0].toString().replaceAll("[ ]+", " ").split(" ");
-                    res=result[0].toString().split("\n");
+                    res = result[0].toString().split("\n");
                 } else {
                     return Collections.EMPTY_MAP;
                 }
@@ -862,7 +872,7 @@ public class CombinationServiceImpl implements CombinationService {
 
                 for (int i = 0; i < sorted.size(); i++) {
                     resultMap.put(sorted.get(i), Double.valueOf(res[i]));
-                    System.out.println(sorted.get(i)+"\t\t"+Double.valueOf(res[i]));
+                    System.out.println(sorted.get(i) + "\t\t" + Double.valueOf(res[i]));
                 }
 
                 return resultMap;
@@ -912,7 +922,7 @@ public class CombinationServiceImpl implements CombinationService {
                 String[] res = null;
                 if (result != null && result.length != 0) {
 //                    res = result[0].toString().replaceAll("[ ]+", " ").split(" ");
-                    res=result[0].toString().split("\n");
+                    res = result[0].toString().split("\n");
                 } else {
                     return Collections.EMPTY_MAP;
                 }
@@ -923,7 +933,7 @@ public class CombinationServiceImpl implements CombinationService {
 
                 for (int i = 0; i < sorted.size(); i++) {
                     resultMap.put(sorted.get(i), Double.valueOf(res[i]));
-                    System.out.println(sorted.get(i)+"\t\t"+Double.valueOf(res[i]));
+                    System.out.println(sorted.get(i) + "\t\t" + Double.valueOf(res[i]));
                 }
 
                 return resultMap;
@@ -958,9 +968,9 @@ public class CombinationServiceImpl implements CombinationService {
      */
     private PyAnalysisResult getBasicFactors(List<String> codes, String startDate, String endDate) {
         PyAnalysisResult result = new PyAnalysisResult();
-        System.out.println(":= "+startDate+"\t"+endDate+"\t"+fillBlank(codes));
+        System.out.println(":= " + startDate + "\t" + endDate + "\t" + fillBlank(codes));
         String pyRes = PythonUser.usePy(FILE_BACK_ANALYSIS, "1" + " " + startDate + " " + endDate + " " + fillBlank(codes));
-        System.out.println("pyRes :" +pyRes);
+        System.out.println("pyRes :" + pyRes);
 
         String[] lines = pyRes.split("\n");
         List<String> useful = new ArrayList<>();
