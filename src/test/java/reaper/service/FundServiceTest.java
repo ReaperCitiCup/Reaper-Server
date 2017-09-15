@@ -1565,44 +1565,477 @@ public class FundServiceTest {
     }
 
     @Test
-    public void findVarietyAttributionTest() throws Exception {
-        List<FieldValueBean>fieldValueBeans=fundService.findVarietyAttribution("000005");
+    public void findVarietyAttributionTest1() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findVarietyAttribution("000005");
+        Assert.assertEquals(9, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "国债", "地方政府债","金融债", "企业债", "公司债", "中期票据", "短期融资券", "定向工具", "其他"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field, fieldValueBeans.get(4).field,
+                        fieldValueBeans.get(5).field, fieldValueBeans.get(6).field, fieldValueBeans.get(7).field, fieldValueBeans.get(8).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        0.0, 0.0, 40.776, 0.0, 0.0,
+                        53.344, 0.0, 0.0, 144.8
+                }, new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value, fieldValueBeans.get(4).value,
+                        fieldValueBeans.get(5).value, fieldValueBeans.get(6).value, fieldValueBeans.get(7).value, fieldValueBeans.get(8).value
+                }
+        );
     }
 
-    //TODO
     @Test
-    public void findBrisonAttributionStockTest() throws Exception {
-        List<FieldValueBean>fieldValueBeans=fundService.findBrisonAttributionStock("000005");
+    public void findVarietyAttributionTest2() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findVarietyAttribution("5");
+        Assert.assertEquals(9, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "国债", "地方政府债","金融债", "企业债", "公司债", "中期票据", "短期融资券", "定向工具", "其他"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field, fieldValueBeans.get(4).field,
+                        fieldValueBeans.get(5).field, fieldValueBeans.get(6).field, fieldValueBeans.get(7).field, fieldValueBeans.get(8).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        0.0, 0.0, 40.776, 0.0, 0.0,
+                        53.344, 0.0, 0.0, 144.8
+                }, new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value, fieldValueBeans.get(4).value,
+                        fieldValueBeans.get(5).value, fieldValueBeans.get(6).value, fieldValueBeans.get(7).value, fieldValueBeans.get(8).value
+                }
+        );
     }
 
     @Test
-    public void findBrisonAttributionBondTest() throws Exception {
-        List<FieldValueBean>fieldValueBeans=fundService.findBrisonAttributionBond("000005");
+    public void findVarietyAttributionTest3() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findVarietyAttribution("005");
+        Assert.assertEquals(9, fieldValueBeans.size());
+        assertArrayEquals(
+                new String[]{
+                        "国债", "地方政府债","金融债", "企业债", "公司债", "中期票据", "短期融资券", "定向工具", "其他"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field, fieldValueBeans.get(4).field,
+                        fieldValueBeans.get(5).field, fieldValueBeans.get(6).field, fieldValueBeans.get(7).field, fieldValueBeans.get(8).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        0.0, 0.0, 40.776, 0.0, 0.0,
+                        53.344, 0.0, 0.0, 144.8
+                }, new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value, fieldValueBeans.get(4).value,
+                        fieldValueBeans.get(5).value, fieldValueBeans.get(6).value, fieldValueBeans.get(7).value, fieldValueBeans.get(8).value
+                }
+        );
     }
 
-    //TODO
     @Test
-    public void findChooseTimeTest() throws Exception {
-        List<ChooseBean> chooseBean=fundService.findChooseStockTime("000005");
+    public void findVarietyAttributionTest4() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findVarietyAttribution("000006");
+        Assert.assertNull(fieldValueBeans);
     }
 
+    @Test
+    public void findVarietyAttributionTest5() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findVarietyAttribution(null);
+        Assert.assertNull(fieldValueBeans);
+    }
+
+    @Test
+    public void findBrisonAttributionStockTest1() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findBrisonAttributionStock("000005");
+        assertArrayEquals(
+                new String[]{
+                        "资产配置效益", "股票选择效益", "交叉效益", "总超额效益"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        41.41, 40.39, -43.66, 38.14
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value
+                }
+        );
+    }
+
+    @Test
+    public void findBrisonAttributionStockTest2() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findBrisonAttributionStock("5");
+        assertArrayEquals(
+                new String[]{
+                        "资产配置效益", "股票选择效益", "交叉效益", "总超额效益"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        41.41, 40.39, -43.66, 38.14
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value
+                }
+        );
+    }
+
+    @Test
+    public void findBrisonAttributionStockTest3() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findBrisonAttributionStock("005");
+        assertArrayEquals(
+                new String[]{
+                        "资产配置效益", "股票选择效益", "交叉效益", "总超额效益"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        41.41, 40.39, -43.66, 38.14
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value
+                }
+        );
+    }
+
+    @Test
+    public void findBrisonAttributionStockTest4() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findBrisonAttributionStock("000006");
+        Assert.assertNull(fieldValueBeans);
+    }
+
+    @Test
+    public void findBrisonAttributionStockTest5() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findBrisonAttributionStock(null);
+        Assert.assertNull(fieldValueBeans);
+    }
+
+    @Test
+    public void findBrisonAttributionBondTest1() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findBrisonAttributionBond("000005");
+        assertArrayEquals(
+                new String[]{
+                        "资产配置效益", "股票选择效益", "交叉效益", "总超额效益"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        72.01, -3.48, -28.25, 40.28
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value
+                }
+        );
+    }
+
+    @Test
+    public void findBrisonAttributionBondTest2() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findBrisonAttributionBond("5");
+        assertArrayEquals(
+                new String[]{
+                        "资产配置效益", "股票选择效益", "交叉效益", "总超额效益"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        72.01, -3.48, -28.25, 40.28
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value
+                }
+        );
+    }
+
+    @Test
+    public void findBrisonAttributionBondTest3() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findBrisonAttributionBond("005");
+        assertArrayEquals(
+                new String[]{
+                        "资产配置效益", "股票选择效益", "交叉效益", "总超额效益"
+                },
+                new String[]{
+                        fieldValueBeans.get(0).field, fieldValueBeans.get(1).field, fieldValueBeans.get(2).field, fieldValueBeans.get(3).field
+                }
+        );
+        assertArrayEquals(
+                new Double[]{
+                        72.01, -3.48, -28.25, 40.28
+                },
+                new Double[]{
+                        fieldValueBeans.get(0).value, fieldValueBeans.get(1).value, fieldValueBeans.get(2).value, fieldValueBeans.get(3).value
+                }
+        );
+    }
+
+    @Test
+    public void findBrisonAttributionBondTest4() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findBrisonAttributionBond("000006");
+        Assert.assertNull(fieldValueBeans);
+    }
+
+    @Test
+    public void findBrisonAttributionBondTest5() throws Exception {
+        List<FieldValueBean> fieldValueBeans=fundService.findBrisonAttributionBond(null);
+        Assert.assertNull(fieldValueBeans);
+    }
+
+    @Test
+    public void findChooseTimeTest1() throws Exception {
+        List<ChooseBean> chooseBeans=fundService.findChooseStockTime("000005");
+        Assert.assertEquals(13, chooseBeans.size());
+        ChooseBean chooseBean=chooseBeans.get(0);
+        Assert.assertEquals(
+                new String[]{
+                        "2016-09-15", "择时能力", "择股能力", "市场收益"
+                },
+                new String[]{
+                        chooseBean.date, chooseBean.data.get(0).field, chooseBean.data.get(1).field, chooseBean.data.get(2).field
+                }
+        );
+        Assert.assertEquals(
+                new Double[]{
+                        -0.13, -0.01, -3.31
+                },
+                new Double[]{
+                        chooseBean.data.get(0).value, chooseBean.data.get(1).value, chooseBean.data.get(2).value
+                }
+        );
+    }
+
+    @Test
+    public void findChooseTimeTest2() throws Exception {
+        List<ChooseBean> chooseBeans=fundService.findChooseStockTime("5");
+        Assert.assertEquals(13, chooseBeans.size());
+        ChooseBean chooseBean=chooseBeans.get(0);
+        Assert.assertEquals(
+                new String[]{
+                        "2016-09-15", "择时能力", "择股能力", "市场收益"
+                },
+                new String[]{
+                        chooseBean.date, chooseBean.data.get(0).field, chooseBean.data.get(1).field, chooseBean.data.get(2).field
+                }
+        );
+        Assert.assertEquals(
+                new Double[]{
+                        -0.13, -0.01, -3.31
+                },
+                new Double[]{
+                        chooseBean.data.get(0).value, chooseBean.data.get(1).value, chooseBean.data.get(2).value
+                }
+        );
+    }
+
+    @Test
+    public void findChooseTimeTest3() throws Exception {
+        List<ChooseBean> chooseBeans=fundService.findChooseStockTime("005");
+        Assert.assertEquals(13, chooseBeans.size());
+        ChooseBean chooseBean=chooseBeans.get(0);
+        Assert.assertEquals(
+                new String[]{
+                        "2016-09-15", "择时能力", "择股能力", "市场收益"
+                },
+                new String[]{
+                        chooseBean.date, chooseBean.data.get(0).field, chooseBean.data.get(1).field, chooseBean.data.get(2).field
+                }
+        );
+        Assert.assertEquals(
+                new Double[]{
+                        -0.13, -0.01, -3.31
+                },
+                new Double[]{
+                        chooseBean.data.get(0).value, chooseBean.data.get(1).value, chooseBean.data.get(2).value
+                }
+        );
+    }
+
+    @Test
+    public void findChooseTimeTest4() throws Exception {
+        List<ChooseBean> chooseBeans=fundService.findChooseStockTime("000006");
+        Assert.assertNull(chooseBeans);
+    }
+
+    @Test
+    public void findChooseTimeTest5() throws Exception {
+        List<ChooseBean> chooseBeans=fundService.findChooseStockTime(null);
+        Assert.assertNull(chooseBeans);
+    }
+
+    //TODO funds没有数据, others后面的数据没有rate和risk
     @Test
     public void findFundPerformanceTest() throws Exception {
         FundPerformanceBean fundPerformanceBean=fundService.findFundPerformance("000005");
+        //fundPerformanceBean.funds;
+        List<PerformanceDataBean> performanceDataBeans=fundPerformanceBean.others;
+
     }
 
     @Test
-    public void findManagerPerformanceTest() throws Exception {
+    public void findManagerPerformanceTest1() throws Exception {
         ManagerPerformanceBean managerPerformanceBean=fundService.findManagerPerformance("000005");
+        PerformanceDataBean manager=managerPerformanceBean.managers.get(0);
+        assertArrayEquals(
+                new String[]{
+                        "30198173", "刘宁", "2954", "2.3"
+                },
+                new String[]{
+                        manager.id, manager.name, manager.rate.toString(), manager.risk.toString()
+                }
+        );
+        List<PerformanceDataBean> others=managerPerformanceBean.others;
+        Assert.assertEquals(1391, others.size());
+        PerformanceDataBean other=others.get(others.size()-1);
+        assertArrayEquals(
+                new String[]{
+                        "30544899", "杜骐臻", "0.0", "8.25"
+                },
+                new String[]{
+                        other.id, other.name, other.rate.toString(), other.risk.toString()
+                }
+        );
     }
 
-    //TODO
     @Test
-    public void findPublicOpinionTest() throws Exception {
-        List<PublicOpinionBean> publicOpinionBean=fundService.findPublicOpinion("000005");
+    public void findManagerPerformanceTest2() throws Exception {
+        ManagerPerformanceBean managerPerformanceBean=fundService.findManagerPerformance("5");
+        PerformanceDataBean manager=managerPerformanceBean.managers.get(0);
+        assertArrayEquals(
+                new String[]{
+                        "30198173", "刘宁", "2954", "2.3"
+                },
+                new String[]{
+                        manager.id, manager.name, manager.rate.toString(), manager.risk.toString()
+                }
+        );
+        List<PerformanceDataBean> others=managerPerformanceBean.others;
+        Assert.assertEquals(1391, others.size());
+        PerformanceDataBean other=others.get(others.size()-1);
+        assertArrayEquals(
+                new String[]{
+                        "30544899", "杜骐臻", "0.0", "8.25"
+                },
+                new String[]{
+                        other.id, other.name, other.rate.toString(), other.risk.toString()
+                }
+        );
     }
 
-    //TODO
+    @Test
+    public void findManagerPerformanceTest3() throws Exception {
+        ManagerPerformanceBean managerPerformanceBean=fundService.findManagerPerformance("005");
+        PerformanceDataBean manager=managerPerformanceBean.managers.get(0);
+        assertArrayEquals(
+                new String[]{
+                        "30198173", "刘宁", "2954", "2.3"
+                },
+                new String[]{
+                        manager.id, manager.name, manager.rate.toString(), manager.risk.toString()
+                }
+        );
+        List<PerformanceDataBean> others=managerPerformanceBean.others;
+        Assert.assertEquals(1391, others.size());
+        PerformanceDataBean other=others.get(others.size()-1);
+        assertArrayEquals(
+                new String[]{
+                        "30544899", "杜骐臻", "0.0", "8.25"
+                },
+                new String[]{
+                        other.id, other.name, other.rate.toString(), other.risk.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findManagerPerformanceTest4() throws Exception {
+        ManagerPerformanceBean managerPerformanceBean=fundService.findManagerPerformance("000006");
+        Assert.assertNull(managerPerformanceBean);
+    }
+
+    @Test
+    public void findManagerPerformanceTest5() throws Exception {
+        ManagerPerformanceBean managerPerformanceBean=fundService.findManagerPerformance(null);
+        Assert.assertNull(managerPerformanceBean);
+    }
+
+    @Test
+    public void findPublicOpinionTest1() throws Exception {
+        List<PublicOpinionBean> publicOpinionBeanS=fundService.findPublicOpinion("000005");
+        Assert.assertEquals(3, publicOpinionBeanS.size());
+        PublicOpinionBean publicOpinionBean=publicOpinionBeanS.get(0);
+        assertArrayEquals(
+                new String[]{
+                        "2017-05-21", "正面评价", "1", "负面评价", "0"
+                },
+                new String[]{
+                        publicOpinionBean.date, publicOpinionBean.quantity.get(0).field, publicOpinionBean.quantity.get(0).value.toString(),
+                        publicOpinionBean.quantity.get(1).field, publicOpinionBean.quantity.get(1).value.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findPublicOpinionTest2() throws Exception {
+        List<PublicOpinionBean> publicOpinionBeanS=fundService.findPublicOpinion("5");
+        Assert.assertEquals(3, publicOpinionBeanS.size());
+        PublicOpinionBean publicOpinionBean=publicOpinionBeanS.get(0);
+        assertArrayEquals(
+                new String[]{
+                        "2017-05-21", "正面评价", "1", "负面评价", "0"
+                },
+                new String[]{
+                        publicOpinionBean.date, publicOpinionBean.quantity.get(0).field, publicOpinionBean.quantity.get(0).value.toString(),
+                        publicOpinionBean.quantity.get(1).field, publicOpinionBean.quantity.get(1).value.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findPublicOpinionTest3() throws Exception {
+        List<PublicOpinionBean> publicOpinionBeanS=fundService.findPublicOpinion("005");
+        Assert.assertEquals(3, publicOpinionBeanS.size());
+        PublicOpinionBean publicOpinionBean=publicOpinionBeanS.get(0);
+        assertArrayEquals(
+                new String[]{
+                        "2017-05-21", "正面评价", "1", "负面评价", "0"
+                },
+                new String[]{
+                        publicOpinionBean.date, publicOpinionBean.quantity.get(0).field, publicOpinionBean.quantity.get(0).value.toString(),
+                        publicOpinionBean.quantity.get(1).field, publicOpinionBean.quantity.get(1).value.toString()
+                }
+        );
+    }
+
+    @Test
+    public void findPublicOpinionTest4() throws Exception {
+        List<PublicOpinionBean> publicOpinionBeanS=fundService.findPublicOpinion("000006");
+        Assert.assertNull(publicOpinionBeanS);
+    }
+
+    @Test
+    public void findPublicOpinionTest5() throws Exception {
+        List<PublicOpinionBean> publicOpinionBeanS=fundService.findPublicOpinion(null);
+        Assert.assertNull(publicOpinionBeanS);
+    }
+
+    //TODO 结果为空
     @Test
     public void findPositionNetworkTest() throws Exception {
         FundNetworkBean networkBean=fundService.findPositionNetwork("000005");
