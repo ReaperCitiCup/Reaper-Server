@@ -603,6 +603,7 @@ public class CombinationServiceImpl implements CombinationService {
                 }
             }
 
+            /*
             if (i == codes.size() - 1) {
                 // 风格归因-收益
                 for (int j = 0; j < styleAttributionProfit.size(); j++) {
@@ -638,7 +639,9 @@ public class CombinationServiceImpl implements CombinationService {
                 for (int j = 0; j < brisonAttributionBond.size(); j++) {
                     brisonAttributionBond.get(j).value = FormatData.fixToTwoAndPercent(brisonAttributionBond.get(j).value);
                 }
+
             }
+            */
         }
 
         backtestReportBean.styleAttributionProfit = styleAttributionProfit;

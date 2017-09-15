@@ -40,7 +40,7 @@ public class CombinationServiceTest {
 //        funds.add(new FundRatioBean("000085", 4.00));
 //        funds.add(new FundRatioBean("000091", 34.00));
 
-        combinationService.createCombinationByUser(name,funds);
+//        combinationService.createCombinationByUser(name,funds);
     }
 
     @Test
@@ -54,9 +54,9 @@ public class CombinationServiceTest {
     @Test
     public void backtestCombination() throws Exception {
         Integer combinationId = 3;
-        String startDate = "2016-07-10";
-        String endDate = "2016-09-26";
-        String baseIndex = "szzs";
+        String startDate = "2016-06-30";
+        String endDate = "2016-08-31";
+        String baseIndex = "上证指数";
 
 
         BacktestReportBean reportBean = combinationService.backtestCombination(combinationId, startDate, endDate, baseIndex);
