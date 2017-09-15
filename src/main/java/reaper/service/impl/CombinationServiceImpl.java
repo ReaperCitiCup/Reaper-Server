@@ -456,7 +456,7 @@ public class CombinationServiceImpl implements CombinationService {
             backtestCorrelationTables.add(new BacktestCorrelationTable(coefficient.getCode1(), coefficient.getCode2(), coefficient.getCc()));
         }
         backtestReportBean.averageCorrelationCoefficient = FormatData.fixToTwo(sum / pyAnalysisResult.pjxgxs.size());
-        backtestReportBean.correlationCoefficientTrend = backtestCorrelationTables;
+        backtestReportBean.correlationCoefficientTable = backtestCorrelationTables;
 
 //        double betasum = 0.0;
 //        for (int i = 0; i < codes.size(); i++) {
