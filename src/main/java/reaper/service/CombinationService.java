@@ -19,7 +19,7 @@ public interface CombinationService {
      * @param funds 组合列表
      * @return
      */
-    public ResultMessage createCombinationByUser(String name, List<FundRatioBean> funds);
+    public ResultMessage createCombinationByUser(String name, List<FundRatioBean> funds, Integer profitRisk);
 
     /**
      * 我的组合列表

@@ -33,7 +33,7 @@ public class CombinationController {
             method = RequestMethod.POST,
             produces = {"application/json; charset=UTF-8"})
     public ResultMessageBean createCombination(@RequestBody CombinationCreationBean creationBean) {
-        ResultMessage resultMessage = combinationService.createCombinationByUser(creationBean.name, creationBean.funds);
+        ResultMessage resultMessage = combinationService.createCombinationByUser(creationBean.name, creationBean.funds, 0);
         ResultMessageBean result = new ResultMessageBean(false);
 
         if (resultMessage.equals(ResultMessage.SUCCESS)) {

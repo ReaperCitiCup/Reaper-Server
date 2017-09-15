@@ -95,7 +95,7 @@ public class FactorNumberMapping {
     }
 
     public static String baseIndexMapping(String eng){
-        if(eng.equals("szzz")){
+        if (eng.equals("szzs")) {
             return "上证指数";
         }else if(eng.equals("sz180")){
             return "上证180";
