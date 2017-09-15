@@ -1,6 +1,7 @@
 package reaper.service;
 
 import org.hibernate.mapping.Collection;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -59,13 +60,13 @@ public class ManagerServiceTest {
                 });
     }
 
-    //测试存在的id=30413691，时间是2017-09-06
+    //测试存在的id=30413691，时间是2017-09-16
     @Test
     public void findFundHistoryById2() throws Exception {
         List<FundHistoryBean> fundHistoryBeans=managerService.findFundHistoryById("30413691");
         int code=fundHistoryBeans.stream().mapToInt((x)->Integer.parseInt(x.id)).summaryStatistics().getMax();
         int time=fundHistoryBeans.stream().mapToInt((x)->x.days).summaryStatistics().getMin();
-        assertArrayEquals(new int[]{2,61,4476},new int[]{fundHistoryBeans.size(),time,code});
+        assertArrayEquals(new int[]{2,71,4476},new int[]{fundHistoryBeans.size(),time,code});
     }
 
     //测试存在的id=30045022，时间是2017-09-06
@@ -109,12 +110,33 @@ public class ManagerServiceTest {
     }
 
     @Test
-    public void findFundRankByManagerId() throws Exception {
+    public void findFundRankByManagerId1() throws Exception {
+        List<RankBean> rankBeans=managerService.findFundRankByManagerId("30132007");
+        Assert.assertEquals(7, rankBeans.size());
+        RankBean rankBean=rankBeans.get(0);
+        assertArrayEquals(
+                new String[]{
+                        "180015", "银华增强债券", "所有", "债券型", "中风险"
+                },new String[]{
+                        rankBean.id, rankBean.name, rankBean.data.get(0).type, rankBean.data.get(1).type, rankBean.data.get(2).type
+                }
+        );
+        assertArrayEquals(
+                new Integer[]{
+                        3853, 5298, 498, 1274, 282, 511
+                },
+                new Integer[]{
+                        rankBean.data.get(0).rank, rankBean.data.get(0).total, rankBean.data.get(1).rank, rankBean.data.get(1).total,rankBean.data.get(2).rank, rankBean.data.get(2).total
+                }
+        );
     }
 
-    //测试根据managerId查看rate trend
+    @Test
+    public void findFundRankByManagerId() throws Exception {
+        List<RankBean> rankBeans=managerService.findFundRankByManagerId("0");
+        Assert.assertEquals(0, rankBeans.size());
+    }
 
-    //测试不存在的id=0，mmmm
     @Test
     public void findFundRateTrendByManagerId1() throws Exception {
         assertArrayEquals(new int[]{0,0}, new int[]{
@@ -157,28 +179,77 @@ public class ManagerServiceTest {
         assertEquals(6,rateTrendBeans.size());
     }
 
-    @Test
-    public void findFundRankTrendByManagerId() throws Exception {
-    }
-
-    //测试根据managerId查看该经理的基金的表现
-
-    //TODO 还差有效值
     //测试不存在的id=0,mmmm
     @Test
     public void findFundPerformanceByManagerId1() throws Exception {
+        FundPerformanceBean fundPerformanceBean1=managerService.findFundPerformanceByManagerId("0");
+        FundPerformanceBean fundPerformanceBean2=managerService.findFundPerformanceByManagerId("mmmm");
+        assertArrayEquals(
+                new Integer[]{
+                        0, 5298, 0, 5298
+                },
+                new Integer[]{
+                        fundPerformanceBean1.funds.size(), fundPerformanceBean1.others.size(), fundPerformanceBean2.funds.size(), fundPerformanceBean2.others.size()
+                }
+        );
     }
 
-    //测试根据managerId查看经理的综合表现
+    @Test
+    public void findFundPerformanceByManagerId2() throws Exception {
+        FundPerformanceBean fundPerformanceBean=managerService.findFundPerformanceByManagerId("30198173");
+        List<PerformanceDataBean> funds=fundPerformanceBean.funds;
+        Assert.assertEquals(15, funds.size());
+        List<PerformanceDataBean> others=fundPerformanceBean.others;
+        Assert.assertEquals(5283, others.size());
+        assertArrayEquals(
+                new String[]{
+                        "000269", "嘉实合润双债两年期定期债券", "-0.23", "0.34"
+                },
+                new String[]{
+                        funds.get(0).id, funds.get(0).name, funds.get(0).rate.toString(), funds.get(0).risk.toString()
+                }
+        );
+        PerformanceDataBean other=others.get(2);
+        assertArrayEquals(
+                new String[]{
+                        "000004", "中海可转债C", "-7.66", "7.35"
+                },
+                new String[]{
+                        other.id, other.name, other.rate.toString(), other.risk.toString()
+                }
+        );
+    }
 
-    //TODO 还差有效值
     //测试不存在的id=0，mmmm
     @Test
     public void findManagerPerformanceByManagerId1() throws Exception {
+        ManagerPerformanceBean managerPerformanceBean1=managerService.findManagerPerformanceByManagerId("0");
+        ManagerPerformanceBean managerPerformanceBean2=managerService.findManagerPerformanceByManagerId("mmmm");
+        assertArrayEquals(
+                new Integer[]{
+                        0, 1392, 0, 1392
+                },
+                new Integer[]{
+                        managerPerformanceBean1.managers.size(), managerPerformanceBean1.others.size(), managerPerformanceBean2.managers.size(), managerPerformanceBean2.others.size()
+                }
+        );
     }
 
-    //TODO 还差有效值
-    //查看根据managerId查看manager ability
+    @Test
+    public void findManagerPerformanceByManagerId2() throws Exception {
+        ManagerPerformanceBean managerPerformanceBean=managerService.findManagerPerformanceByManagerId("30198173");
+        Assert.assertEquals(1, managerPerformanceBean.managers.size());
+        Assert.assertEquals(1391, managerPerformanceBean.others.size());
+        PerformanceDataBean performanceDataBean=managerPerformanceBean.managers.get(0);
+        assertArrayEquals(
+                new String[]{
+                        "30198173", "刘宁", "2954.0", "2.3"
+                },
+                new String[]{
+                        performanceDataBean.id, performanceDataBean.name, performanceDataBean.rate.toString(), performanceDataBean.risk.toString()
+                }
+        );
+    }
 
     //测试不存在的id=0，mmmm
     @Test
@@ -191,8 +262,43 @@ public class ManagerServiceTest {
     }
 
     @Test
-    public void findSocialNetworkByManagerId() throws Exception{
+    public void findSocialNetworkByManagerId1() throws Exception{
+        ManagerNetworkBean managerNetworkBean=managerService.findSocialNetworkByManagerId("30198442");
+        Assert.assertEquals(0, managerNetworkBean.nodes.size());
+        Assert.assertEquals(0, managerNetworkBean.links.size());
+    }
 
+    @Test
+    public void findSocialNetworkByManagerId2() throws Exception{
+        ManagerNetworkBean managerNetworkBean1=managerService.findSocialNetworkByManagerId("0");
+        Assert.assertEquals(0, managerNetworkBean1.nodes.size());
+        Assert.assertEquals(0, managerNetworkBean1.links.size());
+        ManagerNetworkBean managerNetworkBean2=managerService.findSocialNetworkByManagerId("mmmm");
+        Assert.assertEquals(0, managerNetworkBean2.nodes.size());
+        Assert.assertEquals(0, managerNetworkBean2.links.size());
+    }
+
+    public void findSocialNetworkByManagerId3() throws Exception{
+        ManagerNetworkBean managerNetworkBean=managerService.findSocialNetworkByManagerId("30284601");
+        Assert.assertEquals(3, managerNetworkBean.nodes.size());
+        Assert.assertEquals(2, managerNetworkBean.links.size());
+        assertArrayEquals(
+                new String []{
+                        "陈正宪", "何如", "刘珈吟"
+                },
+                new String[]{
+                        managerNetworkBean.nodes.get(0).name, managerNetworkBean.nodes.get(1).name, managerNetworkBean.nodes.get(2).name
+                }
+        );
+        ManagerLinkDataBean managerLinkDataBean=managerNetworkBean.links.get(0);
+        assertArrayEquals(
+                new Integer[]{
+                        0, 1, 12521, 20
+                },
+                new Integer[]{
+                        managerLinkDataBean.source, managerLinkDataBean.target, managerLinkDataBean.days, managerLinkDataBean.times
+                }
+        );
     }
 
 }
