@@ -131,7 +131,7 @@ public class FundServiceImpl implements FundService {
         }
         FundModelToBean fundModelToBean = new FundModelToBean();
 
-        FundNetValue fundNetValue = fundNetValueRepository.findFirstByCodeOrderByDateDesc(code);
+        FundNetValue fundNetValue = fundNetValueRepository.findFirstByCodeAndUnitNetValueNotNullOrderByDateDesc(code);
         RateBean rateBean = getFundRate(code);
 
         List<IdNameBean> managers = new ArrayList<>();
@@ -488,7 +488,7 @@ public class FundServiceImpl implements FundService {
         //其他基金
         for(Fund fund:fundRepository.findAll()){
             PerformanceDataBean res = new PerformanceDataBean(fund);
-            if(!funds.contains(res)){
+            if(!funds.contains(res)&&fund.getAnnualProfit()!=null){
                 others.add(res);
             }
         }
@@ -594,7 +594,7 @@ public class FundServiceImpl implements FundService {
     }
 
     private List<PerformanceDataBean> addFundPerformOfManager(List<PerformanceDataBean> list,String managerId){
-        for(FundHistory fundManager:fundHistoryRepository.findAllByFundCodeAndAndEndDateIsNull(managerId)){
+        for(FundHistory fundManager:fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId)){
             Fund fund = fundRepository.findByCode(fundManager.getFundCode());
             PerformanceDataBean res = new PerformanceDataBean(fund);
             if(fund!=null&&fund.getAnnualProfit()!=null&&!list.contains(res)) {
