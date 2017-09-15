@@ -64,21 +64,23 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public ResultMessage createCombinationByUser(String name, List<FundRatioBean> funds) {
-        User user = userService.getCurrentUser();
-        if (user == null) return ResultMessage.WRONG;
+//        User user = userService.getCurrentUser();
+//        if (user == null) return ResultMessage.WRONG;
         StringBuilder fundsBuilder = new StringBuilder();
         StringBuilder weightsBuilder = new StringBuilder();
 
         for (int i = 0; i < funds.size(); i++) {
             FundRatioBean fundRatioBean = funds.get(i);
             String id = (i == funds.size() - 1) ? fundRatioBean.id : fundRatioBean.id + "|";
+            System.out.println("= - = "+id);
             String ratio = (i == funds.size() - 1) ? String.valueOf(fundRatioBean.ratio) : fundRatioBean.ratio + "|";
+            System.out.println("= - = "+ratio);
             fundsBuilder.append(id);
             weightsBuilder.append(ratio);
         }
 
-        Combination combination = new Combination(0, user.getId(), name, fundsBuilder.toString(), weightsBuilder.toString());
-//        Combination combination = new Combination(0, 123, name, fundsBuilder.toString(), weightsBuilder.toString());
+//        Combination combination = new Combination(0, user.getId(), name, fundsBuilder.toString(), weightsBuilder.toString());
+        Combination combination = new Combination(0, 8, name, fundsBuilder.toString(), weightsBuilder.toString());
 
         String[] fundsArray = combination.getFunds().split("\\|");
         String[] weights = combination.getWeights().split("\\|");
@@ -777,9 +779,9 @@ public class CombinationServiceImpl implements CombinationService {
             beans.add(new FundRatioBean(entry.getKey(), FormatData.fixToTwoAndPercent(entry.getValue())));
         }
 
-//        for (FundRatioBean bean : beans) {
-//            System.out.println("&\t" + bean./id + " " + bean.ratio);
-//        }
+        for (FundRatioBean bean : beans) {
+            System.out.println("&&&\t" + bean.id + " " + bean.ratio);
+        }
 
         return createCombinationByUser(fundCombination.name, beans);
     }
@@ -956,6 +958,7 @@ public class CombinationServiceImpl implements CombinationService {
      */
     private PyAnalysisResult getBasicFactors(List<String> codes, String startDate, String endDate) {
         PyAnalysisResult result = new PyAnalysisResult();
+        System.out.println(":= "+startDate+"\t"+endDate+"\t"+fillBlank(codes));
         String pyRes = PythonUser.usePy(FILE_BACK_ANALYSIS, "1" + " " + startDate + " " + endDate + " " + fillBlank(codes));
         System.out.println("pyRes :" +pyRes);
 

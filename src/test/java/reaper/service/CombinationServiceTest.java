@@ -21,7 +21,7 @@ public class CombinationServiceTest {
 
     @Test
     public void createCombinationByUser() throws Exception {
-        String name = "szs测试用的";
+        String name = "qzh测试用的";
         List<FundRatioBean> funds = new ArrayList<>();
         funds.add(new FundRatioBean("000022", 0.23));
         funds.add(new FundRatioBean("000067", 0.12));

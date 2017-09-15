@@ -19,7 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static reaper.util.FormatData.fixToTwo;
+import static reaper.util.FormatData.*;
 
 /**
  * Created by Sorumi on 17/8/21.
@@ -644,9 +644,9 @@ public class FundServiceImpl implements FundService {
             String attrs[] = line.split(" ");
             //判断是否是日期行
             List<FieldValueBean> data = new ArrayList<>();
-            data.add(new FieldValueBean("择股能力", Double.valueOf(attrs[1])));
-            data.add(new FieldValueBean("择时能力", Double.valueOf(attrs[2])));
-            data.add(new FieldValueBean("市场收益", Double.valueOf(attrs[3])));
+            data.add(new FieldValueBean("择股能力", fixToTwoAndPercent(Double.valueOf(attrs[1]))));
+            data.add(new FieldValueBean("择时能力", fixToTwoAndPercent(Double.valueOf(attrs[2]))));
+            data.add(new FieldValueBean("市场收益", fixToTwoAndPercent(Double.valueOf(attrs[3]))));
 
             res.add(new ChooseBean(attrs[0], data));
         }

@@ -176,7 +176,7 @@ public class ToFieldBean {
         }
         List<FieldValueBean> res = new ArrayList<>();
         res.add(new FieldValueBean("资产配置效益", fixToTwoAndPercent(stockBrinsonResult.getAllocationEffect())));
-        res.add(new FieldValueBean("债券选择效益", fixToTwoAndPercent(stockBrinsonResult.getSelectionEffect())));
+        res.add(new FieldValueBean("股票选择效益", fixToTwoAndPercent(stockBrinsonResult.getSelectionEffect())));
         res.add(new FieldValueBean("交叉效益", fixToTwoAndPercent(stockBrinsonResult.getInteractionEffect())));
         res.add(new FieldValueBean("总超额效益", fixToTwoAndPercent(stockBrinsonResult.getActiveReturn())));
         return res;
@@ -188,7 +188,7 @@ public class ToFieldBean {
         }
         Map<String, Double> res = new HashMap<>();
         res.put("资产配置效益", fixToTwoAndPercent(brisonResult.getAllocationEffect()));
-        res.put("债券选择效益", fixToTwoAndPercent(brisonResult.getSelectionEffect()));
+        res.put("股票选择效益", fixToTwoAndPercent(brisonResult.getSelectionEffect()));
         res.put("交叉效益", fixToTwoAndPercent(brisonResult.getInteractionEffect()));
         res.put("总超额效益", fixToTwoAndPercent(brisonResult.getActiveReturn()));
         return res;

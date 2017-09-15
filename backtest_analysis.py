@@ -284,97 +284,74 @@ class corrDate:
         self.rm = tempRm
         self.rf = tempRf
 
-
-# 市场收益率对象，暂时是从csv文件读取数据，数据库里有该数据可修改成从数据库里读取
+#市场收益率对象，从数据库里读取数据（日更新）
 class Rm:
-    def __init__(self, fileName):
-        self.date = []
-        self.closingPrice = []
-        self.dayRate = []
-        self.monthRate = []
+    def __init__(self):
+        self.date=[]
+        self.closingPrice=[]
+        self.dayRate=[]
+        self.monthRate=[]
 
-        csv_reader = csv.reader(open(fileName))
-        firstRow = 1
-        fundData = []
-        for row in csv_reader:
-            if (1 == firstRow):
-                firstRow = 0
-                continue
-            fundData.append(row)  # 读入每一行数据
+        conn=pymysql.connect(host='106.15.203.173',user='reaper',passwd='reaper112233',db='reaper',port=3306,charset='utf8')
+        cur=conn.cursor()
+        cur.execute('SELECT  date,beforeClosePrice,closePrice FROM basic_stock_index where stockId="000001"')
+        data=cur.fetchall()
+        dataLen=len(data)
+        i=0
 
-        dataLen = len(fundData)
-        i = 0
-        while (i + 20 < dataLen):
-            self.date.append((filter(lambda ch: ch in '-0123456789', fundData[i][0])))
-            curPrice = (float)(filter(lambda ch: ch in '0123456789.', fundData[i][3]))
-            monthAgoPrice = (float)(filter(lambda ch: ch in '0123456789.', fundData[i + 20][3]))  # 设每月20个交易日
+        while(i+20<dataLen):
+            d=data[i]
+            self.date.append((filter(lambda ch: ch in '-0123456789',str(d[0].strftime('%Y-%m-%d')))))
+            beforePrice=(float)(filter(lambda ch: ch in '0123456789.', str(d[1])))
+            curPrice=(float)(filter(lambda ch: ch in '0123456789.', str(d[2])))
+            monthAgoPrice=(float)(filter(lambda ch: ch in '0123456789.', str(data[i+20][2])))#设每月20个交易日
             self.closingPrice.append(curPrice)
-            dateRate = (filter(lambda ch: ch in '-0123456789.', fundData[i][4]))
-            if ('' == dateRate):
-                dateRate = '0'
-            # print dateRate,self.date[-1]
-            self.dayRate.append(float(dateRate) / 100)
-            self.monthRate.append((curPrice - monthAgoPrice) / monthAgoPrice / 100)
-            i += 1
+            dateRate=(curPrice-beforePrice)/beforePrice
+            if(''==dateRate):
+                dateRate='0'
+                #print dateRate,self.date[-1]
+            self.dayRate.append(float(dateRate))
+            self.monthRate.append((curPrice-monthAgoPrice)/monthAgoPrice)
+            i+=1
 
 
-# 无风险收益率对象，暂时是从csv文件读取数据
+#无风险收益率对象，暂时是从csv文件读取数据
 class Rf:
-    def __init__(self, fileName, Treasury=''):
-        self.date = []
-        self.rfDaily = []
-        self.rfWeekly = []
-        self.rfMonthly = []
-        self.rfYearly = []
+    def __init__(self):
+        self.date=[]
+        self.rfDaily=[]
+        self.rfWeekly=[]
+        self.rfMonthly=[]
+        self.rfYearly=[]
 
-        if (Treasury != ''):
-            data = xlrd.open_workbook(Treasury)
+        conn=pymysql.connect(host='106.15.203.173',user='reaper',passwd='reaper112233',db='reaper',port=3306,charset='utf8')
+        cur=conn.cursor()
 
-            table = data.sheets()[0]
-            rm = []
-            r = 1
-            date = datetime(*xldate_as_tuple(table.row_values(r, 0)[0], 0)).strftime('%Y-%m-%d')
-            while (date > '2016-12-30'):  # 用国债数据计算2016/12/30以后的无风险收益率（因为Fund_RiskFree.csv里没有）
-                self.date.append(date)
-                self.rfDaily.append(table.row_values(r, 4)[0])
-                self.rfWeekly.append(
-                    (table.row_values(r, 3)[0] - table.row_values(r + 5, 3)[0]) / table.row_values(r + 5, 3)[0])
-                self.rfMonthly.append(
-                    (table.row_values(r, 3)[0] - table.row_values(r + 20, 3)[0]) / table.row_values(r + 20, 3)[0])
-                self.rfYearly.append(
-                    (table.row_values(r, 3)[0] - table.row_values(r + 246, 3)[0]) / table.row_values(r + 246, 3)[0])
-                r += 1
-                date = datetime(*xldate_as_tuple(table.row_values(r, 0)[0], 0)).strftime('%Y-%m-%d')
-                # print date
+        cur.execute('SELECT date,closePrice,priceFluctuation from basic_stock_index where stockId="000012"')
+        data=cur.fetchall()
+        dataLen=len(data)
+        i=0
+        date=data[i][0].strftime('%Y-%m-%d')
+        while(date>'2016-12-30'):
+            self.date.append(date)
+            self.rfDaily.append(data[i][2])
+            self.rfWeekly.append((data[i][1]-data[i+5][1])/data[i+5][1])
+            self.rfMonthly.append((data[i][1]-data[i+20][1])/data[i+20][1])
+            self.rfYearly.append((data[i][1]-data[i+Number_Of_Trading_Days][1])/data[i+Number_Of_Trading_Days][1])
+            i+=1
+            date=data[i][0].strftime('%Y-%m-%d')
 
-        with open(fileName, 'r') as f:
-            lines = f.readlines()
-            isFirstLine = 1
-            lastLine = lines[-1]
 
-            lineLen = len(lines)
-            i = lineLen - 1 - 1  # 最后一行为空行，舍去
+        cur.execute('SELECT date,rfYearly,rfDaily,rfWeekly,rfMonthly from rf')
+        data=cur.fetchall()
+        dataLen=len(data)
+        for d in data:
+            self.date.append(filter(lambda ch: ch in '0123456789-', str(d[0])))
+            self.rfYearly.append(((float)(filter(lambda ch: ch in '-0123456789.', str(d[1]))))/100)
+            self.rfDaily.append(((float)(filter(lambda ch: ch in '-0123456789.', str(d[2]))))/100)
+            self.rfWeekly.append( ((float)(filter(lambda ch: ch in '-0123456789.', str(d[3]))))/100)
+            self.rfMonthly.append(((float)(filter(lambda ch: ch in '-0123456789.', str(d[4]))))/100)
 
-            while i > 0:
-                line = lines[i]
-                i -= 1
-                if (1 == isFirstLine):
-                    isFirstLine = 0
-                    continue
-                if (line == lastLine):
-                    break
-                date = line[39:58]
-                rfYearly = line[61:76]
-                rfDaily = line[79:92]
-                rfWeekly = line[95:108]
-                rfMonthly = line[111:125]
-
-                self.date.append(filter(lambda ch: ch in '0123456789-', date))
-                # print rfYearly
-                self.rfYearly.append(((float)(filter(lambda ch: ch in '-0123456789.', rfYearly))) / 100)
-                self.rfDaily.append(((float)(filter(lambda ch: ch in '-0123456789.', rfDaily))) / 100)
-                self.rfWeekly.append(((float)(filter(lambda ch: ch in '-0123456789.', rfWeekly))) / 100)
-                self.rfMonthly.append(((float)(filter(lambda ch: ch in '-0123456789.', rfMonthly))) / 100)
 
 
 # TODO unused
@@ -392,9 +369,9 @@ def fundGroup():
 
 # 测试函数
 def test():
-    rm = Rm('000001.csv')  # 读取市场数据
+    rm = Rm()  # 读取市场数据
     # print rm.monthRate
-    rf = Rf('Fund_RiskFree.csv', 'Treasury.xlsx')
+    rf = Rf()
     # print rf.date
     fundDict = {}  # 基金字典，用于查询或管理基金，key为基金代码，value为Fund对象
     # codeList=getCode()
