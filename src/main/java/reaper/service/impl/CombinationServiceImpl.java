@@ -130,7 +130,7 @@ public class CombinationServiceImpl implements CombinationService {
         try {
             double newProfit = 0.0;
             for (int i = 0; i < fundsArray.length; i++) {
-                newProfit += (fundNetValueRepository.findFirstByCodeOrderByDateDesc(fundsArray[i]).getDailyRate() * Double.valueOf(weights[i]) / 100.00);
+                newProfit += (fundNetValueRepository.findFirstByCodeAndUnitNetValueNotNullOrderByDateDesc(fundsArray[i]).getDailyRate() * Double.valueOf(weights[i]) / 100.00);
             }
             combination.setNewProfit(FormatData.fixToTwoAndPercent(newProfit));
         } catch (Exception e) {
