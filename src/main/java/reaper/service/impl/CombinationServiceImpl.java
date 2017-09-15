@@ -213,9 +213,9 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public BacktestReportBean backtestCombination(Integer combinationId, String startDate, String endDate, String baseIndex) throws java.text.ParseException {
-        if (userService.getCurrentUser() == null) {
-            return null;
-        }
+//        if (userService.getCurrentUser() == null) {
+//            return null;
+//        }
 
         BacktestReportBean backtestReportBean = new BacktestReportBean();
         int days = DaysBetween.daysOfTwo(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
@@ -241,7 +241,7 @@ public class CombinationServiceImpl implements CombinationService {
             codes.add(fundRatioNameBean.code);
             fundRatioNameBean.name = fundService.findFundNameByCode(fundRatioNameBean.code).name;
             fundRatioNameBean.weight = FormatData.fixToTwo(Double.parseDouble(combination.getWeights().split("\\|")[i]));
-            weights.add(fundRatioNameBean.weight / 100.00);
+            weights.add(fundRatioNameBean.weight / 100);
 
             backtestReportBean.combination.add(fundRatioNameBean);
         }
@@ -342,7 +342,7 @@ public class CombinationServiceImpl implements CombinationService {
             }
         }
 
-        for (int i = 0; i < netValues.length - 1; i++) {
+        for (int i = 0; i < netValues.length - 2; i++) {
             if (netValues[i] != 0) {
                 ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(dateList.get(i + 1)),
                         FormatData.fixToTwoAndPercent((netValues[i + 1] - netValues[i]) / netValues[i]));
@@ -433,7 +433,7 @@ public class CombinationServiceImpl implements CombinationService {
                     }
                 }
                 double retracement = (lastLargerNetValue - netValues[i]) / netValues[i];
-                maxRetracement = (retracement < maxRetracement) ? retracement : maxRetracement;
+                maxRetracement = (retracement > maxRetracement) ? retracement : maxRetracement;
                 ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(dateList.get(i)),
                         FormatData.fixToTwoAndPercent(retracement));
                 fundRetracementList.add(fundValueDateBean);
