@@ -170,7 +170,15 @@ public class CombinationServiceImpl implements CombinationService {
             miniBean.newProfit = combination.getNewProfit();
             miniBean.volatility = combination.getVolatility();
             miniBean.annualProfit = combination.getAnnualProfit();
-//            miniBean.combination = combination.getWeights();
+            miniBean.combination = new ArrayList<>();
+
+            for (int i = 0; i < combination.getFunds().split("\\|").length; i++) {
+                FundRatioNameBean fundRatioNameBean = new FundRatioNameBean();
+                fundRatioNameBean.code = combination.getFunds().split("\\|")[i];
+                fundRatioNameBean.name = fundService.findFundNameByCode(fundRatioNameBean.code).name;
+                fundRatioNameBean.weight = FormatData.fixToTwo(Double.parseDouble(combination.getWeights().split("\\|")[i]));
+                miniBean.combination.add(fundRatioNameBean);
+            }
 
             combinationMiniBeans.add(miniBean);
         }
