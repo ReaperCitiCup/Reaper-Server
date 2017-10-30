@@ -1,9 +1,12 @@
 package reaper.model;
 
+import reaper.bean.FundRatioNameBean;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.List;
 
 /**
  * @author keenan on 10/09/2017
@@ -51,9 +54,10 @@ public class Combination {
     private Double annualProfit;
 
     /**
-     * 平均相关系数
+     * 波动率
      */
-    private Double correlationCoefficient;
+    private Double volatility;
+
 
     public Combination() {
     }
@@ -122,12 +126,12 @@ public class Combination {
         this.annualProfit = annualProfit;
     }
 
-    public Double getCorrelationCoefficient() {
-        return correlationCoefficient;
+    public Double getVolatility() {
+        return volatility;
     }
 
-    public void setCorrelationCoefficient(Double correlationCoefficient) {
-        this.correlationCoefficient = correlationCoefficient;
+    public void setVolatility(Double volatility) {
+        this.volatility = volatility;
     }
 
     @Override
@@ -141,11 +145,11 @@ public class Combination {
                 ", weights='" + weights + '\'' +
                 ", newProfit=" + newProfit +
                 ", annualProfit=" + annualProfit +
-                ", correlationCoefficient=" + correlationCoefficient +
+                ", volatility=" + volatility +
                 '}';
     }
 
-    public Combination(Integer risk_profit, Integer userid, String name, String funds, String weights, Double newProfit, Double annualProfit, Double correlationCoefficient) {
+    public Combination(Integer risk_profit, Integer userid, String name, String funds, String weights, Double newProfit, Double annualProfit, Double volatility, List<FundRatioNameBean> combination) {
         this.risk_profit = risk_profit;
         this.userid = userid;
         this.name = name;
@@ -153,7 +157,7 @@ public class Combination {
         this.weights = weights;
         this.newProfit = newProfit;
         this.annualProfit = annualProfit;
-        this.correlationCoefficient = correlationCoefficient;
+        this.volatility = volatility;
     }
 
     public Combination(Integer risk_profit, Integer userid, String name, String funds, String weights) {
