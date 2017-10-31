@@ -140,8 +140,21 @@ public class CombinationServiceImpl implements CombinationService {
         }
 
         try {
-            combinationRepository.save(combination);
-            return ResultMessage.SUCCESS;
+            boolean isNameExist = false;
+            for (Combination existCombination : combinationRepository.findCombinationsByUserid(user.getId())) {
+                if (existCombination.getName().equals(name)) {
+                    isNameExist = true;
+                    break;
+                }
+            }
+
+            if (isNameExist) {
+                return ResultMessage.EXIST;
+            } else {
+                combinationRepository.save(combination);
+                return ResultMessage.SUCCESS;
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResultMessage.FAILED;

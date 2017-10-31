@@ -44,6 +44,9 @@ public class CombinationController {
         } else if (resultMessage.equals(ResultMessage.WRONG)) {
             result.result = false;
             result.message = "用户未登录";
+        } else if (resultMessage.equals(ResultMessage.EXIST)) {
+            result.result = false;
+            result.message = "组合名称已存在";
         }
         return result;
     }

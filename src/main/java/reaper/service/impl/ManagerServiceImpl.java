@@ -182,15 +182,16 @@ public class ManagerServiceImpl implements ManagerService {
         //经理所持基金
         try {
             funds = addFundPerformOfManager(funds, managerId);
+
+            //其他基金
+            for (Fund fund : fundRepository.findAll()) {
+                PerformanceDataBean res = new PerformanceDataBean(fund);
+                if (!funds.contains(res) && res.risk <= 50 && res.rate >= -100 && res.rate <= 100) {
+                    others.add(res);
+                }
+            }
         } catch (NullPointerException e) {
             System.out.println(managerId);
-        }
-        //其他基金
-        for (Fund fund : fundRepository.findAll()) {
-            PerformanceDataBean res = new PerformanceDataBean(fund);
-            if (!funds.contains(res) && res.risk <= 50 && res.rate >= -100 && res.rate <= 100) {
-                others.add(res);
-            }
         }
         return new FundPerformanceBean(funds, others);
     }
