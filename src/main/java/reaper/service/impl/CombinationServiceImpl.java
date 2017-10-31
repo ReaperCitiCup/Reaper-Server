@@ -481,7 +481,7 @@ public class CombinationServiceImpl implements CombinationService {
         Collections.reverse(fundRetracementList);
         Collections.reverse(baseRetracementList);
 
-        backtestReportBean.dailyRetracementTrend = new BacktestComparisonBean(, baseRetracementList);
+        backtestReportBean.dailyRetracementTrend = new BacktestComparisonBean(fundRetracementList, baseRetracementList);
         backtestReportBean.maxRetracement = FormatData.fixToTwoAndPercent(maxRetracement);
         System.out.println("每日回撤、最大回撤: " + LocalDateTime.now());
 
