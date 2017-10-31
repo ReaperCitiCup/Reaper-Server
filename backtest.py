@@ -1,17 +1,23 @@
 # -*- coding: utf-8 -*-
-# !/usr/bin/env python
 # @author: xiexian
-# 获得基金的全部数据计算结果，传递的第一个参数为0
-# 获得基金的一段时间数据计算结果，传递的第一个参数为1
+
 import math
 import numpy
 import pandas as pd
 import pymysql
 import sys
+import time
+from datetime import datetime, timedelta
 from sklearn.cross_validation import train_test_split  # 引用交叉验证
 from sklearn.linear_model import LinearRegression
 
 Number_Of_Trading_Days = 245  # 一年的交易日个数
+print "before conn", time.time()
+conn = pymysql.connect(host='106.15.203.173', user='reaper', passwd='reaper112233', db='reaper', port=3306,
+                       charset='utf8')
+cur = conn.cursor()
+# print "after conn", time.time()
+fundDict = {}
 
 
 # 计算标准差,参数类型：列表
@@ -56,7 +62,7 @@ def countBeta(resultRate, marketRate):
     y = marketRate
     cov = countCovariance(x, y)
     var = numpy.var(marketRate)
-    if (0 == var):
+    if 0 == var:
         return 0
     beta = (float)(cov) / var
     return beta
@@ -82,7 +88,6 @@ def countSharpeRatio(resultRate, rf):
         return (Erp - Erf) / std
 
 
-# TODO unused
 # 计算两个序列的相关系数，参数类型：列表
 def countCorrelation(r1, r2):
     return countCovariance(r1, r2) / (numpy.std(r1) * numpy.std(r2))
@@ -110,6 +115,8 @@ def annualizedRate(dailyRate):
 
 # 计算特雷诺比率，参数类型：前两个为列表，beta为数值
 def TreynorRatio(resultRate, rf, beta):
+    if (0 == beta):
+        return 0
     Erp = sum(resultRate) / len(resultRate)
     Erf = sum(rf) / len(rf)
     return (Erp - Erf) / beta
@@ -132,14 +139,13 @@ def ListSubSqare(l1, l2):
     return rtn
 
 
-# TODO unsed
 # 获取数据库里基金的所有代码
 def getCode():
     try:
-        conn = pymysql.connect(host='106.15.203.173', user='reaper', passwd='reaper112233', db='reaper', port=3306,
-                               charset='utf8')
-        cur = conn.cursor()  # 获取一个游标
+        # cur = conn.cursor()  # 获取一个游标
+        print 'getCode', time.time()
         cur.execute('SELECT  distinct code FROM reaper.fund_netValue')
+        print 'getCode - end', time.time()
         data = cur.fetchall()
         code = []
         for d in data:
@@ -162,27 +168,27 @@ class Fund:
 def getFund(code):
     fund = Fund(code)
     try:
-        conn = pymysql.connect(host='106.15.203.173', user='reaper', passwd='reaper112233', db='reaper', port=3306,
-                               charset='utf8')
-        cur = conn.cursor()
+        # cur = conn.cursor()
+        print 'getFund', time.time()
         cur.execute('SELECT  date,unitNetValue,dailyRate FROM reaper.fund_netValue WHERE code=' + code)
+        print 'getFund - end', time.time()
         data = cur.fetchall()
         for d in data:
             fund.date.append((str(d[0]))[:10])  # 去掉时分秒
             nav = filter(lambda ch: ch in '0123456789.', str(d[1]))
-            if ('' == nav):
+            if '' == nav:
                 appNav = sum(fund.nav[-11:-1]) / 10
                 fund.nav.append(appNav)
             else:
                 fund.nav.append(float(nav))
 
             dailyRate = filter(lambda ch: ch in '-0123456789.', str(d[2]))
-            if ('' == dailyRate):
+            if '' == dailyRate:
                 dIndex = data.index(d)
                 appDailyRate = 0
-                if (dIndex + 1 < len(data)):
+                if dIndex + 1 < len(data):
                     yesterdayNav = filter(lambda ch: ch in '-0123456789.', str(data[dIndex + 1][1]))
-                    if (yesterdayNav != ''):
+                    if yesterdayNav != '':
                         yesterdayNav = float(yesterdayNav)
                         appDailyRate = (fund.nav[-1] - yesterdayNav) / yesterdayNav
                     else:
@@ -200,25 +206,25 @@ def getFund(code):
 
 
 # 解决日期与收益率以及净值的对应问题，返回的对象的属性包括：
-# 各个日期序列的并值，以及该时间序列对应的基金收益率，市场收益率和无风险利率(通过相同的下标对应，如fundRate[i],rm[i],rf[i]同为date[i]这一天的数据）
+# 各个日期序列的交集，以及该时间序列对应的基金收益率，市场收益率和无风险利率(通过相同的下标对应，如fundRate[i],rm[i],rf[i]同为date[i]这一天的数据）
 class corrDate:
     def __init__(self, date1, l1, date2, l2, date3=0, l3=0):
-        self.date = []  # date1，date2，date3这三个日期序列的并值
+        self.date = []  # date1，date2，date3这三个日期序列的交集
         self.fundRate = []
         self.rm = []
         self.rf = []
-        if (0 == date3):  # 只有两个时间序列的情况
+        if 0 == date3:  # 只有两个时间序列的情况
             i1 = 0
             i2 = 0
-            while (i1 < len(date1) and i2 < len(date2)):
-                if (date1[i1] > date2[i2]):
-                    while (i1 < len(date1) and date1[i1] > date2[i2]):
+            while i1 < len(date1) and i2 < len(date2):
+                if date1[i1] > date2[i2]:
+                    while i1 < len(date1) and date1[i1] > date2[i2]:
                         i1 += 1
                 else:
-                    while (i2 < len(date2) and date2[i2] > date1[i1]):
+                    while i2 < len(date2) and date2[i2] > date1[i1]:
                         i2 += 1
 
-                if (i1 < len(date1) and i2 < len(date2)):
+                if i1 < len(date1) and i2 < len(date2):
                     # 此处有date1[i1]=date2[i2]
                     self.date.append(date1[i1])
                     self.fundRate.append(l1[i1])
@@ -229,28 +235,28 @@ class corrDate:
             i1 = 0
             i2 = 0
             i3 = 0
-            while (i1 < len(date1) and i2 < len(date2) and i3 < len(date3)):
+            while i1 < len(date1) and i2 < len(date2) and i3 < len(date3):
                 if ((date1[i1] < date2[i2] or date1[i1] == date2[i2]) and (
                                 date1[i1] < date3[i3] or date1[i1] == date3[i3])):
-                    while (i2 < len(date2) and date1[i1] < date2[i2]):
+                    while i2 < len(date2) and date1[i1] < date2[i2]:
                         i2 += 1
-                    while (i3 < len(date3) and date1[i1] < date3[i3]):
+                    while i3 < len(date3) and date1[i1] < date3[i3]:
                         i3 += 1
 
                 elif ((date2[i2] < date1[i1] or date2[i2] == date1[i1]) and (
                                 date2[i2] < date3[i3] or date2[i2] == date3[i3])):
-                    while (i1 < len(date1) and date2[i2] < date1[i1]):
+                    while i1 < len(date1) and date2[i2] < date1[i1]:
                         i1 += 1
-                    while (i3 < len(date3) and date2[i2] < date3[i3]):
+                    while i3 < len(date3) and date2[i2] < date3[i3]:
                         i3 += 1
 
                 else:
-                    while (i1 < len(date1) and date3[i3] < date1[i1]):
+                    while i1 < len(date1) and date3[i3] < date1[i1]:
                         i1 += 1
-                    while (i2 < len(date2) and date3[i3] < date2[i2]):
+                    while i2 < len(date2) and date3[i3] < date2[i2]:
                         i2 += 1
 
-                if (i1 < len(date1) and i2 < len(date2) and i3 < len(date3)):
+                if i1 < len(date1) and i2 < len(date2) and i3 < len(date3):
                     self.date.append(date1[i1])
                     self.fundRate.append(l1[i1])
                     self.rm.append(l2[i2])
@@ -266,9 +272,9 @@ class corrDate:
         tempFundRate = []
         tempRm = []
         tempRf = []
-        while (i < len(self.date) and self.date[i] > endTime):
+        while i < len(self.date) and self.date[i] > endTime:
             i += 1
-        while (i < len(self.date) and self.date[i] >= startTime):
+        while i < len(self.date) and self.date[i] >= startTime:
             tempDate.append(self.date[i])
             tempFundRate.append(self.fundRate[i])
             tempRm.append(self.rm[i])
@@ -289,15 +295,14 @@ class Rm:
         self.dayRate = []
         self.monthRate = []
 
-        conn = pymysql.connect(host='106.15.203.173', user='reaper', passwd='reaper112233', db='reaper', port=3306,
-                               charset='utf8')
-        cur = conn.cursor()
+        print 'Rm', time.time()
         cur.execute('SELECT  date,beforeClosePrice,closePrice FROM basic_stock_index where stockId="000001"')
+        print 'Rm - end', time.time()
         data = cur.fetchall()
         dataLen = len(data)
         i = 0
 
-        while (i + 20 < dataLen):
+        while i + 20 < dataLen:
             d = data[i]
             self.date.append((filter(lambda ch: ch in '-0123456789', str(d[0].strftime('%Y-%m-%d')))))
             beforePrice = (float)(filter(lambda ch: ch in '0123456789.', str(d[1])))
@@ -305,15 +310,14 @@ class Rm:
             monthAgoPrice = (float)(filter(lambda ch: ch in '0123456789.', str(data[i + 20][2])))  # 设每月20个交易日
             self.closingPrice.append(curPrice)
             dateRate = (curPrice - beforePrice) / beforePrice
-            if ('' == dateRate):
+            if '' == dateRate:
                 dateRate = '0'
-                # print dateRate,self.date[-1]
             self.dayRate.append(float(dateRate))
             self.monthRate.append((curPrice - monthAgoPrice) / monthAgoPrice)
             i += 1
 
 
-# 无风险收益率对象，暂时是从csv文件读取数据
+# 无风险收益率对象，从数据库读取数据（日更）
 class Rf:
     def __init__(self):
         self.date = []
@@ -322,16 +326,13 @@ class Rf:
         self.rfMonthly = []
         self.rfYearly = []
 
-        conn = pymysql.connect(host='106.15.203.173', user='reaper', passwd='reaper112233', db='reaper', port=3306,
-                               charset='utf8')
-        cur = conn.cursor()
-
+        print 'Rf1', time.time()
         cur.execute('SELECT date,closePrice,priceFluctuation from basic_stock_index where stockId="000012"')
+        print 'Rf1 - end', time.time()
         data = cur.fetchall()
-        dataLen = len(data)
         i = 0
         date = data[i][0].strftime('%Y-%m-%d')
-        while (date > '2016-12-30'):
+        while date > '2016-12-30':
             self.date.append(date)
             self.rfDaily.append(data[i][2])
             self.rfWeekly.append((data[i][1] - data[i + 5][1]) / data[i + 5][1])
@@ -341,9 +342,10 @@ class Rf:
             i += 1
             date = data[i][0].strftime('%Y-%m-%d')
 
+        print 'Rf2', time.time()
         cur.execute('SELECT date,rfYearly,rfDaily,rfWeekly,rfMonthly from rf')
+        print 'Rf2 - end', time.time()
         data = cur.fetchall()
-        dataLen = len(data)
         for d in data:
             self.date.append(filter(lambda ch: ch in '0123456789-', str(d[0])))
             self.rfYearly.append(((float)(filter(lambda ch: ch in '-0123456789.', str(d[1])))) / 100)
@@ -352,119 +354,153 @@ class Rf:
             self.rfMonthly.append(((float)(filter(lambda ch: ch in '-0123456789.', str(d[4])))) / 100)
 
 
-# TODO unused
-# 构造基金组合，待续
-def fundGroup():
-    fundDict = {}
-    codeList = []  # 前端应该传来的用于构造基金组合的数据
-    pencentage = []  # codeList为用户所选的组合中所用基金的代码（列表类型），pencentage为组合中所用基金占组合的百分比（也为列表类型，与codeList通过下标对应，如pencentage[i]表示基金代码为codeList[i]的基金占组合的百分比）
+# 构造基金组合
+def fundGroup(codeList, pencentage):
+    code0 = codeList[0]
+    if len(codeList) != len(pencentage):
+        print "基金代码序列和百分比序列长度不一致\n"
+        return
+    # 前端应该传来的用于构造基金组合的数据
+    # codeList为用户所选的组合中所用基金的代码（列表类型），pencentage为组合中所用基金占组合的百分比（也为列表类型，与codeList通过下标对应，如pencentage[i]表示基金代码为codeList[i]的基金占组合的百分比）
+    minEndDate = '9999-12-30'
+    maxStartDate = '1000-01-01'
     for code in codeList:
         fundDict[code] = getFund(code)  # 获取组合中各个基金的信息
-
+        if fundDict[code].date[-1] > maxStartDate:
+            maxStartDate = fundDict[code].date[-1]  # 时间序列是按逆序存放的
+        if fundDict[code].date[0] < minEndDate:
+            minEndDate = fundDict[code].date[0]
     myFundGroup = Fund("myFundGroup")  # 创建一个空的基金组合对象，加权平均后的数据可放到这个对象中
-    # 。。。
+    maxStartTime = datetime.strptime(maxStartDate, '%Y-%m-%d')
+    minEndTime = datetime.strptime(minEndDate, '%Y-%m-%d')
+    days = (minEndTime - maxStartTime).days
+    index = []  # 各个基金的下标列表
+    for i in range(len(codeList)):
+        index.append(0)
+    if days <= 0:
+        print '这两个基金的数据没有交集\n'
+        return
+    breakFlag = 0
+    curDays = 0
+    while curDays < days:
+
+        curTime = minEndTime - timedelta(days=curDays)  # 从结束时间开始
+        for i in range(len(codeList)):
+            while (index[i] < len(fundDict[codeList[i]].date) and fundDict[codeList[i]].date[
+                index[i]] > curTime.strftime('%Y-%m-%d')):
+                index[i] += 1
+
+        for i in range(len(codeList)):
+            if index[i] >= len(fundDict[codeList[i]].date):
+                breakFlag = 1
+                break
+        if 1 == breakFlag:
+            break
+
+        if (fundDict[code0].date[index[0]] != curTime.strftime('%Y-%m-%d')):  # 如果今天不是交易日
+            curDays += 1
+            continue
+        myFundGroup.date.append(fundDict[codeList[0]].date[index[0]])
+        curRate = 0
+        for i in range(len(pencentage)):
+            curRate += fundDict[codeList[i]].dailyRate[index[i]] * pencentage[i]
+        myFundGroup.dailyRate.append(curRate)
+        curDays += 1
+
+    return myFundGroup
 
 
-# 测试函数
-def test():
-    rm = Rm()  # 读取市场数据
-    # print rm.monthRate
-    rf = Rf()
-    # print rf.date
-    fundDict = {}  # 基金字典，用于查询或管理基金，key为基金代码，value为Fund对象
-    # codeList=getCode()
-    # for code in codeList:
-    #    fundDict[code]=getFund(code)
-    if int(sys.argv[1]) == 0:
-        lists = [[]] * (len(sys.argv) - 2)
-        for i in range(2, len(sys.argv)):
-            code = str(sys.argv[i])  # 前端点击查看某只基金的信息后，传来该基金的代码，赋值到这里，便可获取该基金的信息并计算各种风险因子
-            fundDict[code] = getFund(code)
+def countFundCorrelation(code0, code1):  # 计算相关系数的函数，参数：两个基金代码
+    fund0 = fundDict[code0]
+    fund0CorrDate = corrDate(fund0.date, fund0.dailyRate, rm.date, rm.dayRate, rf.date, rf.rfMonthly)
+    fund1 = fundDict[code1]
+    fund1CorrDate = corrDate(fund1.date, fund1.dailyRate, rm.date, rm.dayRate, rf.date, rf.rfMonthly)
 
-            temp = corrDate(fundDict[code].date, fundDict[code].dailyRate, rm.date, rm.dayRate, rf.date, rf.rfMonthly)
-            # 统一日期，并返回统一后的日期序列和该日期序列对应的基金收益率序列/市场收益率序列/无风险利率序列,市场数据用的是日收益率，无风险利率用的是月收益率
-
-            beta = countBeta(temp.fundRate, temp.rm)
-            alpha = countAlpha(temp.fundRate, temp.rm, temp.rf, beta)
-
-            print "*", code, "年化收益率=", annualizedRate(fundDict[code].dailyRate)
-            print "*", code, "年化波动率=", annualizedVolatility(temp.fundRate)
-            print "*", code, "在险价值=", countValue_at_risk(annualizedVolatility(temp.fundRate))
-            print "*", code, "收益率序列的下行标准差=", downsideStdDev(temp.fundRate, temp.rf)
-            print "*", code, "夏普比=", countSharpeRatio(temp.fundRate, temp.rf)
-            print "*", code, "beta=", beta
-            # for i in range(len(alpha)):
-            # print temp.date[i]+"对应的alpha值为",alpha[i]
-            print "*", code, "特雷诺指数=", TreynorRatio(temp.fundRate, temp.rf, beta)
-
-            # T-M回归模型（详情见指标数据归纳.pdf)
-            y = ListSub(temp.fundRate, temp.rf)
-            x1 = ListSub(temp.rm, temp.rf)
-            x2 = ListSubSqare(temp.rm, temp.rf)
-            obj_dict = {'y': y, 'x1': x1, 'x2': x2}
-            data = pd.DataFrame(obj_dict)  # 通过字典创建dataframe
-            # data.to_csv("testfoo.csv")
-            x = data[['x1', 'x2']]
-            y = data['y']
-            X_train, X_test, y_train, y_test = train_test_split(x, y, random_state=1)
-            linreg = LinearRegression()
-            model = linreg.fit(X_train, y_train)
-            # print model
-            print "*", code, "择股系数=", linreg.intercept_
-            print "*", code, "择时系数=", linreg.coef_[1]
-            # for j in range(0, len(lists)):
-            #     for k in range(j + 1, len(lists)):
-            #         print "##", str(sys.argv[j + 2]), str(sys.argv[k + 2]), countCorrelation(lists[j], lists[k])
-
-    if int(sys.argv[1]) == 1:
-        # 计算某段时间内的各种基金指标
-        lists = [[]] * (len(sys.argv) - 4)
-        before = str(sys.argv[2])
-        after = str(sys.argv[3])
-        for i in range(4, len(sys.argv)):
-            code = str(sys.argv[i])
-
-            # code = '000003'  # 前端点击查看某只基金的信息后，传来该基金的代码，赋值到这里，便可获取该基金的信息并计算各种风险因子
-            fundDict[code] = getFund(code)
-            # -----------------------------------------------------------------------------------
-            lists[i - 4] = fundDict[code].dailyRate
-            # -----------------------------------------------------------------------------------
-            temp = corrDate(fundDict[code].date, fundDict[code].dailyRate, rm.date, rm.dayRate, rf.date, rf.rfMonthly)
-            temp.countByDate(before,
-                             after)  # 若要计算 某段时间内 的波动率，则要先调用这个函数，参数为开始和截至日期，类型为字符串，格式为'yyyy-mm-dd'(五月六号的5和6前的0不能省略）
-            # 然后用temp的属性计算出来的波动率就是这段时间内的了（前提是目标基金/市场收益率/无风险利率有这段时间内的数据）
-            # 计算方法同上
-            beta = countBeta(temp.fundRate, temp.rm)
-            alpha = countAlpha(temp.fundRate, temp.rm, temp.rf, beta)
-            # -----------------------------------------------------------------------------------
-            print "#", code, "年化收益率=", annualizedRate(fundDict[code].dailyRate)
-            print "#", code, "年化波动率=", annualizedVolatility(temp.fundRate)
-            print "#", code, "在险价值=", countValue_at_risk(annualizedVolatility(temp.fundRate))
-            print "#", code, "收益率序列的下行标准差=", downsideStdDev(temp.fundRate, temp.rf)
-            print "#", code, "夏普比=", countSharpeRatio(temp.fundRate, temp.rf)
-            print "#", code, "beta=", beta
-            print "#", code, "特雷诺指数=", TreynorRatio(temp.fundRate, temp.rf, beta)
-            # -----------------------------------------------------------------------------------
-
-            # T-M回归模型的计算也同上
-            y = ListSub(temp.fundRate, temp.rf)
-            x1 = ListSub(temp.rm, temp.rf)
-            x2 = ListSubSqare(temp.rm, temp.rf)
-            obj_dict = {'y': y, 'x1': x1, 'x2': x2}
-            data = pd.DataFrame(obj_dict)  # 通过字典创建dataframe
-            # data.to_csv("testfoo.csv")
-            x = data[['x1', 'x2']]
-            y = data['y']
-            X_train, X_test, y_train, y_test = train_test_split(x, y, random_state=1)
-            linreg = LinearRegression()
-            model = linreg.fit(X_train, y_train)
-            # print model
-            print "#", code, "择股系数=", linreg.intercept_
-            print "#", code, "择时系数=", linreg.coef_[1]
-
-        for j in range(0, len(lists)):
-            for k in range(j + 1, len(lists)):
-                print "#", str(sys.argv[j + 4]), str(sys.argv[k + 4]), countCorrelation(lists[j], lists[k])
+    print "# ", code0, code1, countCorrelation(fund0CorrDate.fundRate, fund1CorrDate.fundRate)
 
 
-test()
+# 基金组合测试函数
+def fundGroupTest(codeList, pencentage, startTime, endTime):
+    code = 'myFundGroup'
+    fundDict[code] = fundGroup(codeList, pencentage)
+
+    temp = corrDate(fundDict[code].date, fundDict[code].dailyRate, rm.date, rm.dayRate, rf.date, rf.rfMonthly)
+
+    temp.countByDate(startTime, endTime)
+    temp = corrDate(fundDict[code].date, fundDict[code].dailyRate, rm.date, rm.dayRate, rf.date, rf.rfMonthly)
+
+    temp.countByDate(startTime, endTime)
+
+    y = ListSub(temp.fundRate, temp.rf)
+    x1 = ListSub(temp.rm, temp.rf)
+    x2 = ListSubSqare(temp.rm, temp.rf)
+    obj_dict = {'y': y, 'x1': x1, 'x2': x2}
+    data = pd.DataFrame(obj_dict)  # 通过字典创建dataframe
+    x = data[['x1', 'x2']]
+    y = data['y']
+    X_train, X_test, y_train, y_test = train_test_split(x, y, random_state=1)
+    linreg = LinearRegression()
+
+    model = linreg.fit(X_train, y_train)
+
+    rmSubSqareRfAvg = sum(x2) / len(x2)
+
+    print "# 择股系数=", linreg.intercept_
+    print "市场收益率为", sum(temp.rm)
+    print "# 择时系数=", linreg.coef_[1] * rmSubSqareRfAvg
+
+    temp = corrDate(fundDict[code].date, fundDict[code].dailyRate, rm.date, rm.dayRate, rf.date, rf.rfMonthly)
+
+    temp.countByDate(startTime, endTime)
+
+    beta = countBeta(temp.fundRate, temp.rm)
+
+    print "# beta=", beta
+
+    print "# 年化收益率=", annualizedRate(temp.fundRate)
+
+    print "# 年化波动率=", annualizedVolatility(temp.fundRate)
+
+    print "# 在险价值=", countValue_at_risk(annualizedVolatility(temp.fundRate))
+
+    print "# 下行标准差=", downsideStdDev(temp.fundRate, temp.rf)
+
+    print "# 夏普比=", countSharpeRatio(temp.fundRate, temp.rf)
+
+    print "# 特雷诺指数=", TreynorRatio(temp.fundRate, temp.rf, beta)
+
+
+print "1", time.time()
+rm = Rm()  # 读取市场数据
+print "2", time.time()
+rf = Rf()  # 读取无风险利率
+codeList = []
+percentage = []
+
+print "3", time.time()
+sys_param_len = len(sys.argv)
+for index in range(3, sys_param_len):
+    if index % 2 == 1:
+        codeList.append(sys.argv[index])
+    else:
+        percentage.append(float(sys.argv[index]))
+
+# 计算指标
+print "4", time.time()
+fundGroupTest(codeList, percentage, sys.argv[1], sys.argv[2])
+
+# 计算相关系数
+print "5", time.time()
+code_list_len = len(codeList)
+for j in range(code_list_len):
+    code0 = codeList[j]
+    for k in range(j + 1, code_list_len):
+        code1 = codeList[k]
+        countFundCorrelation(code0, code1)
+
+cur.close()
+conn.close()
+
+print "end", time.time()
+
+# python backtest.py 2017-07-08 2017-09-08 000022 0.23 000067 0.12 000069 0.09 000003 0.18 000085 0.04 000091 0.34

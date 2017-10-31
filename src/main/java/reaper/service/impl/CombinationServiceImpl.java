@@ -21,8 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static reaper.util.CodeFormatUtil.fillBlank;
-import static reaper.util.CodeFormatUtil.getCodeList;
+import static reaper.util.CodeFormatUtil.*;
 
 /**
  * @author keenan on 08/09/2017
@@ -292,6 +291,7 @@ public class CombinationServiceImpl implements CombinationService {
 
         /**
          * 组合期末净值、期初净值、夏普比率
+         * TODO 夏普比率
          */
         double[] netValues = new double[days];
         double[] dailyRates = new double[days];
@@ -322,6 +322,7 @@ public class CombinationServiceImpl implements CombinationService {
 
         /**
          * 区间年化收益、累积收益、最终净值
+         * TODO 年化收益
          */
         double fundAnnualProfit = 0.0;
         if (days < 365) {
@@ -339,6 +340,7 @@ public class CombinationServiceImpl implements CombinationService {
 
         /**
          * 波动率：收益率的标准差
+         * TODO 波动率
          */
         backtestReportBean.volatility = FormatData.fixToTwo(Calculator.calStandardDeviation(dailyRates));
 
@@ -841,21 +843,9 @@ public class CombinationServiceImpl implements CombinationService {
         List<String> sorted = new ArrayList<>(codes);
         Collections.sort(sorted);
         String[] strings = codes.toArray(new String[codes.size()]);
-//        for(int i=0;i<strings.length;i++){
-//            System.out.print(strings[i]+"\t");
-//        }
-//        System.out.println();
         Double[] input_kind_array = input_kind.toArray(new Double[input_kind.size()]);
-//        for(int i=0;i<input_kind_array.length;i++){
-//            System.out.print(input_kind_array[i]+"\t");
-//        }
-//        System.out.println();
 
         Double[] input_weight_array = input_weight.toArray(new Double[input_weight.size()]);
-//        for(int i=0;i<input_weight_array.length;i++){
-//            System.out.print(input_weight_array[i]+"\t");
-//        }
-//        System.out.println();
 
         /**
          * 资产间分散需要的参数
@@ -893,7 +883,6 @@ public class CombinationServiceImpl implements CombinationService {
                 String[] res = null;
                 if (result != null && result.length != 0) {
                     System.out.println(result[0].toString());
-//                    res = result[0].toString().replaceAll("[ ]+", " ").split(" ");
                     res = result[0].toString().split("\n");
                 } else {
                     return Collections.EMPTY_MAP;
@@ -1082,6 +1071,58 @@ public class CombinationServiceImpl implements CombinationService {
                 result.zsxs.put(values[1], Double.valueOf(values[3]));
             }
         }
+        return result;
+    }
+
+    /**
+     * 调用python代码 可得到年化收益率，年化波动率，在险价值，收益率序列的下行标准差，夏普比率，beta，特雷诺指数，择股系数，择时系数，相关系数
+     *
+     * @param codeList   代码
+     * @param percentage 占比
+     * @param startDate  开始日期
+     * @param endDate    结束日期
+     * @return
+     */
+    private PyAnalysisResult getBasicFactors(List<String> codeList, List<Double> percentage, String startDate, String endDate) {
+        PyAnalysisResult result = new PyAnalysisResult();
+        String pyRes = PythonUser.usePy("backtest.py", startDate + " " + endDate + " " + combineAndFillBlank(codeList, percentage));
+
+        String[] lines = pyRes.split("\n");
+        List<String> useful = new ArrayList<>();
+        for (String line : lines) {
+            if (line.startsWith("#")) {
+                useful.add(line);
+            }
+        }
+
+        List<PyAnalysisResult.CorrelationCoefficient> coefficients = new ArrayList<>();
+        for (String each : useful) {
+            String[] values = each.split(" ");
+            if (values[2].equals("年化收益率=")) {
+                result.nhsyl.put(values[1], Double.valueOf(values[3]));
+            } else if (values[2].equals("年化波动率=")) {
+                result.nhbdl.put(values[1], Double.valueOf(values[3]));
+            } else if (values[2].equals("在险价值=")) {
+                result.zxjz.put(values[1], Double.valueOf(values[3]));
+            } else if (values[2].equals("下行标准差=")) {
+                result.xxbzc.put(values[1], Double.valueOf(values[3]));
+            } else if (values[2].equals("夏普比=")) {
+                result.sharpe.put(values[1], Double.valueOf(values[3]));
+            } else if (values[2].equals("beta=")) {
+                result.beta.put(values[1], Double.valueOf(values[3]));
+            } else if (values[2].equals("特雷诺指数=")) {
+                result.tln.put(values[1], Double.valueOf(values[3]));
+            } else if (values[2].equals("择股系数=")) {
+                result.zgxs.put(values[1], Double.valueOf(values[3]));
+            } else if (values[2].equals("择时系数=")) {
+                result.zsxs.put(values[1], Double.valueOf(values[3]));
+            } else {
+                PyAnalysisResult.CorrelationCoefficient correlationCoefficient = result.new CorrelationCoefficient(values[1], values[2], Double.valueOf(values[3]));
+                coefficients.add(correlationCoefficient);
+            }
+        }
+
+        result.setPjxgxs(coefficients);
         return result;
     }
 
