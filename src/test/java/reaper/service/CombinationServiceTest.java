@@ -63,7 +63,7 @@ public class CombinationServiceTest {
         if (reportBean == null) {
             System.out.println("null");
         } else {
-            System.out.println(reportBean.toString());
+//            System.out.println(reportBean.toString());
         }
     }
 
