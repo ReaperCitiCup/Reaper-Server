@@ -10,8 +10,7 @@ import java.time.LocalDateTime;
  */
 @Component
 public class SchedulerUtil {
-    //    @Scheduled(cron = "0 0 3 * * ?")
-    @Scheduled(fixedRate = 3000)
+    @Scheduled(cron = "0 0 3 * * ?")
     public void sayHello() throws Exception {
         System.out.println("Hello " + LocalDateTime.now());
     }
