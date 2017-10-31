@@ -53,7 +53,7 @@ public class CombinationServiceTest {
 
     @Test
     public void backtestCombination() throws Exception {
-        Integer combinationId = 26;
+        Integer combinationId = 40;
         String startDate = "2016-06-30";
         String endDate = "2016-08-31";
         String baseIndex = "上证指数";
