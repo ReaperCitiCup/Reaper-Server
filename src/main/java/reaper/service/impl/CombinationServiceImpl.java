@@ -477,7 +477,11 @@ public class CombinationServiceImpl implements CombinationService {
             }
         }
 
-        backtestReportBean.dailyRetracementTrend = new BacktestComparisonBean(fundRetracementList, baseRetracementList);
+        // 前端不展示倒排日期的list
+        Collections.reverse(fundRetracementList);
+        Collections.reverse(baseRetracementList);
+
+        backtestReportBean.dailyRetracementTrend = new BacktestComparisonBean(, baseRetracementList);
         backtestReportBean.maxRetracement = FormatData.fixToTwoAndPercent(maxRetracement);
         System.out.println("每日回撤、最大回撤: " + LocalDateTime.now());
 
