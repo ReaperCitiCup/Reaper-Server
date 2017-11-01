@@ -1,11 +1,5 @@
 package reaper.service.impl;
 
-import Asset_Allocation.Asset_Allocation;
-import Asset_Allocation_Factor.Asset_Allocation_Factor;
-import com.mathworks.toolbox.javabuilder.MWArray;
-import com.mathworks.toolbox.javabuilder.MWCharArray;
-import com.mathworks.toolbox.javabuilder.MWException;
-import com.mathworks.toolbox.javabuilder.MWNumericArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reaper.bean.*;
@@ -15,14 +9,16 @@ import reaper.service.CombinationService;
 import reaper.service.FundService;
 import reaper.service.UserService;
 import reaper.util.*;
+import reaper.util.backtest_util.PyAnalysisResult;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static reaper.util.CodeFormatUtil.combineAndFillBlank;
-import static reaper.util.CodeFormatUtil.getCodeList;
+import static reaper.util.backtest_util.BackTestPyAnalysisGetter.getBasicFactors;
+import static reaper.util.backtest_util.PortfolioMatlabResultGetter.calComponentWeight;
+import static reaper.util.backtest_util.PortfolioTargetPathPythonGetter.getTargetPathCodes;
 
 /**
  * @author keenan on 08/09/2017
@@ -42,7 +38,6 @@ public class CombinationServiceImpl implements CombinationService {
     private StockBrinsonResultRepository stockBrinsonResultRepository;
     @Autowired
     private BrisonResultRepository brisonResultRepository;
-
     @Autowired
     private FundService fundService;
     @Autowired
@@ -50,8 +45,6 @@ public class CombinationServiceImpl implements CombinationService {
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    private static final String FILE_BACK_ANALYSIS = "backtest.py";
-    private static final String FILE_TARGET_PATH = "target_path.py";
 
     /**
      * 自定创建组合
@@ -752,251 +745,6 @@ public class CombinationServiceImpl implements CombinationService {
         }
 
         return createCombinationByUser(fundCombination.name, beans, fundCombination.profitRiskTarget);
-    }
-
-    /**
-     * 创建组合时获得各基金的权重 matlab调用
-     *
-     * @param codes         基金代码
-     * @param portfolioType 分散化方法类型
-     * @return <基金代码, 权重(未百分化的double)>
-     */
-    private Map<String, Double> calComponentWeight(List<String> codes, int portfolioType, List<Double> input_kind, List<Double> input_weight, int uncentralize_type, double profitRate) {
-        Map<String, Double> resultMap = new HashMap<>();
-        List<String> sorted = new ArrayList<>(codes);
-        Collections.sort(sorted);
-        String[] strings = codes.toArray(new String[codes.size()]);
-        Double[] input_kind_array = input_kind.toArray(new Double[input_kind.size()]);
-
-        Double[] input_weight_array = input_weight.toArray(new Double[input_weight.size()]);
-
-        /**
-         * 资产间分散需要的参数
-         *
-         *  String[] codes = {"000005","150039","002853","519746","150197","000007"};
-         *  double[] input_kind={1,1,1,2,2,2};//输入资产的种类，1代表债券型基金，2代表股票型基金，3代表混合型
-         *  double[] input_weight={0.7,0.3,0};//大类资产配置的比例，债券型0.7，股票型0.3，混合型0
-
-         *  输入input_kind的长度必须和codes对应，input_weight(m3)指
-         *  大类资产比例（0.7指所有债券基金配置比例和占70%，0.3指股票型基金配置比例和占30%）
-         *  这个参数应该是前面选择时保留下来的，如果配置比例是0.6,0.4,0，就相应调整。
-         *  另外，codes,input_kind与input_weight是互相对应，上面的初始化表示"000005","150039","002853"
-         *  这三支基金是债券型基金，其配置的比例和为0.7，"519746","150197","000007"是股票型基金，其
-         *  配置的比例之和为0.3。
-         */
-        if (uncentralize_type == 1) {
-            Object[] result = null;
-            Asset_Allocation assetAllocation = null;
-            MWCharArray funds = null;
-            MWNumericArray pType = null;
-            MWNumericArray inputKind = null;
-            MWNumericArray inputWeight = null;
-
-            try {
-                funds = new MWCharArray(strings);
-                pType = new MWNumericArray(portfolioType);
-                inputKind = new MWNumericArray(input_kind_array);
-                inputWeight = new MWNumericArray(input_weight_array);
-                assetAllocation = new Asset_Allocation();
-                if (portfolioType == 2) {
-                    result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight, new MWNumericArray(profitRate));
-                } else {
-                    result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight);
-                }
-                String[] res = null;
-                if (result != null && result.length != 0) {
-                    System.out.println(result[0].toString());
-                    res = result[0].toString().split("\n");
-                } else {
-                    return Collections.EMPTY_MAP;
-                }
-
-                if (res == null || res.length != codes.size()) {
-                    return Collections.EMPTY_MAP;
-                }
-
-                for (int i = 0; i < sorted.size(); i++) {
-                    resultMap.put(sorted.get(i), Double.valueOf(res[i]));
-                    System.out.println(sorted.get(i) + "\t\t" + Double.valueOf(res[i]));
-                }
-
-                return resultMap;
-            } catch (MWException e) {
-                return Collections.EMPTY_MAP;
-            } finally {
-                MWArray.disposeArray(result);
-                MWArray.disposeArray(funds);
-                MWArray.disposeArray(pType);
-                MWArray.disposeArray(inputKind);
-                MWArray.disposeArray(inputWeight);
-
-                if (assetAllocation != null) {
-                    assetAllocation.dispose();
-                    assetAllocation = null;
-                }
-            }
-            /**
-             * 因子间分散需要的参数
-             *
-             *  String[] codes = {"000007","000004","000017","000024","000025","000026","000052","000027","000065","000050","000003","000039","000042"};
-             *  double[] input_kind={1,1,1,2,2,8,8,5,5,6,4,4,4};//输入因子的种类
-             *  输入input_kind的长度必须和codes对应，input_facotr_num是指因子个数，input_kind指因子种类，其他
-             *  变化不大，对参数格式有疑问可以问李振安
-             */
-        } else if (uncentralize_type == 2) {
-            Object[] result = null;
-            Asset_Allocation_Factor asset_allocation_factor = null;
-            MWCharArray funds = null;
-            MWNumericArray pType = null;
-            MWNumericArray inputKind = null;
-            MWNumericArray inputFactorNum = null;
-            int input_factor_num = new HashSet<>(input_kind).size();
-
-            try {
-                asset_allocation_factor = new Asset_Allocation_Factor();
-                funds = new MWCharArray(strings);
-                pType = new MWNumericArray(portfolioType);
-                inputKind = new MWNumericArray(input_kind_array);
-                inputFactorNum = new MWNumericArray(input_factor_num);
-
-                if (portfolioType == 2) {
-                    result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum, new MWNumericArray(profitRate));
-                } else {
-                    result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum);
-                }
-                String[] res = null;
-                if (result != null && result.length != 0) {
-//                    res = result[0].toString().replaceAll("[ ]+", " ").split(" ");
-                    res = result[0].toString().split("\n");
-                } else {
-                    return Collections.EMPTY_MAP;
-                }
-
-                if (res == null || res.length != codes.size()) {
-                    return Collections.EMPTY_MAP;
-                }
-
-                for (int i = 0; i < sorted.size(); i++) {
-                    resultMap.put(sorted.get(i), Double.valueOf(res[i]));
-                    System.out.println(sorted.get(i) + "\t\t" + Double.valueOf(res[i]));
-                }
-
-                return resultMap;
-            } catch (MWException e) {
-                return Collections.EMPTY_MAP;
-            } finally {
-                MWArray.disposeArray(result);
-                MWArray.disposeArray(funds);
-                MWArray.disposeArray(pType);
-                MWArray.disposeArray(inputKind);
-                MWArray.disposeArray(inputFactorNum);
-
-                if (asset_allocation_factor != null) {
-                    asset_allocation_factor.dispose();
-                    asset_allocation_factor = null;
-                }
-            }
-        } else {
-            return Collections.EMPTY_MAP;
-        }
-
-    }
-
-    /**
-     * 调用python代码 可得到年化收益率，年化波动率，在险价值，收益率序列的下行标准差，夏普比率，beta，特雷诺指数，择股系数，择时系数，相关系数
-     *
-     * @param codeList   代码
-     * @param percentage 占比
-     * @param startDate  开始日期
-     * @param endDate    结束日期
-     * @return
-     */
-    private PyAnalysisResult getBasicFactors(List<String> codeList, List<Double> percentage, String startDate, String endDate) {
-        PyAnalysisResult result = new PyAnalysisResult();
-        String pyRes = PythonUser.usePy(FILE_BACK_ANALYSIS, startDate + " " + endDate + " " + combineAndFillBlank(codeList, percentage));
-
-        String[] lines = pyRes.split("\n");
-        List<String> useful = new ArrayList<>();
-        for (String line : lines) {
-            if (line.startsWith("#")) {
-                useful.add(line);
-            }
-        }
-
-        List<PyAnalysisResult.CorrelationCoefficient> coefficients = new ArrayList<>();
-        TreeSet<ValueDateBean> dailyReturnRates = new TreeSet<>(new ValueDateBeanComparator());
-        TreeSet<ValueDateBean> cumNet = new TreeSet<>(new ValueDateBeanComparator());
-        TreeSet<ValueDateBean> dailyRetrace = new TreeSet<>(new ValueDateBeanComparator());
-        for (String each : useful) {
-            String[] values = each.split(" ");
-            if (values[1].equals("年化收益率=")) {
-                result.setNhsyl(Double.valueOf(values[2]));
-            } else if (values[1].equals("年化波动率=")) {
-                result.setNhbdl(Double.valueOf(values[2]));
-            } else if (values[1].equals("在险价值=")) {
-                result.setZxjz(Double.valueOf(values[2]));
-            } else if (values[1].equals("下行标准差=")) {
-                result.setXxbzc(Double.valueOf(values[2]));
-            } else if (values[1].equals("夏普比=")) {
-                result.setSharpe(Double.valueOf(values[2]));
-            } else if (values[1].equals("beta=")) {
-                result.setBeta(Double.valueOf(values[2]));
-            } else if (values[1].equals("特雷诺指数=")) {
-                result.setTln(Double.valueOf(values[2]));
-            } else if (values[1].equals("择股系数=")) {
-                result.setZgxs(Double.valueOf(values[2]));
-            } else if (values[1].equals("择时系数=")) {
-                result.setZsxs(Double.valueOf(values[2]));
-            } else if (values[1].equals("最大跌幅=")) {
-                result.setZddf(Double.valueOf(values[2]));
-            } else if (values[1].equals("期初净值=")) {
-                result.setQcjz(Double.valueOf(values[2]));
-            } else if (values[1].equals("期末净值=")) {
-                result.setQmjz(Double.valueOf(values[2]));
-            } else if (values[1].equals("累计净值")) {
-                cumNet.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
-            } else if (values[1].equals("日收益率")) {
-                dailyReturnRates.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
-            } else if (values[1].equals("每日回撤")) {
-                dailyRetrace.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
-            } else {
-                PyAnalysisResult.CorrelationCoefficient correlationCoefficient = result.new CorrelationCoefficient(values[1], values[2], Double.valueOf(values[3]));
-                coefficients.add(correlationCoefficient);
-            }
-        }
-
-        result.setPjxgxs(coefficients);
-        result.setCumNet(new ArrayList<>(cumNet));
-        result.setDailyRetrace(new ArrayList<>(dailyRetrace));
-        result.setDailyReturnRate(new ArrayList<>(dailyReturnRates));
-        return result;
-    }
-
-
-    /**
-     * 根据参数调取python获得基金代码
-     *
-     * @param lamda       是彩虹条的那个选择
-     * @param count       资产间分散为10，因子间分散为3
-     * @param sqlkind     1为资产减分散，2为因子间分散
-     * @param type_kind   只在资产间分散的时候要用，1债券型，2股票型，3混合型 要分三次调用
-     * @param factor_kind 只在因子间分散时要用 要分10次调用
-     * @return
-     */
-    private List<String> getTargetPathCodes(Integer lamda, Integer count, Integer sqlkind, Integer type_kind, Integer factor_kind) {
-        lamda = (lamda == null) ? 5 : lamda;
-        count = (count == null) ? 8 : count;
-        sqlkind = (sqlkind == null) ? 1 : sqlkind;
-        type_kind = (type_kind == null) ? 1 : type_kind;
-        factor_kind = (factor_kind == null) ? 1 : factor_kind;
-
-        String pyRes = PythonUser.usePy(FILE_TARGET_PATH, lamda + " " + count + " " + sqlkind + " " + type_kind + " " + factor_kind);
-
-        if (pyRes.equals("") || pyRes == null || pyRes.equals("[]") || pyRes.equals("[ ]")) {
-            return Collections.EMPTY_LIST;
-        } else {
-            return getCodeList(pyRes);
-        }
     }
 
     /**
