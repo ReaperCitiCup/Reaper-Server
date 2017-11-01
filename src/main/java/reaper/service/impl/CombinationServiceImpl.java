@@ -168,6 +168,7 @@ public class CombinationServiceImpl implements CombinationService {
             miniBean.newProfit = combination.getNewProfit();
             miniBean.volatility = combination.getVolatility();
             miniBean.annualProfit = combination.getAnnualProfit();
+            miniBean.hasRisk = combination.getHasRisk();
             miniBean.combination = new ArrayList<>();
 
             for (int i = 0; i < combination.getFunds().split("\\|").length; i++) {

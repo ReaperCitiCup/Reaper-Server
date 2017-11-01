@@ -54,9 +54,14 @@ public class Combination {
     private Double annualProfit;
 
     /**
-     * 波动率
+     * 年化波动率
      */
     private Double volatility;
+
+    /**
+     * 是否有风险
+     */
+    private Boolean hasRisk;
 
 
     public Combination() {
@@ -134,6 +139,14 @@ public class Combination {
         this.volatility = volatility;
     }
 
+    public Boolean getHasRisk() {
+        return hasRisk;
+    }
+
+    public void setHasRisk(Boolean hasRisk) {
+        this.hasRisk = hasRisk;
+    }
+
     @Override
     public String toString() {
         return "Combination{" +
@@ -146,6 +159,7 @@ public class Combination {
                 ", newProfit=" + newProfit +
                 ", annualProfit=" + annualProfit +
                 ", volatility=" + volatility +
+                ", hasRisk=" + hasRisk +
                 '}';
     }
 
