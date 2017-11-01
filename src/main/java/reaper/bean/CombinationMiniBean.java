@@ -37,20 +37,18 @@ public class CombinationMiniBean {
     public List<FundRatioNameBean> combination;
 
     /**
-     *
-     * @param id
-     * @param name
-     * @param newProfit
-     * @param annualProfit
-     * @param volatility
+     * 是否有风险产生
      */
-    public CombinationMiniBean(Integer id, String name, Double newProfit, Double annualProfit, Double volatility, List<FundRatioNameBean> combination) {
+    public Boolean hasRisk;
+
+    public CombinationMiniBean(Integer id, String name, Double newProfit, Double annualProfit, Double volatility, List<FundRatioNameBean> combination, Boolean hasRisk) {
         this.id = id;
         this.name = name;
         this.newProfit = newProfit;
         this.annualProfit = annualProfit;
         this.volatility = volatility;
         this.combination = combination;
+        this.hasRisk = hasRisk;
     }
 
     public CombinationMiniBean() {
