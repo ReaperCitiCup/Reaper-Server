@@ -1,9 +1,8 @@
 package reaper.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import reaper.bean.ValueDateBean;
+
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author keenan on 10/09/2017
@@ -12,65 +11,82 @@ public class PyAnalysisResult {
     /**
      * 年化收益率
      */
-    public Map<String, Double> nhsyl;
+    private Double nhsyl;
 
     /**
      * 年化波动率
      */
-    public Map<String, Double> nhbdl;
+    private Double nhbdl;
 
     /**
      * 在险价值
      */
-    public Map<String, Double> zxjz;
+    private Double zxjz;
 
     /**
      * 收益率序列的下行标准差
      */
-    public Map<String, Double> xxbzc;
+    private Double xxbzc;
 
     /**
      * 夏普比率
      */
-    public Map<String, Double> sharpe;
+    private Double sharpe;
 
     /**
      * beta
      */
-    public Map<String, Double> beta;
+    private Double beta;
 
     /**
      * 特雷诺指数
      */
-    public Map<String, Double> tln;
+    private Double tln;
 
     /**
      * 择股系数
      */
-    public Map<String, Double> zgxs;
+    private Double zgxs;
 
     /**
      * 择时系数
      */
-    public Map<String, Double> zsxs;
+    private Double zsxs;
+
+    /**
+     * 最大跌幅
+     */
+    private Double zddf;
+
+    /**
+     * 期初净值
+     */
+    private Double qcjz;
+
+    /**
+     * 期末净值
+     */
+    private Double qmjz;
 
     /**
      * 平均相关系数
      */
-    public List<CorrelationCoefficient> pjxgxs;
+    private List<CorrelationCoefficient> pjxgxs;
 
-    public PyAnalysisResult() {
-        this.nhsyl = new HashMap<>();
-        this.nhbdl = new HashMap<>();
-        this.zxjz = new HashMap<>();
-        this.xxbzc = new HashMap<>();
-        this.sharpe = new HashMap<>();
-        this.beta = new HashMap<>();
-        this.tln = new HashMap<>();
-        this.zgxs = new HashMap<>();
-        this.zsxs = new HashMap<>();
-        this.pjxgxs = new ArrayList<>();
-    }
+    /**
+     * 日收益率
+     */
+    private List<ValueDateBean> dailyReturnRate;
+
+    /**
+     * 累计净值
+     */
+    private List<ValueDateBean> cumNet;
+
+    /**
+     * 每日回撤
+     */
+    private List<ValueDateBean> dailyRetrace;
 
     public void setPjxgxs(List<CorrelationCoefficient> pjxgxs) {
         this.pjxgxs = pjxgxs;
@@ -123,46 +139,127 @@ public class PyAnalysisResult {
         }
     }
 
-    public void printContent() {
-        System.out.println("=*=*=*=*= 年化收益率 =*=*=*=*=");
-        for (Map.Entry<String, Double> entry : nhsyl.entrySet()) {
-            System.out.println(entry.getKey() + "\t" + entry.getValue());
-        }
-        System.out.println("=*=*=*=*= 年化波动率 =*=*=*=*=");
-        for (Map.Entry<String, Double> entry : nhbdl.entrySet()) {
-            System.out.println(entry.getKey() + "\t" + entry.getValue());
-        }
-        System.out.println("=*=*=*=*= 在险价值 =*=*=*=*=");
-        for (Map.Entry<String, Double> entry : zxjz.entrySet()) {
-            System.out.println(entry.getKey() + "\t" + entry.getValue());
-        }
-        System.out.println("=*=*=*=*= 收益率序列的下行标准差 =*=*=*=*=");
-        for (Map.Entry<String, Double> entry : xxbzc.entrySet()) {
-            System.out.println(entry.getKey() + "\t" + entry.getValue());
-        }
-        System.out.println("=*=*=*=*= 夏普比 =*=*=*=*=");
-        for (Map.Entry<String, Double> entry : sharpe.entrySet()) {
-            System.out.println(entry.getKey() + "\t" + entry.getValue());
-        }
-        System.out.println("=*=*=*=*= beta =*=*=*=*=");
-        for (Map.Entry<String, Double> entry : beta.entrySet()) {
-            System.out.println(entry.getKey() + "\t" + entry.getValue());
-        }
-        System.out.println("=*=*=*=*= 特雷诺指数 =*=*=*=*=");
-        for (Map.Entry<String, Double> entry : tln.entrySet()) {
-            System.out.println(entry.getKey() + "\t" + entry.getValue());
-        }
-        System.out.println("=*=*=*=*= 择股系数 =*=*=*=*=");
-        for (Map.Entry<String, Double> entry : zgxs.entrySet()) {
-            System.out.println(entry.getKey() + "\t" + entry.getValue());
-        }
-        System.out.println("=*=*=*=*= 择时系数 =*=*=*=*=");
-        for (Map.Entry<String, Double> entry : zsxs.entrySet()) {
-            System.out.println(entry.getKey() + "\t" + entry.getValue());
-        }
-        System.out.println("=*=*=*=*= 相关系数 =*=*=*=*=");
-        for (CorrelationCoefficient correlationCoefficient : pjxgxs) {
-            System.out.println(correlationCoefficient.toString());
-        }
+    public void setNhsyl(Double nhsyl) {
+        this.nhsyl = nhsyl;
+    }
+
+    public void setNhbdl(Double nhbdl) {
+        this.nhbdl = nhbdl;
+    }
+
+    public void setZxjz(Double zxjz) {
+        this.zxjz = zxjz;
+    }
+
+    public void setXxbzc(Double xxbzc) {
+        this.xxbzc = xxbzc;
+    }
+
+    public void setSharpe(Double sharpe) {
+        this.sharpe = sharpe;
+    }
+
+    public void setBeta(Double beta) {
+        this.beta = beta;
+    }
+
+    public void setTln(Double tln) {
+        this.tln = tln;
+    }
+
+    public void setZgxs(Double zgxs) {
+        this.zgxs = zgxs;
+    }
+
+    public void setZsxs(Double zsxs) {
+        this.zsxs = zsxs;
+    }
+
+    public void setZddf(Double zddf) {
+        this.zddf = zddf;
+    }
+
+    public void setQcjz(Double qcjz) {
+        this.qcjz = qcjz;
+    }
+
+    public void setQmjz(Double qmjz) {
+        this.qmjz = qmjz;
+    }
+
+    public Double getNhsyl() {
+        return nhsyl;
+    }
+
+    public Double getNhbdl() {
+        return nhbdl;
+    }
+
+    public Double getZxjz() {
+        return zxjz;
+    }
+
+    public Double getXxbzc() {
+        return xxbzc;
+    }
+
+    public Double getSharpe() {
+        return sharpe;
+    }
+
+    public Double getBeta() {
+        return beta;
+    }
+
+    public Double getTln() {
+        return tln;
+    }
+
+    public Double getZgxs() {
+        return zgxs;
+    }
+
+    public Double getZsxs() {
+        return zsxs;
+    }
+
+    public Double getZddf() {
+        return zddf;
+    }
+
+    public Double getQcjz() {
+        return qcjz;
+    }
+
+    public Double getQmjz() {
+        return qmjz;
+    }
+
+    public List<CorrelationCoefficient> getPjxgxs() {
+        return pjxgxs;
+    }
+
+    public List<ValueDateBean> getDailyReturnRate() {
+        return dailyReturnRate;
+    }
+
+    public void setDailyReturnRate(List<ValueDateBean> dailyReturnRate) {
+        this.dailyReturnRate = dailyReturnRate;
+    }
+
+    public List<ValueDateBean> getCumNet() {
+        return cumNet;
+    }
+
+    public void setCumNet(List<ValueDateBean> cumNet) {
+        this.cumNet = cumNet;
+    }
+
+    public List<ValueDateBean> getDailyRetrace() {
+        return dailyRetrace;
+    }
+
+    public void setDailyRetrace(List<ValueDateBean> dailyRetrace) {
+        this.dailyRetrace = dailyRetrace;
     }
 }
