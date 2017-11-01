@@ -7,10 +7,10 @@ Created on Sun Sep 10 10:48:40 2017
 
 import numpy as np
 import pymysql
-import sys
+import time
 
 
-def sqlByType(type_kind):
+def sqlByType(type_kind, lamda=5, count=8):
     if type_kind == 1:
         fund_type = 'type1=\'债券型\' or type1= \'债券指数\' or type1= \'保本型\''
     elif type_kind == 2:
@@ -22,54 +22,77 @@ def sqlByType(type_kind):
     try:
         conn = pymysql.connect(host='106.15.203.173', user='reaper', passwd='reaper112233', db='reaper', port=3306,
                                charset='utf8')
-        cur = conn.cursor()  # 获取一个游标
+        cur1 = conn.cursor()  # 获取一个游标
+        print "1", time.time()
+        cur1.execute('SELECT  code FROM reaper.fund WHERE ' + fund_type)
+        print "1 - end", time.time()
+        data = cur1.fetchall()
 
-        cur.execute('SELECT  code FROM reaper.fund WHERE ' + fund_type)
-        data = cur.fetchall()
-
-        data_code = [];
+        data_code = []
 
         for d in data:
             data_code.append(int(d[0]))
             # data_date.append(str(d[1]))
+
+        cur2 = conn.cursor()
+        print "2", time.time()
+        cur2.execute('SELECT code,rank' + str(int(lamda)) + ' FROM reaper.fund_rank WHERE 1')
+        print "2 - end", time.time()
+        data = cur2.fetchall()
+        data_score = []
+        for d in data:
+            if int(d[0]) in data_code:
+                data_score.append([int(d[0]), float(d[1])])
+
+        data_score = np.array(data_score)
+        data_score = data_score[np.lexsort(-data_score.T)]
+        code = data_score[0:count, 0]
+        code = code.tolist()
+
     except Exception:
         print("查询失败")
-    return data_code
+    finally:
+        cur1.close()
+        cur2.close()
+        conn.close()
+    return code
 
 
-def sqlByFactor(factor_kind):
-    data_code = [];
+def sqlByFactor(factor_kind, lamda=5, count=8):
+    data_code = []
     try:
         conn = pymysql.connect(host='106.15.203.173', user='reaper', passwd='reaper112233', db='reaper', port=3306,
                                charset='utf8')
-        cur = conn.cursor()  # 获取一个游标
+        cur1 = conn.cursor()  # 获取一个游标
 
-        cur.execute('SELECT code FROM reaper.factor_result WHERE max2=' + str(int(factor_kind)))
-        data = cur.fetchall()
+        print "1", time.time()
+        cur1.execute('SELECT code FROM reaper.factor_result WHERE max2=' + str(int(factor_kind)))
+        print "1 - end", time.time()
+        data = cur1.fetchall()
 
         for d in data:
             data_code.append(int(d[0]))
-            # data_date.append(str(d[1]))
+
+        cur2 = conn.cursor()  # 获取一个游标
+        print "2", time.time()
+        cur2.execute('SELECT code,rank' + str(int(lamda)) + ' FROM reaper.fund_rank WHERE 1')
+        print "2 - end", time.time()
+        data = cur2.fetchall()
+        data_score = []
+        for d in data:
+            if int(d[0]) in data_code:
+                data_score.append([int(d[0]), float(d[1])])
+
+        data_score = np.array(data_score)
+        data_score = data_score[np.lexsort(-data_score.T)]
+        code = data_score[0:count, 0]
+        code = code.tolist()
     except Exception:
         print("查询失败")
-    return data_code
-
-
-def sqlOrder(data_code, lamda=5, count=8):
-    conn = pymysql.connect(host='106.15.203.173', user='reaper', passwd='reaper112233', db='reaper', port=3306,
-                           charset='utf8')
-    cur = conn.cursor()  # 获取一个游标
-    cur.execute('SELECT code,rank' + str(int(lamda)) + ' FROM reaper.fund_rank WHERE 1')
-    data = cur.fetchall()
-    data_score = []
-    for d in data:
-        if int(d[0]) in data_code:
-            data_score.append([int(d[0]), float(d[1])])
-
-    data_score = np.array(data_score)
-    data_score = data_score[np.lexsort(-data_score.T)]
-    code = data_score[0:count, 0]
-    code = code.tolist()
+    finally:
+        cur1.close()
+        cur2.close()
+        conn.close()
     return code
 
 
@@ -85,24 +108,16 @@ def sqlCode(lamda=5, count=8, sqlkind=1, type_kind=1, factor_kind=1):
     # type_kind 资产种类 范围 整数1-3
     # factor_kind 因子种类 范围 整数1-10
     if sqlkind == 1:
-        code = sqlByType(type_kind)
-        code = sqlOrder(code, lamda, count)
+        code = sqlByType(type_kind, lamda, count)
     elif sqlkind == 2:
-        code = sqlByFactor(factor_kind)
-        code = sqlOrder(code, lamda, count)
-
+        code = sqlByFactor(factor_kind, lamda, count)
     return code
 
 
-# print(sqlByType(1))
-# print(sqlByFactor(6))
-# print(sqlOrder(sqlByType(1),1))
-# print(sqlCode())
-# a=sqlOrder(sqlByType(1),1)
-
-lamda = int(sys.argv[1])
-count = int(sys.argv[2])
-sqlkind = int(sys.argv[3])
-type_kind = int(sys.argv[4])
-factor_kind = int(sys.argv[5])
-print sqlCode(lamda, count, sqlkind, type_kind, factor_kind)
+# lamda = int(sys.argv[1])
+# count = int(sys.argv[2])
+# sqlkind = int(sys.argv[3])
+# type_kind = int(sys.argv[4])
+# factor_kind = int(sys.argv[5])
+# print sqlCode(lamda, count, sqlkind, type_kind, factor_kind)
+print sqlCode(5, 8, 1, 1, 1)

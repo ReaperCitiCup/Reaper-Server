@@ -1,5 +1,7 @@
 package reaper.bean;
 
+import java.util.List;
+
 /**
  * @author keenan on 09/09/2017
  */
@@ -25,16 +27,28 @@ public class CombinationMiniBean {
     public Double annualProfit;
 
     /**
-     * 平均相关系数
+     * 波动率
      */
-    public Double correlationCoefficient;
+    public Double volatility;
 
-    public CombinationMiniBean(Integer id, String name, Double newProfit, Double annualProfit, Double correlationCoefficient) {
+    /**
+     * 基金组成
+     */
+    public List<FundRatioNameBean> combination;
+
+    /**
+     * 是否有风险产生
+     */
+    public Boolean hasRisk;
+
+    public CombinationMiniBean(Integer id, String name, Double newProfit, Double annualProfit, Double volatility, List<FundRatioNameBean> combination, Boolean hasRisk) {
         this.id = id;
         this.name = name;
         this.newProfit = newProfit;
         this.annualProfit = annualProfit;
-        this.correlationCoefficient = correlationCoefficient;
+        this.volatility = volatility;
+        this.combination = combination;
+        this.hasRisk = hasRisk;
     }
 
     public CombinationMiniBean() {

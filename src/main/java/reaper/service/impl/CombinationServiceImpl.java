@@ -1,11 +1,5 @@
 package reaper.service.impl;
 
-import Asset_Allocation.Asset_Allocation;
-import Asset_Allocation_Factor.Asset_Allocation_Factor;
-import com.mathworks.toolbox.javabuilder.MWArray;
-import com.mathworks.toolbox.javabuilder.MWCharArray;
-import com.mathworks.toolbox.javabuilder.MWException;
-import com.mathworks.toolbox.javabuilder.MWNumericArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reaper.bean.*;
@@ -15,12 +9,16 @@ import reaper.service.CombinationService;
 import reaper.service.FundService;
 import reaper.service.UserService;
 import reaper.util.*;
+import reaper.util.backtest_util.PyAnalysisResult;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
-import static reaper.util.CodeFormatUtil.fillBlank;
-import static reaper.util.CodeFormatUtil.getCodeList;
+import static reaper.util.backtest_util.BackTestPyAnalysisGetter.getBasicFactors;
+import static reaper.util.backtest_util.PortfolioMatlabResultGetter.calComponentWeight;
+import static reaper.util.backtest_util.PortfolioTargetPathPythonGetter.getTargetPathCodes;
 
 /**
  * @author keenan on 08/09/2017
@@ -31,8 +29,6 @@ public class CombinationServiceImpl implements CombinationService {
     @Autowired
     private CombinationRepository combinationRepository;
     @Autowired
-    private FundNetValueRepository fundNetValueRepository;
-    @Autowired
     private BasicStockIndexRepository basicStockIndexRepository;
     @Autowired
     private FundRankRepository fundRankRepository;
@@ -42,7 +38,6 @@ public class CombinationServiceImpl implements CombinationService {
     private StockBrinsonResultRepository stockBrinsonResultRepository;
     @Autowired
     private BrisonResultRepository brisonResultRepository;
-
     @Autowired
     private FundService fundService;
     @Autowired
@@ -50,8 +45,6 @@ public class CombinationServiceImpl implements CombinationService {
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    private static final String FILE_BACK_ANALYSIS = "backtest_analysis.py";
-    private static final String FILE_TARGET_PATH = "target_path.py";
 
     /**
      * 自定创建组合
@@ -78,30 +71,20 @@ public class CombinationServiceImpl implements CombinationService {
         }
 
         Combination combination = new Combination(profitRisk, user.getId(), name, fundsBuilder.toString(), weightsBuilder.toString());
-//        Combination combination = new Combination(0, 8, name, fundsBuilder.toString(), weightsBuilder.toString());
 
         String[] fundsArray = combination.getFunds().split("\\|");
         String[] weights = combination.getWeights().split("\\|");
-        PyAnalysisResult result_withoutRange = getBasicFactors(Arrays.asList(fundsArray));
-
-        Date date = new Date();
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        calendar.set(year - 1, month, day);
-        Date newday = calendar.getTime();
-        PyAnalysisResult result_withRange = getBasicFactors(Arrays.asList(fundsArray), simpleDateFormat.format(newday), simpleDateFormat.format(date));
+        List<Double> percentage = new ArrayList<>();
+        for (String weight : weights) {
+            percentage.add(Double.valueOf(weight));
+        }
+        PyAnalysisResult result = getBasicFactors(Arrays.asList(fundsArray), percentage, "1900-05-05", simpleDateFormat.format(new Date()));
 
         /**
          * 年化收益率
          */
         try {
-            double annualProfit = 0.0;
-            for (int i = 0; i < fundsArray.length; i++) {
-                String code = fundsArray[i];
-                annualProfit += (result_withoutRange.nhsyl.get(code) * Double.valueOf(weights[i]) / 100.00);
-            }
+            double annualProfit = result.getNhsyl();
             combination.setAnnualProfit(FormatData.fixToTwoAndPercent(annualProfit));
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,28 +93,22 @@ public class CombinationServiceImpl implements CombinationService {
 
 
         /**
-         * 平均相关系数
+         * 年化波动率
          */
         try {
-            double sum = 0.0;
-            for (PyAnalysisResult.CorrelationCoefficient c : result_withRange.pjxgxs) {
-                sum += c.getCc();
-            }
-            double correlationCoefficient = sum / result_withRange.pjxgxs.size();
-            combination.setCorrelationCoefficient(FormatData.fixToTwo(correlationCoefficient));
+            double volatility = result.getNhbdl();
+            combination.setVolatility(FormatData.fixToTwoAndPercent(volatility));
         } catch (Exception e) {
             e.printStackTrace();
-            combination.setCorrelationCoefficient(0.0);
+            combination.setVolatility(0.0);
         }
 
         /**
          * 最新收益率
          */
         try {
-            double newProfit = 0.0;
-            for (int i = 0; i < fundsArray.length; i++) {
-                newProfit += (fundNetValueRepository.findFirstByCodeAndUnitNetValueNotNullOrderByDateDesc(fundsArray[i]).getDailyRate() * Double.valueOf(weights[i]) / 100.00);
-            }
+            List<ValueDateBean> returnRates = result.getDailyReturnRate();
+            double newProfit = returnRates.get(returnRates.size() - 1).value;
             combination.setNewProfit(FormatData.fixToTwoAndPercent(newProfit));
         } catch (Exception e) {
             e.printStackTrace();
@@ -139,12 +116,27 @@ public class CombinationServiceImpl implements CombinationService {
         }
 
         try {
-            combinationRepository.save(combination);
-            return ResultMessage.SUCCESS;
+            boolean isNameExist = false;
+            for (Combination existCombination : combinationRepository.findCombinationsByUserid(user.getId())) {
+                if (existCombination.getName().equals(name)) {
+                    isNameExist = true;
+                    break;
+                }
+            }
+
+            if (isNameExist) {
+                return ResultMessage.EXIST;
+            } else {
+                combinationRepository.save(combination);
+                return ResultMessage.SUCCESS;
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResultMessage.FAILED;
         }
+
+        // TODO 数据库增加是否有风险
     }
 
     /**
@@ -167,8 +159,18 @@ public class CombinationServiceImpl implements CombinationService {
             miniBean.id = combination.getId();
             miniBean.name = combination.getName();
             miniBean.newProfit = combination.getNewProfit();
-            miniBean.correlationCoefficient = combination.getCorrelationCoefficient();
+            miniBean.volatility = combination.getVolatility();
             miniBean.annualProfit = combination.getAnnualProfit();
+            miniBean.hasRisk = combination.getHasRisk();
+            miniBean.combination = new ArrayList<>();
+
+            for (int i = 0; i < combination.getFunds().split("\\|").length; i++) {
+                FundRatioNameBean fundRatioNameBean = new FundRatioNameBean();
+                fundRatioNameBean.code = combination.getFunds().split("\\|")[i];
+                fundRatioNameBean.name = fundService.findFundNameByCode(fundRatioNameBean.code).name;
+                fundRatioNameBean.weight = FormatData.fixToTwo(Double.parseDouble(combination.getWeights().split("\\|")[i]));
+                miniBean.combination.add(fundRatioNameBean);
+            }
 
             combinationMiniBeans.add(miniBean);
         }
@@ -211,13 +213,15 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public BacktestReportBean backtestCombination(Integer combinationId, String startDate, String endDate, String baseIndex) throws java.text.ParseException {
-//        if (userService.getCurrentUser() == null) {
-//            return null;
-//        }
+        if (userService.getCurrentUser() == null) {
+            return null;
+        }
 
         BacktestReportBean backtestReportBean = new BacktestReportBean();
         int days = DaysBetween.daysOfTwo(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
         List<Date> dateList = DaysBetween.getDatesBetweenTwoDate(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
+
+        System.out.println(LocalDate.now());
 
         /**
          * 基本信息
@@ -225,6 +229,8 @@ public class CombinationServiceImpl implements CombinationService {
         backtestReportBean.startDate = startDate;
         backtestReportBean.endDate = endDate;
         backtestReportBean.baseIndex = baseIndex;
+
+        System.out.println("基本信息: " + LocalDateTime.now());
 
         /**
          * 基金组成
@@ -244,6 +250,9 @@ public class CombinationServiceImpl implements CombinationService {
             backtestReportBean.combination.add(fundRatioNameBean);
         }
 
+        PyAnalysisResult pyAnalysisResult = getBasicFactors(codes, weights, startDate, endDate);
+        System.out.println("基金组成: " + LocalDateTime.now());
+
         /**
          * 投资目标
          */
@@ -258,65 +267,48 @@ public class CombinationServiceImpl implements CombinationService {
             backtestReportBean.investmentGoal = "无";
         }
 
+        System.out.println("投资目标: " + LocalDateTime.now());
+
 
         /**
          * 组合期末净值、期初净值、夏普比率
          */
-        double[] netValues = new double[days];
-        double[] dailyRates = new double[days];
-        backtestReportBean.sharpeRatio = 0.0;
+        List<ValueDateBean> netValues = pyAnalysisResult.getCumNet();
+        List<ValueDateBean> dailyRates = pyAnalysisResult.getDailyReturnRate();
+        backtestReportBean.sharpeRatio = pyAnalysisResult.getSharpe();
 
-        for (int i = 0; i < codes.size(); i++) {
+        double finalNetValue = pyAnalysisResult.getQcjz();
+        double startNetValue = pyAnalysisResult.getQmjz();
 
-            try {
-                backtestReportBean.sharpeRatio += FormatData.fixToTwo(getBasicFactors(codes, startDate, endDate).sharpe.get(codes.get(i)) * weights.get(i));
-            } catch (NullPointerException e) {
-                backtestReportBean.sharpeRatio += 0;
-            }
-
-            List<FundNetValue> fundNetValues = fundNetValueRepository.findAllByCodeAndDateBetween(codes.get(i), simpleDateFormat.parse(startDate), simpleDateFormat.parse((endDate)));
-
-            for (int j = 0; j < fundNetValues.size(); j++) {
-                if (fundNetValues.get(j) != null) {
-                    netValues[j] += fundNetValues.get(j).getUnitNetValue() * weights.get(i);
-                    dailyRates[j] += fundNetValues.get(j).getDailyRate() * weights.get(i);
-                }
-            }
-        }
-
-        double finalNetValue = netValues[codes.size() - 1];
-        double startNetValue = netValues[0];
+        System.out.println("组合期末净值、期初净值、夏普比率: " + LocalDateTime.now());
 
         /**
          * 区间年化收益、累积收益、最终净值
          */
-        double fundAnnualProfit = 0.0;
-        if (days < 365) {
-            fundAnnualProfit = (finalNetValue - startNetValue) / days * 365.0;
-        } else {
-            int years = days / 365;
-            fundAnnualProfit = Math.pow(finalNetValue / startNetValue, 1.0 / years) - 1;
-        }
+        double fundAnnualProfit = pyAnalysisResult.getNhsyl();
 
         backtestReportBean.intervalAnnualProfit = FormatData.fixToTwoAndPercent(fundAnnualProfit);
         backtestReportBean.cumulativeProfit = FormatData.fixToTwoAndPercent((finalNetValue - startNetValue) / startNetValue);
         backtestReportBean.finalNetValue = FormatData.fixToTwo(finalNetValue);
 
+        System.out.println("区间年化收益、累积收益、最终净值: " + LocalDateTime.now());
+
         /**
          * 波动率：收益率的标准差
          */
         backtestReportBean.volatility = FormatData.fixToTwo(Calculator.calStandardDeviation(dailyRates));
+        System.out.println("波动率: " + LocalDateTime.now());
 
         /**
          * 主要的三个因子
          */
         backtestReportBean.mainFactors = findMainFactors(codes, weights);
+        System.out.println("最主要的三个因子: " + LocalDateTime.now());
 
         /**
          * 【图】累计净值
          */
         List<ValueDateBean> baseNetValueList = new ArrayList<>();
-        List<ValueDateBean> fundNetValueList = new ArrayList<>();
 
         List<BasicStockIndex> basicStockIndexList = basicStockIndexRepository.findAllByStockNameAndDateBetweenOrderByDateAsc(baseIndex, simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
         for (BasicStockIndex basicStockIndex : basicStockIndexList) {
@@ -324,18 +316,14 @@ public class CombinationServiceImpl implements CombinationService {
             baseNetValueList.add(baseValueDateBean);
         }
 
-        for (int i = 0; i < netValues.length; i++) {
-            ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(dateList.get(i)), FormatData.fixToTwo(netValues[i]));
-            fundNetValueList.add(fundValueDateBean);
-        }
 
-        backtestReportBean.cumulativeNetValueTrend = new BacktestComparisonBean(fundNetValueList, baseNetValueList);
+        backtestReportBean.cumulativeNetValueTrend = new BacktestComparisonBean(netValues, baseNetValueList);
+        System.out.println("【图】累计净值: " + LocalDateTime.now());
 
         /**
          * 【图】收益率
          */
         List<ValueDateBean> baseProfitList = new ArrayList<>();
-        List<ValueDateBean> fundProfitList = new ArrayList<>();
 
         for (int i = 0; i < basicStockIndexList.size() - 1; i++) {
             if (basicStockIndexList.get(i).getClosePrice() != 0) {
@@ -345,15 +333,8 @@ public class CombinationServiceImpl implements CombinationService {
             }
         }
 
-        for (int i = 0; i < netValues.length - 1; i++) {
-            if ((netValues[i] != 0) && (netValues[i + 1] != 0)) {
-                ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(dateList.get(i + 1)),
-                        FormatData.fixToTwoAndPercent((netValues[i + 1] - netValues[i]) / netValues[i]));
-                fundProfitList.add(fundValueDateBean);
-            }
-        }
-
-        backtestReportBean.profitRateTrend = new BacktestComparisonBean(fundProfitList, baseProfitList);
+        backtestReportBean.profitRateTrend = new BacktestComparisonBean(dailyRates, baseProfitList);
+        System.out.println("【图】收益率: " + LocalDateTime.now());
 
         /**
          * 总收益率 比较
@@ -363,11 +344,15 @@ public class CombinationServiceImpl implements CombinationService {
         double baseProfit = FormatData.fixToTwoAndPercent((finalBaseValue - startBaseValue) / startBaseValue);
         double fundProfit = FormatData.fixToTwoAndPercent((finalNetValue - startNetValue) / startNetValue);
         backtestReportBean.totalProfitRate = new BacktestValueComparisonBean(fundProfit, baseProfit);
+        System.out.println("总收益率: " + LocalDateTime.now());
+
 
         /**
          * 超额收益率 比较
          */
         backtestReportBean.overProfitRate = new BacktestValueComparisonBean(fundProfit - baseProfit, FormatData.fixToTwoAndPercent(0.0));
+        System.out.println("超额收益率: " + LocalDateTime.now());
+
 
         /**
          * 年化收益率 比较
@@ -380,6 +365,7 @@ public class CombinationServiceImpl implements CombinationService {
             baseAnnualProfit = Math.pow(finalBaseValue / startBaseValue, 1.0 / years) - 1;
         }
         backtestReportBean.annualProfit = new BacktestValueComparisonBean(FormatData.fixToTwoAndPercent(fundAnnualProfit), FormatData.fixToTwoAndPercent(baseAnnualProfit));
+        System.out.println("年化收益率: " + LocalDateTime.now());
 
         /**
          * 盈利天占比
@@ -393,19 +379,21 @@ public class CombinationServiceImpl implements CombinationService {
             }
         }
 
-        for (int i = 0; i < netValues.length - 1; i++) {
-            if (netValues[i + 1] > netValues[i]) {
+        for (int i = 0; i < netValues.size() - 1; i++) {
+            if (netValues.get(i + 1).value > netValues.get(i).value) {
                 fundProfitDays++;
             }
         }
 
         backtestReportBean.profitDaysRatio = new BacktestValueComparisonBean(FormatData.fixToTwoAndPercent(fundProfitDays / days), FormatData.fixToTwoAndPercent(baseProfitDays / days));
+        System.out.println("盈利天占比: " + LocalDateTime.now());
+
 
         /**
          * 【图】每日回撤、最大回撤
          */
         List<ValueDateBean> baseRetracementList = new ArrayList<>();
-        List<ValueDateBean> fundRetracementList = new ArrayList<>();
+        List<ValueDateBean> fundRetracementList = pyAnalysisResult.getDailyRetrace();
         double maxRetracement = 0.0;
 
         for (int i = basicStockIndexList.size() - 1; i > 1; i--) {
@@ -422,29 +410,19 @@ public class CombinationServiceImpl implements CombinationService {
                         FormatData.fixToTwoAndPercent((lastLargerPrice - basicStockIndexList.get(i).getClosePrice()) / basicStockIndexList.get(i).getClosePrice()));
                 baseRetracementList.add(baseValueDateBean);
             }
-
         }
 
-        for (int i = netValues.length - 1; i > 1; i--) {
-            if (netValues[i] != 0) {
-                double lastLargerNetValue = netValues[i];
-
-                for (int j = i - 1; j > 0; j--) {
-                    if (netValues[j] > netValues[i]) {
-                        lastLargerNetValue = netValues[j];
-                        break;
-                    }
-                }
-                double retracement = (lastLargerNetValue - netValues[i]) / netValues[i];
-                maxRetracement = (retracement > maxRetracement) ? retracement : maxRetracement;
-                ValueDateBean fundValueDateBean = new ValueDateBean(simpleDateFormat.format(dateList.get(i)),
-                        FormatData.fixToTwoAndPercent(retracement));
-                fundRetracementList.add(fundValueDateBean);
-            }
+        for (ValueDateBean eachBean : fundRetracementList) {
+            maxRetracement = (maxRetracement < eachBean.value) ? eachBean.value : maxRetracement;
         }
+
+
+        // 前端不展示倒排日期的list
+        Collections.reverse(baseRetracementList);
 
         backtestReportBean.dailyRetracementTrend = new BacktestComparisonBean(fundRetracementList, baseRetracementList);
         backtestReportBean.maxRetracement = FormatData.fixToTwoAndPercent(maxRetracement);
+        System.out.println("每日回撤、最大回撤: " + LocalDateTime.now());
 
         /**
          * 【表】相关系数
@@ -452,51 +430,51 @@ public class CombinationServiceImpl implements CombinationService {
          * beta
          */
         List<BacktestCorrelationTable> backtestCorrelationTables = new ArrayList<>();
-        PyAnalysisResult pyAnalysisResult = getBasicFactors(codes, startDate, endDate);
         double sum = 0.0;
-        for (PyAnalysisResult.CorrelationCoefficient coefficient : pyAnalysisResult.pjxgxs) {
+        for (PyAnalysisResult.CorrelationCoefficient coefficient : pyAnalysisResult.getPjxgxs()) {
             sum += coefficient.getCc();
             backtestCorrelationTables.add(new BacktestCorrelationTable(coefficient.getCode1(), coefficient.getCode2(), coefficient.getCc()));
         }
         System.out.println(sum);
-        System.out.println(pyAnalysisResult.pjxgxs.size());
-        if (pyAnalysisResult.pjxgxs.size() == 0) {
+        System.out.println(pyAnalysisResult.getPjxgxs().size());
+        if (pyAnalysisResult.getPjxgxs().size() == 0) {
             backtestReportBean.averageCorrelationCoefficient = 0.0;
         } else {
-            backtestReportBean.averageCorrelationCoefficient = FormatData.fixToTwo(sum / pyAnalysisResult.pjxgxs.size());
+            backtestReportBean.averageCorrelationCoefficient = FormatData.fixToTwo(sum / pyAnalysisResult.getPjxgxs().size());
         }
 
         backtestReportBean.correlationCoefficientTable = backtestCorrelationTables;
-
-//        double betasum = 0.0;
-//        for (int i = 0; i < codes.size(); i++) {
-//            betasum += pyAnalysisResult.beta.get(codes.get(i)) * weights.get(i);
-//        }
-//        backtestReportBean.beta = FormatData.fixToTwo(betasum / codes.size());
+        System.out.println("相关系数: " + LocalDateTime.now());
 
         /**
          * 最大单日跌幅、最大连跌天数
          */
         double maxDayDown = 0.0;
         int downDays = 0;
-        for (int i = 0; i < netValues.length - 2; i++) {
-            maxDayDown = (netValues[i + 1] - netValues[i]) < maxDayDown ? (netValues[i + 1] - netValues[i]) : maxDayDown;
-            if (netValues[i + 1] < netValues[i]) {
+        for (int i = 0; i < netValues.size() - 2; i++) {
+            maxDayDown = (netValues.get(i + 1).value - netValues.get(i).value) < maxDayDown ? (netValues.get(i + 1).value - netValues.get(i).value) : maxDayDown;
+            if (netValues.get(i + 1).value < netValues.get(i).value) {
                 downDays++;
             }
         }
         backtestReportBean.maxDayDown = FormatData.fixToTwo(0.0 - maxDayDown);
         backtestReportBean.maxDownDays = downDays;
+        System.out.println("最大单日跌幅、最大连跌天数: " + LocalDateTime.now());
+
 
         /**
          * 年化波动率
          */
-        backtestReportBean.annualVolatility = FormatData.fixToTwo(backtestReportBean.volatility * Math.sqrt(252.0));
+        backtestReportBean.annualVolatility = FormatData.fixToTwo(pyAnalysisResult.getNhbdl());
+        System.out.println("年华波动率: " + LocalDateTime.now());
+
 
         /**
          * VaR 在险价值
          */
-        backtestReportBean.var = FormatData.fixToTwo(backtestReportBean.volatility * 2.33 * 1.0 / Math.sqrt(52.0));
+        backtestReportBean.var = FormatData.fixToTwo(pyAnalysisResult.getZxjz());
+        System.out.println("在险价值: " + LocalDateTime.now());
+
 
         /**
          * 风格归因-收益, 风格归因-风险, 行业归因-收益, 行业归因-风险, 品种归因, Brison归因-股票, Brison归因-债券
@@ -621,6 +599,8 @@ public class CombinationServiceImpl implements CombinationService {
         backtestReportBean.varietyAttribution = varietyAttribution;
         backtestReportBean.brisonAttributionBond = brisonAttributionBond;
         backtestReportBean.brisonAttributionStock = brisonAttributionStock;
+        System.out.println("归因: " + LocalDateTime.now());
+
 
         return backtestReportBean;
     }
@@ -765,289 +745,6 @@ public class CombinationServiceImpl implements CombinationService {
         }
 
         return createCombinationByUser(fundCombination.name, beans, fundCombination.profitRiskTarget);
-    }
-
-    /**
-     * 创建组合时获得各基金的权重 matlab调用
-     *
-     * @param codes         基金代码
-     * @param portfolioType 分散化方法类型
-     * @return <基金代码, 权重(未百分化的double)>
-     */
-    private Map<String, Double> calComponentWeight(List<String> codes, int portfolioType, List<Double> input_kind, List<Double> input_weight, int uncentralize_type, double profitRate) {
-        Map<String, Double> resultMap = new HashMap<>();
-        List<String> sorted = new ArrayList<>(codes);
-        Collections.sort(sorted);
-        String[] strings = codes.toArray(new String[codes.size()]);
-//        for(int i=0;i<strings.length;i++){
-//            System.out.print(strings[i]+"\t");
-//        }
-//        System.out.println();
-        Double[] input_kind_array = input_kind.toArray(new Double[input_kind.size()]);
-//        for(int i=0;i<input_kind_array.length;i++){
-//            System.out.print(input_kind_array[i]+"\t");
-//        }
-//        System.out.println();
-
-        Double[] input_weight_array = input_weight.toArray(new Double[input_weight.size()]);
-//        for(int i=0;i<input_weight_array.length;i++){
-//            System.out.print(input_weight_array[i]+"\t");
-//        }
-//        System.out.println();
-
-        /**
-         * 资产间分散需要的参数
-         *
-         *  String[] codes = {"000005","150039","002853","519746","150197","000007"};
-         *  double[] input_kind={1,1,1,2,2,2};//输入资产的种类，1代表债券型基金，2代表股票型基金，3代表混合型
-         *  double[] input_weight={0.7,0.3,0};//大类资产配置的比例，债券型0.7，股票型0.3，混合型0
-
-         *  输入input_kind的长度必须和codes对应，input_weight(m3)指
-         *  大类资产比例（0.7指所有债券基金配置比例和占70%，0.3指股票型基金配置比例和占30%）
-         *  这个参数应该是前面选择时保留下来的，如果配置比例是0.6,0.4,0，就相应调整。
-         *  另外，codes,input_kind与input_weight是互相对应，上面的初始化表示"000005","150039","002853"
-         *  这三支基金是债券型基金，其配置的比例和为0.7，"519746","150197","000007"是股票型基金，其
-         *  配置的比例之和为0.3。
-         */
-        if (uncentralize_type == 1) {
-            Object[] result = null;
-            Asset_Allocation assetAllocation = null;
-            MWCharArray funds = null;
-            MWNumericArray pType = null;
-            MWNumericArray inputKind = null;
-            MWNumericArray inputWeight = null;
-
-            try {
-                funds = new MWCharArray(strings);
-                pType = new MWNumericArray(portfolioType);
-                inputKind = new MWNumericArray(input_kind_array);
-                inputWeight = new MWNumericArray(input_weight_array);
-                assetAllocation = new Asset_Allocation();
-                if (portfolioType == 2) {
-                    result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight, new MWNumericArray(profitRate));
-                } else {
-                    result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight);
-                }
-                String[] res = null;
-                if (result != null && result.length != 0) {
-                    System.out.println(result[0].toString());
-//                    res = result[0].toString().replaceAll("[ ]+", " ").split(" ");
-                    res = result[0].toString().split("\n");
-                } else {
-                    return Collections.EMPTY_MAP;
-                }
-
-                if (res == null || res.length != codes.size()) {
-                    return Collections.EMPTY_MAP;
-                }
-
-                for (int i = 0; i < sorted.size(); i++) {
-                    resultMap.put(sorted.get(i), Double.valueOf(res[i]));
-                    System.out.println(sorted.get(i) + "\t\t" + Double.valueOf(res[i]));
-                }
-
-                return resultMap;
-            } catch (MWException e) {
-                return Collections.EMPTY_MAP;
-            } finally {
-                MWArray.disposeArray(result);
-                MWArray.disposeArray(funds);
-                MWArray.disposeArray(pType);
-                MWArray.disposeArray(inputKind);
-                MWArray.disposeArray(inputWeight);
-
-                if (assetAllocation != null) {
-                    assetAllocation.dispose();
-                    assetAllocation = null;
-                }
-            }
-            /**
-             * 因子间分散需要的参数
-             *
-             *  String[] codes = {"000007","000004","000017","000024","000025","000026","000052","000027","000065","000050","000003","000039","000042"};
-             *  double[] input_kind={1,1,1,2,2,8,8,5,5,6,4,4,4};//输入因子的种类
-             *  输入input_kind的长度必须和codes对应，input_facotr_num是指因子个数，input_kind指因子种类，其他
-             *  变化不大，对参数格式有疑问可以问李振安
-             */
-        } else if (uncentralize_type == 2) {
-            Object[] result = null;
-            Asset_Allocation_Factor asset_allocation_factor = null;
-            MWCharArray funds = null;
-            MWNumericArray pType = null;
-            MWNumericArray inputKind = null;
-            MWNumericArray inputFactorNum = null;
-            int input_factor_num = new HashSet<>(input_kind).size();
-
-            try {
-                asset_allocation_factor = new Asset_Allocation_Factor();
-                funds = new MWCharArray(strings);
-                pType = new MWNumericArray(portfolioType);
-                inputKind = new MWNumericArray(input_kind_array);
-                inputFactorNum = new MWNumericArray(input_factor_num);
-
-                if (portfolioType == 2) {
-                    result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum, new MWNumericArray(profitRate));
-                } else {
-                    result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum);
-                }
-                String[] res = null;
-                if (result != null && result.length != 0) {
-//                    res = result[0].toString().replaceAll("[ ]+", " ").split(" ");
-                    res = result[0].toString().split("\n");
-                } else {
-                    return Collections.EMPTY_MAP;
-                }
-
-                if (res == null || res.length != codes.size()) {
-                    return Collections.EMPTY_MAP;
-                }
-
-                for (int i = 0; i < sorted.size(); i++) {
-                    resultMap.put(sorted.get(i), Double.valueOf(res[i]));
-                    System.out.println(sorted.get(i) + "\t\t" + Double.valueOf(res[i]));
-                }
-
-                return resultMap;
-            } catch (MWException e) {
-                return Collections.EMPTY_MAP;
-            } finally {
-                MWArray.disposeArray(result);
-                MWArray.disposeArray(funds);
-                MWArray.disposeArray(pType);
-                MWArray.disposeArray(inputKind);
-                MWArray.disposeArray(inputFactorNum);
-
-                if (asset_allocation_factor != null) {
-                    asset_allocation_factor.dispose();
-                    asset_allocation_factor = null;
-                }
-            }
-        } else {
-            return Collections.EMPTY_MAP;
-        }
-
-    }
-
-    /**
-     * 调用python代码 backtest_analysis.py
-     * 可得到年化收益率，年化波动率，在险价值，收益率序列的下行标准差，夏普比率，beta，特雷诺指数，择股系数，择时系数，相关系数
-     *
-     * @param codes     代码
-     * @param startDate 开始日期
-     * @param endDate   结束日期
-     * @return
-     */
-    private PyAnalysisResult getBasicFactors(List<String> codes, String startDate, String endDate) {
-        PyAnalysisResult result = new PyAnalysisResult();
-        System.out.println(":= " + startDate + "\t" + endDate + "\t" + fillBlank(codes));
-        String pyRes = PythonUser.usePy(FILE_BACK_ANALYSIS, "1" + " " + startDate + " " + endDate + " " + fillBlank(codes));
-        System.out.println("pyRes :" + pyRes);
-
-        String[] lines = pyRes.split("\n");
-        List<String> useful = new ArrayList<>();
-        for (String line : lines) {
-            if (line.startsWith("#")) {
-                useful.add(line);
-            }
-        }
-        List<PyAnalysisResult.CorrelationCoefficient> coefficients = new ArrayList<>();
-        for (String each : useful) {
-            String[] values = each.split(" ");
-            if (values[2].equals("年化收益率=")) {
-                result.nhsyl.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("年化波动率=")) {
-                result.nhbdl.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("在险价值=")) {
-                result.zxjz.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("收益率序列的下行标准差=")) {
-                result.xxbzc.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("夏普比=")) {
-                result.sharpe.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("beta=")) {
-                result.beta.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("特雷诺指数=")) {
-                result.tln.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("择股系数=")) {
-                result.zgxs.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("择时系数=")) {
-                result.zsxs.put(values[1], Double.valueOf(values[3]));
-            } else {
-                PyAnalysisResult.CorrelationCoefficient correlationCoefficient = result.new CorrelationCoefficient(values[1], values[2], Double.valueOf(values[3]));
-                coefficients.add(correlationCoefficient);
-            }
-        }
-        result.setPjxgxs(coefficients);
-        return result;
-    }
-
-    /**
-     * 调用python代码 backtest_analysis.py
-     * 可得到年化收益率，年化波动率，在险价值，收益率序列的下行标准差，夏普比率，beta，特雷诺指数，择股系数，择时系数
-     *
-     * @param codes 代码
-     * @return
-     */
-    private PyAnalysisResult getBasicFactors(List<String> codes) {
-        PyAnalysisResult result = new PyAnalysisResult();
-        String pyRes = PythonUser.usePy(FILE_BACK_ANALYSIS, "0" + " " + fillBlank(codes));
-        System.out.println(pyRes);
-        String[] lines = pyRes.split("\n");
-        List<String> useful = new ArrayList<>();
-        for (String line : lines) {
-            if (line.startsWith("*")) {
-                useful.add(line);
-            }
-        }
-        for (String each : useful) {
-            String[] values = each.split(" ");
-            if (values[2].equals("年化收益率=")) {
-                result.nhsyl.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("年化波动率=")) {
-                result.nhbdl.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("在险价值=")) {
-                result.zxjz.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("收益率序列的下行标准差=")) {
-                result.xxbzc.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("夏普比=")) {
-                result.sharpe.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("beta=")) {
-                result.beta.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("特雷诺指数=")) {
-                result.tln.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("择股系数=")) {
-                result.zgxs.put(values[1], Double.valueOf(values[3]));
-            } else if (values[2].equals("择时系数=")) {
-                result.zsxs.put(values[1], Double.valueOf(values[3]));
-            }
-        }
-        return result;
-    }
-
-
-    /**
-     * 根据参数调取python获得基金代码
-     *
-     * @param lamda       是彩虹条的那个选择
-     * @param count       资产间分散为10，因子间分散为3
-     * @param sqlkind     1为资产减分散，2为因子间分散
-     * @param type_kind   只在资产间分散的时候要用，1债券型，2股票型，3混合型 要分三次调用
-     * @param factor_kind 只在因子间分散时要用 要分10次调用
-     * @return
-     */
-    private List<String> getTargetPathCodes(Integer lamda, Integer count, Integer sqlkind, Integer type_kind, Integer factor_kind) {
-        lamda = (lamda == null) ? 5 : lamda;
-        count = (count == null) ? 8 : count;
-        sqlkind = (sqlkind == null) ? 1 : sqlkind;
-        type_kind = (type_kind == null) ? 1 : type_kind;
-        factor_kind = (factor_kind == null) ? 1 : factor_kind;
-
-        String pyRes = PythonUser.usePy(FILE_TARGET_PATH, lamda + " " + count + " " + sqlkind + " " + type_kind + " " + factor_kind);
-
-        if (pyRes.equals("") || pyRes == null || pyRes.equals("[]") || pyRes.equals("[ ]")) {
-            return Collections.EMPTY_LIST;
-        } else {
-            return getCodeList(pyRes);
-        }
     }
 
     /**

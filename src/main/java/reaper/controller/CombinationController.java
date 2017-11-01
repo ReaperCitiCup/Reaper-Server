@@ -44,6 +44,9 @@ public class CombinationController {
         } else if (resultMessage.equals(ResultMessage.WRONG)) {
             result.result = false;
             result.message = "用户未登录";
+        } else if (resultMessage.equals(ResultMessage.EXIST)) {
+            result.result = false;
+            result.message = "组合名称已存在";
         }
         return result;
     }
@@ -144,15 +147,18 @@ public class CombinationController {
 
         if (resultMessage.equals(ResultMessage.SUCCESS)) {
             result.result = true;
-        } else if (resultMessage.equals(ResultMessage.FAILED)) {
-            result.result = false;
-            result.message = "创建组合失败";
         } else if (resultMessage.equals(ResultMessage.WRONG)) {
             result.result = false;
             result.message = "用户未登录";
         } else if (resultMessage.equals(ResultMessage.INVALID)) {
             result.result = false;
             result.message = "无效的分散化方法";
+        } else if (resultMessage.equals(ResultMessage.EXIST)) {
+            result.result = false;
+            result.message = "组合名称已存在";
+        } else {
+            result.result = false;
+            result.message = "创建组合失败";
         }
         return result;
     }

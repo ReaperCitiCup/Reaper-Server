@@ -40,6 +40,28 @@ public class CodeFormatUtil {
     }
 
     /**
+     * 代码和权重组合，并填充空格
+     * 格式化py参数
+     *
+     * @param codes
+     * @param ratio
+     * @return
+     */
+    public static String combineAndFillBlank(List<String> codes, List<Double> ratio) {
+        StringBuilder builder = new StringBuilder();
+        if (codes.size() != ratio.size()) {
+            return "";
+        }
+
+        for (int i = 0; i < codes.size(); i++) {
+            String comb = (i == codes.size() - 1) ? codes.get(i) + " " + ratio.get(i) : codes.get(i) + " " + ratio.get(i) + " ";
+            builder.append(comb);
+        }
+
+        return builder.toString();
+    }
+
+    /**
      * 将python输出的基金代码转为 List<String>
      * python输出格式示例为    [4529.0, 2521.0, 710302.0, 710301.0, 519977.0, 519976.0, 4538.0, 531020.0]
      *

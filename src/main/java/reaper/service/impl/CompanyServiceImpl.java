@@ -54,25 +54,25 @@ public class CompanyServiceImpl implements CompanyService {
         for (FundCompany fundCompany : fundCompanies) {
             try {
                 Fund fund = fundRepository.findByCode(fundCompany.getFundId());
-                if(fund.getAnnualProfit()!=null&&fund.getVolatility()!=null) {
+                if (fund.getAnnualProfit() != null && fund.getVolatility() != null) {
                     funds.add(new PerformanceDataBean(fund));
                 }
             } catch (NullPointerException e) {
                 System.out.println(fundCompany.getFundId());
                 //若不存在，则动态爬取
                 Fund fund = new Crawler().crawlFundDetail(fundCompany.getFundId(), fundRepository);
-                if(fund.getAnnualProfit()!=null&&fund.getVolatility()!=null) {
+                if (fund.getAnnualProfit() != null && fund.getVolatility() != null) {
                     funds.add(new PerformanceDataBean(fund));
                 }
             }
         }
 
         for (Fund fund : fundRepository.findAll()) {
-            if(fund.getAnnualProfit()!=null&&fund.getVolatility()!=null) {
+            if (fund.getAnnualProfit() != null && fund.getVolatility() != null) {
                 PerformanceDataBean data = new PerformanceDataBean(fund);
 
                 //判断是否是公司的
-                if (!funds.contains(data)) {
+                if (!funds.contains(data) && data.risk <= 50 && data.rate >= -100 && data.rate <= 100) {
                     others.add(data);
                 }
             }
@@ -95,8 +95,8 @@ public class CompanyServiceImpl implements CompanyService {
         for (ManagerCompany managerCompany : managerCompanies) {
             try {
                 Manager manager = managerRepository.findByManagerId(managerCompany.getManagerId());
-                if(manager.getReturnRate()!=null&&manager.getRisk()!=null) {
-                    managers.add(new PerformanceDataBean(manager.getManagerId(), manager.getName(), manager.getReturnRate(), manager.getRisk()));
+                if (manager.getReturnRate() != null && manager.getRisk() != null) {
+                    managers.add(new PerformanceDataBean(manager.getManagerId(), manager.getName(), manager.getReturnRate() / 100, manager.getRisk()));
                 }
             } catch (NullPointerException e) {
                 System.out.println(managerCompany.getManagerId());
@@ -105,15 +105,16 @@ public class CompanyServiceImpl implements CompanyService {
         }
 
         for (Manager manager : managerRepository.findAll()) {
-            if(manager.getRisk()!=null&&manager.getReturnRate()!=null) {
+            if (manager.getRisk() != null && manager.getReturnRate() != null) {
                 PerformanceDataBean data = new PerformanceDataBean(manager);
-                if (!managers.contains(data)) {
+                data.rate /= 100;
+                if (!managers.contains(data) && data.rate <= 200 && data.risk <= 20) {
                     others.add(data);
                 }
             }
         }
 
-        return new ManagerPerformanceBean(managers,others);
+        return new ManagerPerformanceBean(managers, others);
     }
 
     /**
@@ -130,9 +131,9 @@ public class CompanyServiceImpl implements CompanyService {
         double stock = 0;
         double bond = 0;
         double bank = 0;
-        for(FundCompany fundCompany:fundCompanies){
+        for (FundCompany fundCompany : fundCompanies) {
             AssetAllocation assetAllocation = assetAllocationRepository.findByCode(fundCompany.getFundId());
-            if(assetAllocation==null||assetAllocation.getBank() == null){
+            if (assetAllocation == null || assetAllocation.getBank() == null) {
                 continue;
             }
             stock += assetAllocation.stock;
@@ -141,10 +142,10 @@ public class CompanyServiceImpl implements CompanyService {
             count++;
         }
         List<FieldValueBean> res = new ArrayList<>();
-        res.add(new FieldValueBean("股票",FormatData.fixToTwo(stock/count)));
-        res.add(new FieldValueBean("银行",FormatData.fixToTwo(bank/count)));
-        res.add(new FieldValueBean("债券",FormatData.fixToTwo(bond/count)));
-        res.add(new FieldValueBean("其他",FormatData.fixToTwo(100-stock/count-bank/count-bond/count)));
+        res.add(new FieldValueBean("股票", FormatData.fixToTwo(stock / count)));
+        res.add(new FieldValueBean("银行", FormatData.fixToTwo(bank / count)));
+        res.add(new FieldValueBean("债券", FormatData.fixToTwo(bond / count)));
+        res.add(new FieldValueBean("其他", FormatData.fixToTwo(100 - stock / count - bank / count - bond / count)));
         return res;
     }
 
@@ -156,7 +157,7 @@ public class CompanyServiceImpl implements CompanyService {
      */
     @Override
     public List<FieldValueBean> findStyleAttributionProfitByCompanyId(String companyId) {
-        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(companyId,'N');
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(companyId, 'N');
         return ToFieldBean.factorResultToStyleAttribution(factorResult);
     }
 
@@ -168,7 +169,7 @@ public class CompanyServiceImpl implements CompanyService {
      */
     @Override
     public List<FieldValueBean> findStyleAttributionRiskByCompanyId(String companyId) {
-        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(companyId,'R');
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(companyId, 'R');
         return ToFieldBean.factorResultToStyleAttribution(factorResult);
     }
 
@@ -180,7 +181,7 @@ public class CompanyServiceImpl implements CompanyService {
      */
     @Override
     public List<FieldValueBean> findIndustryAttributionProfitByCompanyId(String companyId) {
-        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(companyId,'N');
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(companyId, 'N');
         return ToFieldBean.factorResultToIndustryAttribution(factorResult);
     }
 
@@ -192,7 +193,7 @@ public class CompanyServiceImpl implements CompanyService {
      */
     @Override
     public List<FieldValueBean> findIndustryAttributionRiskByCompanyId(String companyId) {
-        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(companyId,'R');
+        FactorResult factorResult = factorResultRepository.findByCodeAndFactorType(companyId, 'R');
         return ToFieldBean.factorResultToIndustryAttribution(factorResult);
     }
 }
