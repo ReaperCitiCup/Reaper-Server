@@ -73,6 +73,9 @@ public class UserServiceImpl implements UserService {
         if (oldUser != null) {
             return ResultMessage.EXIST;
         }
+//        TODO 这里应该直接用自增
+//        User user=new User(null,username,password);
+//        userRepository.save(user);
         Integer integer = userRepository.findNextId();
         User user = new User(integer, username, password);
         if (integer != null) {
