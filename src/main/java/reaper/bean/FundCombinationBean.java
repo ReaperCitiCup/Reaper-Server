@@ -1,5 +1,11 @@
 package reaper.bean;
 
+import com.sun.tools.javac.code.Attribute;
+import reaper.model.CombinationAnalysis;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -48,6 +54,9 @@ public class FundCombinationBean {
      */
     public Double profitRate;
 
+    public FundCombinationBean() {
+    }
+
     public FundCombinationBean(Integer profitRiskTarget, Integer path, AssetWeightBean weight, List<String> factor,
                                String name, List<FundCategoryBean> funds, Integer method, Double profitRate) {
         this.profitRiskTarget = profitRiskTarget;
@@ -60,6 +69,5 @@ public class FundCombinationBean {
         this.profitRate = profitRate;
     }
 
-    public FundCombinationBean() {
-    }
+
 }
