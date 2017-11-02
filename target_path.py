@@ -20,7 +20,7 @@ def sqlByType(type_kind, lamda=5, count=8):
     else:
         print("invalid type")
     try:
-        conn = pymysql.connect(host='106.15.203.173', user='reaper', passwd='reaper112233', db='reaper', port=3306,
+        conn = pymysql.connect(host='101.132.182.30', user='reaper', passwd='reaper112233', db='reaper', port=3306,
                                charset='utf8')
         cur1 = conn.cursor()  # 获取一个游标
         print "1", time.time()
@@ -61,7 +61,7 @@ def sqlByType(type_kind, lamda=5, count=8):
 def sqlByFactor(factor_kind, lamda=5, count=8):
     data_code = []
     try:
-        conn = pymysql.connect(host='106.15.203.173', user='reaper', passwd='reaper112233', db='reaper', port=3306,
+        conn = pymysql.connect(host='101.132.182.30', user='reaper', passwd='reaper112233', db='reaper', port=3306,
                                charset='utf8')
         cur1 = conn.cursor()  # 获取一个游标
 

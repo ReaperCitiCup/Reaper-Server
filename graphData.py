@@ -12,7 +12,7 @@ from sklearn.cross_validation import train_test_split  # 引用交叉验证
 from sklearn.linear_model import LinearRegression
 
 Number_Of_Trading_Days = 245  # 一年的交易日个数
-conn = pymysql.connect(host='106.15.203.173', user='reaper', passwd='reaper112233', db='reaper', port=3306,
+conn = pymysql.connect(host='101.132.182.30', user='reaper', passwd='reaper112233', db='reaper', port=3306,
                        charset='utf8')
 cur = conn.cursor()  # 获取一个游标
 
