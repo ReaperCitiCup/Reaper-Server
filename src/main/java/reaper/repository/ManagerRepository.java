@@ -19,5 +19,10 @@ public interface ManagerRepository extends JpaRepository<Manager,Integer>{
     @Query(value = "SELECT * FROM manager WHERE companyId=manage<>?1 AND " +
             "bestReturns<=200 AND risk<=20;",
             nativeQuery = true)
-    List<Manager> findOtherManger(String company);
+    List<Manager> findOtherMangerByCompanyId(String company);
+
+    //TODO 未测试
+    @Query(value = "SELECT * FROM manager WHERE managerId<>?1 AND " +
+            "bestReturns<=200 AND risk<=20;",nativeQuery = true)
+    List<Manager> findOtherManagerByManagerId(String manager);
 }

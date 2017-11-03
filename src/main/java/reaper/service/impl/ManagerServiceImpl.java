@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Feng on 2017/8/23.
@@ -131,14 +132,18 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public List<RankBean> findFundRankByManagerId(String managerId) {
         List<RankBean> res = new ArrayList<>();
-        List<FundHistory> fundManagers = fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId);
-        for (FundHistory fundManager : fundManagers) {
-            String code = fundManager.getFundCode();
+        List<FundHistory> fundHistories= fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId);
+        for (FundHistory fundHistory : fundHistories) {
+            String code = fundHistory.getFundCode();
             List<RankDataBean> ranks = new ArrayList<>();
-            for (FundRankByType fundRankByType : fundRankByTypeRepository.findAllByCode(code)) {
-                ranks.add(new RankDataBean(fundRankByType.getType(), fundRankByType.getRank(), fundRankByType.getTotal()));
+            List<FundRankByType> fundRankByTypes=fundRankByTypeRepository.findAllByCode(code);
+            for (FundRankByType fundRankByType : fundRankByTypes) {
+                ranks.add(new RankDataBean(fundRankByType.getType(), fundRankByType.getRank(),
+                        fundRankByType.getTotal()));
             }
             try {
+//                TODO 这里咋不直接用fundhistory的name呢？
+//                res.add(new RankBean(code, fundHistory.getFundName(), ranks));
                 res.add(new RankBean(code, fundRepository.findByCode(code).getName(), ranks));
             } catch (NullPointerException e) {
                 e.printStackTrace();
@@ -185,7 +190,27 @@ public class ManagerServiceImpl implements ManagerService {
         List<PerformanceDataBean> others = new ArrayList<>();
         //经理所持基金
         try {
-            funds = addFundPerformOfManager(funds, managerId);
+            //TODO 这里只用fundrepository查一次
+//            List<FundHistory> fundHistoryList=fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId);
+//            List<String> codeList=fundHistoryList.parallelStream().map(FundHistory::getFundCode).collect(Collectors.toList());
+//            List<Fund> fundList=fundRepository.findAllFundOfManagerService();
+//            for(Fund fund:fundList){
+//                PerformanceDataBean res = new PerformanceDataBean(fund);
+//                if(codeList.contains(fund.getCode())&& !funds.contains(res)){
+//                    funds.add(res);
+//                }
+//                else if(res.risk <= 50 && res.rate >= -100 && res.rate <= 100){
+//                    others.add(res);
+//                }
+//            }
+            for (FundHistory fundManager : fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId)) {
+                Fund fund = fundRepository.findByCode(fundManager.getFundCode());
+                PerformanceDataBean res = new PerformanceDataBean(fund);
+                if (fund != null && fund.getAnnualProfit() != null && !funds.contains(res)) {
+                    funds.add(res);
+                }
+            }
+            funds = addFundPerformOfManager(funds, managerId);//
 
             //其他基金
             for (Fund fund : fundRepository.findAll()) {
@@ -217,6 +242,7 @@ public class ManagerServiceImpl implements ManagerService {
             res.rate /= 100;
             managers.add(res);
         }
+        //TODO 问钱
         for (Manager manager1 : managerRepository.findAll()) {
             PerformanceDataBean res = new PerformanceDataBean(manager1);
             res.rate /= 100;
@@ -236,8 +262,9 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
         Manager manager = managerRepository.findByManagerId(managerId);
+        Integer id=Integer.parseInt(managerId);
         if (manager != null) {
-            ManagerRemark managerRemark = managerRemarkRepository.findByManagerId(Integer.parseInt(managerId));
+            ManagerRemark managerRemark = managerRemarkRepository.findByManagerId(id);
             if (managerRemark != null) {
                 return new ManagerAbilityBean(managerRemark);
             }
@@ -254,6 +281,7 @@ public class ManagerServiceImpl implements ManagerService {
      */
     @Override
     public ManagerNetworkBean findSocialNetworkByManagerId(String managerId) {
+        //TODO 联系改好数据库后再说
         List<NodeDataBean> nodes = new ArrayList<>();
         List<ManagerLinkDataBean> links = new ArrayList<>();
 
@@ -285,6 +313,7 @@ public class ManagerServiceImpl implements ManagerService {
 
         //把id转化成name
         for (NodeDataBean node : nodes) {
+            //这里为了名字访问了数据库
             node.name = managerRepository.findByManagerId(node.name).getName();
         }
 

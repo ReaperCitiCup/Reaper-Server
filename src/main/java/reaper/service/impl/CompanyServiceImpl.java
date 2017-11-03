@@ -113,7 +113,7 @@ public class CompanyServiceImpl implements CompanyService {
 //            managers.add(new PerformanceDataBean(manager.getManagerId(),manager.getName(),
 //                    manager.getReturnRate(),manager.getRisk()));
 //        }
-//        List<Manager> otherManager=managerRepository.findOtherManger(companyId);
+//        List<Manager> otherManager=managerRepository.findOtherMangerByCompanyId(companyId);
 //        for(Manager manager:otherManager){
 //            others.add(new PerformanceDataBean(manager));
 //        }
