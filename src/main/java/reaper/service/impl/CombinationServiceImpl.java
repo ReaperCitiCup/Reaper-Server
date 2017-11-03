@@ -39,6 +39,8 @@ public class CombinationServiceImpl implements CombinationService {
     @Autowired
     private BrisonResultRepository brisonResultRepository;
     @Autowired
+    private CombinationAnalysisRepository combinationAnalysisRepository;
+    @Autowired
     private FundService fundService;
     @Autowired
     private UserService userService;
@@ -670,6 +672,8 @@ public class CombinationServiceImpl implements CombinationService {
         if (user == null) {
             return ResultMessage.WRONG;
         }
+
+        combinationAnalysisRepository.save(new CombinationAnalysis(fundCombination));
 
         /**
          * 静态比例配置要特别处理
