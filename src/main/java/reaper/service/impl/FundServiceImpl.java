@@ -94,7 +94,7 @@ public class FundServiceImpl implements FundService {
             //根据经理代码找到经理名
             List<MiniBean> managerList = new ArrayList<>();
             for(FundHistory fundManager:fundManagers){
-                managerList.add(new MiniBean(fundManager.getManagerId(),managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
+                managerList.add(new MiniBean(fundManager.getManagerId(),fundManager.getManagerName()));
             }
             miniBeans.add(new FundMiniBean(fund.getCode(), fund.getName(), fund.getAnnualProfit(), fund.getVolatility(), managerList));
         }
@@ -136,10 +136,12 @@ public class FundServiceImpl implements FundService {
 
         List<IdNameBean> managers = new ArrayList<>();
         for(FundHistory fundManager:fundHistoryRepository.findAllByFundCodeAndAndEndDateIsNull(code)){
-            managers.add(new IdNameBean(fundManager.getManagerId(), managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
+            managers.add(new IdNameBean(fundManager.getManagerId(), fundManager.getManagerName()));
         }
-        String id = fundCompanyRepository.findByFundId(code).getCompanyId();
-        IdNameBean company = new IdNameBean(id, companyRepository.findByCompanyId(id).getName());
+        IdNameBean company = null;
+        if(fund.getCompanyId()!=null) {
+            company = new IdNameBean(fund.getCompanyId(), companyRepository.findByCompanyId(fund.getCompanyId()).getName());
+        }
         return fundModelToBean.modelToBean(fund, fundNetValue, rateBean, managers, company);
     }
 
@@ -206,7 +208,7 @@ public class FundServiceImpl implements FundService {
         for (FundHistory fundHistory : fundHistoryRepository.findAllByFundCodeOrderByStartDateAsc(fillCode(code))) {
             //计算相差的天数
             int difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(),fundHistory.getEndDate());
-            res.add(new HistoryManagerBean(fundHistory.getManagerId(), managerRepository.findByManagerId(fundHistory.getManagerId()).getName(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()), difDays, fundHistory.getPayback()));
+            res.add(new HistoryManagerBean(fundHistory.getManagerId(), fundHistory.getManagerName(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()), difDays, fundHistory.getPayback()));
         }
         return res;
     }
@@ -223,8 +225,7 @@ public class FundServiceImpl implements FundService {
 
         for(FundHistory fundManager:fundHistoryRepository.findAllByFundCodeAndAndEndDateIsNull(fillCode(code))){
             try {
-                Manager manager = managerRepository.findByManagerId(fundManager.getManagerId());
-                res.add(new IdNameBean(manager.getManagerId(),manager.getName()));
+                res.add(new IdNameBean(fundManager.getManagerId(),fundManager.getManagerName()));
             }catch (NullPointerException e){
                 System.out.println(fundManager.getManagerId());
                 //TODO
@@ -239,15 +240,13 @@ public class FundServiceImpl implements FundService {
         List<ManagerHistoryBean> res = new ArrayList<>();
 
         for(FundHistory fundHistory:fundHistoryRepository.findAllByFundCode(fillCode(code))){
-            //找到对应经理名字
-            Manager manager = managerRepository.findByManagerId(fundHistory.getManagerId());
             int difDays;
             if(fundHistory.getEndDate()!=null){
                 difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(),fundHistory.getEndDate());
             }else {
                 difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(), new Date());
             }
-            res.add(new ManagerHistoryBean(fundHistory.getManagerId(), manager.getName(), sdf.format(fundHistory.getStartDate()), fundHistory.getEndDate()==null?null:sdf.format(fundHistory.getEndDate()), difDays,fundHistory.getPayback()));
+            res.add(new ManagerHistoryBean(fundHistory.getManagerId(), fundHistory.getManagerName(), sdf.format(fundHistory.getStartDate()), fundHistory.getEndDate()==null?null:sdf.format(fundHistory.getEndDate()), difDays,fundHistory.getPayback()));
         }
         return res;
     }

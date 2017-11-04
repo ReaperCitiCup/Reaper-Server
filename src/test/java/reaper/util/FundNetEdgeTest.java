@@ -32,7 +32,7 @@ public class FundNetEdgeTest {
 
 
     public void getAllIn(){
-        File file=new File("fund_net_edge(2).csv");
+        File file=new File("src/main/fund_net_edge_10.csv");
         try {
             FileReader fileReader=new FileReader(file);
             BufferedReader bufferedReader=new BufferedReader(fileReader);

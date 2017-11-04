@@ -18,6 +18,6 @@ public class Application implements EmbeddedServletContainerCustomizer{
 
     @Override
     public void customize(ConfigurableEmbeddedServletContainer container) {
-        container.setPort(80);
+        container.setPort(8080);
     }
 }
