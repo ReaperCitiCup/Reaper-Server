@@ -225,7 +225,8 @@ public class FundServiceImpl implements FundService {
 
         for(FundHistory fundManager:fundHistoryRepository.findAllByFundCodeAndAndEndDateIsNull(fillCode(code))){
             try {
-                res.add(new IdNameBean(fundManager.getManagerId(),fundManager.getManagerName()));
+                Manager manager = managerRepository.findByManagerId(fundManager.getManagerId());
+                res.add(new IdNameBean(manager.getManagerId(),manager.getName()));
             }catch (NullPointerException e){
                 System.out.println(fundManager.getManagerId());
                 //TODO
@@ -240,6 +241,8 @@ public class FundServiceImpl implements FundService {
         List<ManagerHistoryBean> res = new ArrayList<>();
 
         for(FundHistory fundHistory:fundHistoryRepository.findAllByFundCode(fillCode(code))){
+            //找到对应经理名字
+            Manager manager = managerRepository.findByManagerId(fundHistory.getManagerId());
             int difDays;
             if(fundHistory.getEndDate()!=null){
                 difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(),fundHistory.getEndDate());

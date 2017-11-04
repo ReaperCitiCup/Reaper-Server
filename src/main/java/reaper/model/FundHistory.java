@@ -21,6 +21,14 @@ public class FundHistory {
         this.managerId = managerId;
     }
 
+    public String getManagerName() {
+        return managerName;
+    }
+
+    public void setManagerName(String managerName) {
+        this.managerName = managerName;
+    }
+
     public String getFundCode() {
         return fundCode;
     }
@@ -79,6 +87,7 @@ public class FundHistory {
 
     @Column(length = 8)
     private String managerId;
+    private String managerName;
     @Column(length = 6)
     private String fundCode;
     private String fundName;
@@ -95,6 +104,7 @@ public class FundHistory {
     public String toString() {
         return "FundHistory{" +
                 "managerId='" + managerId + '\'' +
+                "managerName='" + managerName + '\'' +
                 ", fundCode='" + fundCode + '\'' +
                 ", fundName='" + fundName+ '\'' +
                 ", startDate=" + startDate +
