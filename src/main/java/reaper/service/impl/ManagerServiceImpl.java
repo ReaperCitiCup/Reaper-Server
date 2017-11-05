@@ -290,8 +290,7 @@ public class ManagerServiceImpl implements ManagerService {
             int indexA;
             int indexB;
 
-            //先用id作为name，方便判断是否已经包含，最后一起转化为name
-            NodeDataBean node = new NodeDataBean(managerEdge.getManagerIdA());
+            NodeDataBean node = new NodeDataBean(managerEdge.getManagerNameA());
             int i = nodes.indexOf(node);
             if (i < 0) {
                 nodes.add(node);
@@ -300,7 +299,7 @@ public class ManagerServiceImpl implements ManagerService {
                 indexA = i;
             }
 
-            node = new NodeDataBean(managerEdge.getManagerIdB());
+            node = new NodeDataBean(managerEdge.getManagerNameB());
             i = nodes.indexOf(node);
             if (i < 0) {
                 nodes.add(node);
@@ -309,12 +308,6 @@ public class ManagerServiceImpl implements ManagerService {
                 indexB = i;
             }
             links.add(new ManagerLinkDataBean(indexA, indexB, managerEdge.getDays(), managerEdge.getTimes()));
-        }
-
-        //把id转化成name
-        for (NodeDataBean node : nodes) {
-            //这里为了名字访问了数据库
-            node.name = managerRepository.findByManagerId(node.name).getName();
         }
 
         return new ManagerNetworkBean(nodes, links);

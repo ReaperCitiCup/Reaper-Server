@@ -11,12 +11,18 @@ public class ManagerEdge {
     @Id
     @GeneratedValue
     private Integer id;
-    @Column(length = 8)
+    @Column(length = 8,nullable = false)
     private String managerIdA;
-    @Column(length = 8)
+    @Column(length = 8,nullable = false)
     private String managerIdB;
-
+    @Column(length = 32,nullable = false)
+    private String managerNameA;
+    @Column(length = 32,nullable = false)
+    private String managerNameB;
+    @Column(nullable = false)
     private int times;
+    @Column(nullable = false)
+    private int  days;
 
     public String getManagerIdA() {
         return managerIdA;
@@ -50,7 +56,23 @@ public class ManagerEdge {
         this.days = days;
     }
 
-    private int  days;
+    public String getManagerNameA() {
+        return managerNameA;
+    }
+
+    public void setManagerNameA(String managerNameA) {
+        this.managerNameA = managerNameA;
+    }
+
+    public String getManagerNameB() {
+        return managerNameB;
+    }
+
+    public void setManagerNameB(String managerNameB) {
+        this.managerNameB = managerNameB;
+    }
+
+
 
 
     @Override
