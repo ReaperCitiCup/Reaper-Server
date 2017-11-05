@@ -14,7 +14,7 @@ public class PythonUser {
     public static String usePy(String pyName, String argvs){
         String res = "";
         try {
-            Process process = Runtime.getRuntime().exec("python2 "+pyName+" "+argvs);
+            Process process = Runtime.getRuntime().exec("python "+pyName+" "+argvs);
 
             InputStreamReader ins = new InputStreamReader(process.getInputStream());
             BufferedReader br = new BufferedReader(ins);
