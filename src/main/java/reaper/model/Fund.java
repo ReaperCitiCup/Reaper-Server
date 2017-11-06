@@ -41,7 +41,6 @@ public class Fund {
      * 为减少关联查询，添加一个companyId的属性
      */
     @Column(length = 8)
-    @NotNull
     private String companyId;
 
     public Fund(){

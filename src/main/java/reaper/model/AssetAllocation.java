@@ -7,25 +7,28 @@ import javax.persistence.*;
 public class AssetAllocation {
     @Id
     @GeneratedValue
-    public Integer id;
+    private Integer id;
 
-    @Column(length = 6)
-    public String code;
+    @Column(length = 6,unique = true,nullable = false)
+    private String code;
 
     /**
      * 股票
      */
-    public Double stock;
+    private Double stock;
 
     /**
      * 债券
      */
-    public Double bond;
+    private Double bond;
 
     /**
      * 银行存款
      */
-    public Double bank;
+    private Double bank;
+
+    @Column(length = 8)
+    private String companyId;
 
     public String getCode() {
         return code;
@@ -59,13 +62,11 @@ public class AssetAllocation {
         this.bank = bank;
     }
 
-    @Override
-    public String toString() {
-        return "AssetAllocation{" +
-                "code='" + code + '\'' +
-                ", stock=" + stock +
-                ", bond=" + bond +
-                ", bank=" + bank +
-                '}';
+    public String getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(String companyId) {
+        this.companyId = companyId;
     }
 }
