@@ -7,20 +7,21 @@ import java.io.InputStreamReader;
 public class PythonUser {
     /**
      * 调用python代码
+     *
      * @param pyName python脚本名（带.py）
-     * @param argvs 参数
+     * @param argvs  参数
      * @return 所有命令行输出
      */
-    public static String usePy(String pyName, String argvs){
+    public static String usePy(String pyName, String argvs) {
         String res = "";
         try {
-            Process process = Runtime.getRuntime().exec("python "+pyName+" "+argvs);
+            Process process = Runtime.getRuntime().exec("python " + pyName + " " + argvs);
 
             InputStreamReader ins = new InputStreamReader(process.getInputStream());
             BufferedReader br = new BufferedReader(ins);
             String s;
-            while ((s = br.readLine())!=null){
-                res+=s+"\n";
+            while ((s = br.readLine()) != null) {
+                res += s + "\n";
             }
             br.close();
 

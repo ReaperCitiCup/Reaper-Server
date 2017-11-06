@@ -27,4 +27,8 @@ public interface FundRepository extends JpaRepository<Fund, Integer> {
             "annualProfit BETWEEN -100 AND 100 AND volatility <=50;",
             nativeQuery = true)
     public List<Fund> findCompanyFund(String companyId);
+
+    //TODO 未测试
+    @Query(value = "SELECT * FROM fund WHERE annualProfit IS NOT NULL;",nativeQuery = true)
+    List<Fund> findAllFundOfManagerService();
 }

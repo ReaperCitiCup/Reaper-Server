@@ -471,10 +471,10 @@ def fundGroupTest(codeList, pencentage, startTime, endTime):
     # print len(temp.date),len(temp.nav),len(temp.accNetValue)
 
     for i in range(len(temp.date)):
-        print "#", "日收益率", temp.date[i], temp.fundRate[i]
+        print "#", "日收益率=", temp.date[i], temp.fundRate[i]
 
     for i in range(len(temp.date)):
-        print "#", "累计净值", temp.date[i], temp.accNetValue[i]
+        print "#", "累计净值=", temp.date[i], temp.accNetValue[i]
 
     for i in range(len(temp.date)):
         # 每日回撤=（当前日之前出现的最大的净值-当日净值）/当日净值
@@ -484,7 +484,7 @@ def fundGroupTest(codeList, pencentage, startTime, endTime):
         else:
             preMaxNAV = max(temp.nav[i:-1])
             retracement = (preMaxNAV - temp.nav[i]) / temp.nav[i]
-        print "#", "每日回撤", temp.date[i], retracement
+        print "#", "每日回撤=", temp.date[i], retracement
 
     print "# 最大跌幅=", min(temp.fundRate)
     print "# 期初净值=", temp.nav[-1]
@@ -512,9 +512,9 @@ def fundGroupTest(codeList, pencentage, startTime, endTime):
 
     print "# 年化收益率=", annualizedRate(temp.fundRate)
 
-    print "# 年化波动率", annualizedVolatility(temp.fundRate)
+    print "# 年化波动率=", annualizedVolatility(temp.fundRate)
 
-    print "# 在险价值", countValue_at_risk(annualizedVolatility(temp.fundRate))
+    print "# 在险价值=", countValue_at_risk(annualizedVolatility(temp.fundRate))
 
     print "# 下行标准差=", downsideStdDev(temp.fundRate, temp.rf)
 

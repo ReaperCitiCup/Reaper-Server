@@ -48,6 +48,9 @@ public class FundCombinationBean {
      */
     public Double profitRate;
 
+    public FundCombinationBean() {
+    }
+
     public FundCombinationBean(Integer profitRiskTarget, Integer path, AssetWeightBean weight, List<String> factor,
                                String name, List<FundCategoryBean> funds, Integer method, Double profitRate) {
         this.profitRiskTarget = profitRiskTarget;
@@ -60,6 +63,5 @@ public class FundCombinationBean {
         this.profitRate = profitRate;
     }
 
-    public FundCombinationBean() {
-    }
+
 }

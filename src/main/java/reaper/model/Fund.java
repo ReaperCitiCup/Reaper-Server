@@ -1,6 +1,7 @@
 package reaper.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
@@ -35,6 +36,12 @@ public class Fund {
      * 波动率（经过百分化）
      */
     private Double volatility;
+
+    /**
+     * 为减少关联查询，添加一个companyId的属性
+     */
+    @Column(length = 8)
+    private String companyId;
 
     public Fund(){
 
@@ -104,17 +111,11 @@ public class Fund {
         this.volatility = volatility;
     }
 
-    @Override
-    public String toString() {
-        return "Fund{" +
-                "code='" + code + '\'' +
-                ", name='" + name + '\'' +
-                ", type1='" + type1 + '\'' +
-                ", type2='" + type2 + '\'' +
-                ", establishmentDate=" + establishmentDate +
-                ", scope=" + scope +
-                ", annualProfit=" + annualProfit +
-                ", volatility=" + volatility +
-                '}';
+    public String getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(String companyId) {
+        this.companyId = companyId;
     }
 }

@@ -39,6 +39,8 @@ public class CombinationServiceImpl implements CombinationService {
     @Autowired
     private BrisonResultRepository brisonResultRepository;
     @Autowired
+    private CombinationAnalysisRepository combinationAnalysisRepository;
+    @Autowired
     private FundService fundService;
     @Autowired
     private UserService userService;
@@ -239,6 +241,7 @@ public class CombinationServiceImpl implements CombinationService {
         List<String> codes = new ArrayList<>();
         List<Double> weights = new ArrayList<>();
         backtestReportBean.combination = new ArrayList<>();
+
         for (int i = 0; i < combination.getFunds().split("\\|").length; i++) {
             FundRatioNameBean fundRatioNameBean = new FundRatioNameBean();
             fundRatioNameBean.code = combination.getFunds().split("\\|")[i];
@@ -277,8 +280,9 @@ public class CombinationServiceImpl implements CombinationService {
         List<ValueDateBean> dailyRates = pyAnalysisResult.getDailyReturnRate();
         backtestReportBean.sharpeRatio = pyAnalysisResult.getSharpe();
 
-        double finalNetValue = pyAnalysisResult.getQcjz();
-        double startNetValue = pyAnalysisResult.getQmjz();
+
+        double finalNetValue = pyAnalysisResult.getQmjz();
+        double startNetValue = pyAnalysisResult.getQcjz();
 
         System.out.println("组合期末净值、期初净值、夏普比率: " + LocalDateTime.now());
 
@@ -670,6 +674,8 @@ public class CombinationServiceImpl implements CombinationService {
         if (user == null) {
             return ResultMessage.WRONG;
         }
+
+        combinationAnalysisRepository.save(new CombinationAnalysis(fundCombination));
 
         /**
          * 静态比例配置要特别处理

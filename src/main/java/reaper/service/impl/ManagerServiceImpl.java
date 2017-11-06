@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Feng on 2017/8/23.
@@ -58,9 +59,9 @@ public class ManagerServiceImpl implements ManagerService {
     public ManagerBean findManagerById(String id) {
         Manager manager = managerRepository.findByManagerId(id);
         if (manager != null) {
-            ManagerCompany managerCompany = managerCompanyRespository.findByManagerId(manager.getManagerId());
-            if (managerCompany != null) {
-                Company company = companyRepository.findByCompanyId(managerCompany.getCompanyId());
+            String companyId=manager.getCompanyId();
+            if(companyId!=null){
+                Company company=companyRepository.findByCompanyId(companyId);
                 if (company != null) {
                     return new ManagerBean(manager.getManagerId(), manager.getName(), sdf.format(manager.getAppointedDate()),
                             String.valueOf((int) ((new Date().getTime() - manager.getAppointedDate().getTime()) / (1000 * 3600 * 24))),
@@ -127,15 +128,18 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public List<RankBean> findFundRankByManagerId(String managerId) {
         List<RankBean> res = new ArrayList<>();
-        List<FundHistory> fundManagers = fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId);
-        for (FundHistory fundManager : fundManagers) {
-            String code = fundManager.getFundCode();
+        List<FundHistory> fundHistories= fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId);
+        for (FundHistory fundHistory : fundHistories) {
+            String code = fundHistory.getFundCode();
             List<RankDataBean> ranks = new ArrayList<>();
-            for (FundRankByType fundRankByType : fundRankByTypeRepository.findAllByCode(code)) {
-                ranks.add(new RankDataBean(fundRankByType.getType(), fundRankByType.getRank(), fundRankByType.getTotal()));
+            List<FundRankByType> fundRankByTypes=fundRankByTypeRepository.findAllByCode(code);
+            for (FundRankByType fundRankByType : fundRankByTypes) {
+                ranks.add(new RankDataBean(fundRankByType.getType(), fundRankByType.getRank(),
+                        fundRankByType.getTotal()));
             }
             try {
-                res.add(new RankBean(code, fundRepository.findByCode(code).getName(), ranks));
+                res.add(new RankBean(code, fundHistory.getFundName(), ranks));
+//                res.add(new RankBean(code, fundRepository.findByCode(code).getName(), ranks));
             } catch (NullPointerException e) {
                 e.printStackTrace();
                 System.out.println(managerId + "的" + code + "基金找不到");
@@ -181,15 +185,34 @@ public class ManagerServiceImpl implements ManagerService {
         List<PerformanceDataBean> others = new ArrayList<>();
         //经理所持基金
         try {
-            funds = addFundPerformOfManager(funds, managerId);
-
-            //其他基金
-            for (Fund fund : fundRepository.findAll()) {
+            List<FundHistory> fundHistoryList=fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId);
+            List<String> codeList=fundHistoryList.parallelStream().map(FundHistory::getFundCode).collect(Collectors.toList());
+            List<Fund> fundList=fundRepository.findAllFundOfManagerService();
+            for(Fund fund:fundList){
                 PerformanceDataBean res = new PerformanceDataBean(fund);
-                if (!funds.contains(res) && res.risk <= 50 && res.rate >= -100 && res.rate <= 100) {
+                if(codeList.contains(fund.getCode())&& !funds.contains(res)){
+                    funds.add(res);
+                }
+                else if(res.risk <= 50 && res.rate >= -100 && res.rate <= 100){
                     others.add(res);
                 }
             }
+//            for (FundHistory fundManager : fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId)) {
+//                Fund fund = fundRepository.findByCode(fundManager.getFundCode());
+//                PerformanceDataBean res = new PerformanceDataBean(fund);
+//                if (fund != null && fund.getAnnualProfit() != null && !funds.contains(res)) {
+//                    funds.add(res);
+//                }
+//            }
+//            funds = addFundPerformOfManager(funds, managerId);
+//
+//            //其他基金
+//            for (Fund fund : fundRepository.findAll()) {
+//                PerformanceDataBean res = new PerformanceDataBean(fund);
+//                if (!funds.contains(res) && res.risk <= 50 && res.rate >= -100 && res.rate <= 100) {
+//                    others.add(res);
+//                }
+//            }
         } catch (NullPointerException e) {
             System.out.println(managerId);
         }
@@ -213,6 +236,7 @@ public class ManagerServiceImpl implements ManagerService {
             res.rate /= 100;
             managers.add(res);
         }
+        //TODO 问钱
         for (Manager manager1 : managerRepository.findAll()) {
             PerformanceDataBean res = new PerformanceDataBean(manager1);
             res.rate /= 100;
@@ -232,8 +256,9 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
         Manager manager = managerRepository.findByManagerId(managerId);
+        Integer id=Integer.parseInt(managerId);
         if (manager != null) {
-            ManagerRemark managerRemark = managerRemarkRepository.findByManagerId(Integer.parseInt(managerId));
+            ManagerRemark managerRemark = managerRemarkRepository.findByManagerId(id);
             if (managerRemark != null) {
                 return new ManagerAbilityBean(managerRemark);
             }
@@ -250,6 +275,7 @@ public class ManagerServiceImpl implements ManagerService {
      */
     @Override
     public ManagerNetworkBean findSocialNetworkByManagerId(String managerId) {
+        //TODO 联系改好数据库后再说
         List<NodeDataBean> nodes = new ArrayList<>();
         List<ManagerLinkDataBean> links = new ArrayList<>();
 
@@ -258,8 +284,7 @@ public class ManagerServiceImpl implements ManagerService {
             int indexA;
             int indexB;
 
-            //先用id作为name，方便判断是否已经包含，最后一起转化为name
-            NodeDataBean node = new NodeDataBean(managerEdge.getManagerIdA());
+            NodeDataBean node = new NodeDataBean(managerEdge.getManagerNameA());
             int i = nodes.indexOf(node);
             if (i < 0) {
                 nodes.add(node);
@@ -268,7 +293,7 @@ public class ManagerServiceImpl implements ManagerService {
                 indexA = i;
             }
 
-            node = new NodeDataBean(managerEdge.getManagerIdB());
+            node = new NodeDataBean(managerEdge.getManagerNameB());
             i = nodes.indexOf(node);
             if (i < 0) {
                 nodes.add(node);
@@ -277,11 +302,6 @@ public class ManagerServiceImpl implements ManagerService {
                 indexB = i;
             }
             links.add(new ManagerLinkDataBean(indexA, indexB, managerEdge.getDays(), managerEdge.getTimes()));
-        }
-
-        //把id转化成name
-        for (NodeDataBean node : nodes) {
-            node.name = managerRepository.findByManagerId(node.name).getName();
         }
 
         return new ManagerNetworkBean(nodes, links);

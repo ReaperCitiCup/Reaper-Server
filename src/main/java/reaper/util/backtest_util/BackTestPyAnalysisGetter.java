@@ -67,13 +67,14 @@ public class BackTestPyAnalysisGetter {
                 result.setQcjz(Double.valueOf(values[2]));
             } else if (values[1].equals("期末净值=")) {
                 result.setQmjz(Double.valueOf(values[2]));
-            } else if (values[1].equals("累计净值")) {
+            } else if (values[1].equals("累计净值=")) {
                 cumNet.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
-            } else if (values[1].equals("日收益率")) {
+            } else if (values[1].equals("日收益率=")) {
                 dailyReturnRates.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
-            } else if (values[1].equals("每日回撤")) {
+            } else if (values[1].equals("每日回撤=")) {
                 dailyRetrace.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
             } else {
+                System.out.println(each);
                 PyAnalysisResult.CorrelationCoefficient correlationCoefficient = result.new CorrelationCoefficient(values[1], values[2], Double.valueOf(values[3]));
                 coefficients.add(correlationCoefficient);
             }

@@ -9,8 +9,6 @@ import java.util.Date;
 @Entity
 @Table(name = "fund_history")
 public class FundHistory {
-
-
     @Id
     @GeneratedValue
     private Integer id;
@@ -71,6 +69,14 @@ public class FundHistory {
         this.payback = payback;
     }
 
+    public String getManagerName() {
+        return managerName;
+    }
+
+    public void setManagerName(String managerName) {
+        this.managerName = managerName;
+    }
+
     @Column(length = 8)
     private String managerId;
     @Column(length = 6)
@@ -81,12 +87,15 @@ public class FundHistory {
     @Column(length = 64)
     private String time;
     private Double payback;
+    @Column(length = 32)
+    private String managerName;
 
 
     @Override
     public String toString() {
         return "FundHistory{" +
                 "managerId='" + managerId + '\'' +
+                "managerName='" + managerName + '\'' +
                 ", fundCode='" + fundCode + '\'' +
                 ", fundName='" + fundName+ '\'' +
                 ", startDate=" + startDate +

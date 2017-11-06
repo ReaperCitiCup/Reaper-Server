@@ -10,10 +10,10 @@ public class Manager {
     @GeneratedValue
     private Integer id;
 
-    @Column(length = 8)
+    @Column(length = 8,unique = true,nullable = false)
     private String managerId;
 
-    @Column(length = 32)
+    @Column(length = 32,nullable = false)
     private String name;
 
     private Date appointedDate;
@@ -34,6 +34,9 @@ public class Manager {
      * 风险率
      */
     private Double risk;
+
+    @Column(length = 8)
+    private String companyId;
 
     public Manager(){
 
@@ -103,15 +106,11 @@ public class Manager {
         this.risk = risk;
     }
 
-    @Override
-    public String toString() {
-        return "Manager{" +
-                "managerId='" + managerId + '\'' +
-                ", name='" + name + '\'' +
-                ", appointedDate=" + appointedDate +
-                ", introduction='" + introduction + '\'' +
-                ", totalScope=" + totalScope +
-                ", bestReturns=" + bestReturns +
-                '}';
+    public String getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(String companyId) {
+        this.companyId = companyId;
     }
 }

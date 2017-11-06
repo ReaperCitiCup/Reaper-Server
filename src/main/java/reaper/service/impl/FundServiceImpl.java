@@ -94,7 +94,7 @@ public class FundServiceImpl implements FundService {
             //根据经理代码找到经理名
             List<MiniBean> managerList = new ArrayList<>();
             for(FundHistory fundManager:fundManagers){
-                managerList.add(new MiniBean(fundManager.getManagerId(),managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
+                managerList.add(new MiniBean(fundManager.getManagerId(),fundManager.getManagerName()));
             }
             miniBeans.add(new FundMiniBean(fund.getCode(), fund.getName(), fund.getAnnualProfit(), fund.getVolatility(), managerList));
         }
@@ -136,10 +136,12 @@ public class FundServiceImpl implements FundService {
 
         List<IdNameBean> managers = new ArrayList<>();
         for(FundHistory fundManager:fundHistoryRepository.findAllByFundCodeAndAndEndDateIsNull(code)){
-            managers.add(new IdNameBean(fundManager.getManagerId(), managerRepository.findByManagerId(fundManager.getManagerId()).getName()));
+            managers.add(new IdNameBean(fundManager.getManagerId(), fundManager.getManagerName()));
         }
-        String id = fundCompanyRepository.findByFundId(code).getCompanyId();
-        IdNameBean company = new IdNameBean(id, companyRepository.findByCompanyId(id).getName());
+        IdNameBean company = null;
+        if(fund.getCompanyId()!=null) {
+            company = new IdNameBean(fund.getCompanyId(), companyRepository.findByCompanyId(fund.getCompanyId()).getName());
+        }
         return fundModelToBean.modelToBean(fund, fundNetValue, rateBean, managers, company);
     }
 
@@ -206,7 +208,7 @@ public class FundServiceImpl implements FundService {
         for (FundHistory fundHistory : fundHistoryRepository.findAllByFundCodeOrderByStartDateAsc(fillCode(code))) {
             //计算相差的天数
             int difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(),fundHistory.getEndDate());
-            res.add(new HistoryManagerBean(fundHistory.getManagerId(), managerRepository.findByManagerId(fundHistory.getManagerId()).getName(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()), difDays, fundHistory.getPayback()));
+            res.add(new HistoryManagerBean(fundHistory.getManagerId(), fundHistory.getManagerName(), sdf.format(fundHistory.getStartDate()), sdf.format(fundHistory.getEndDate()), difDays, fundHistory.getPayback()));
         }
         return res;
     }
@@ -214,7 +216,7 @@ public class FundServiceImpl implements FundService {
     @Override
     public CurrentAssetBean findCurrentAssetByCode(String code) {
         AssetAllocation assetAllocation = assetAllocationRepository.findByCode(fillCode(code));
-        return assetAllocation==null?null:new CurrentAssetBean(Double.valueOf(fixToTwo(assetAllocation.bond)),Double.valueOf(fixToTwo(assetAllocation.stock)),Double.valueOf(fixToTwo(assetAllocation.bank)));
+        return assetAllocation==null?null:new CurrentAssetBean(Double.valueOf(fixToTwo(assetAllocation.getBond())),Double.valueOf(fixToTwo(assetAllocation.getStock())),Double.valueOf(fixToTwo(assetAllocation.getBank())));
     }
 
     @Override
@@ -247,7 +249,7 @@ public class FundServiceImpl implements FundService {
             }else {
                 difDays = DaysBetween.daysOfTwo(fundHistory.getStartDate(), new Date());
             }
-            res.add(new ManagerHistoryBean(fundHistory.getManagerId(), manager.getName(), sdf.format(fundHistory.getStartDate()), fundHistory.getEndDate()==null?null:sdf.format(fundHistory.getEndDate()), difDays,fundHistory.getPayback()));
+            res.add(new ManagerHistoryBean(fundHistory.getManagerId(), fundHistory.getManagerName(), sdf.format(fundHistory.getStartDate()), fundHistory.getEndDate()==null?null:sdf.format(fundHistory.getEndDate()), difDays,fundHistory.getPayback()));
         }
         return res;
     }
@@ -555,38 +557,47 @@ public class FundServiceImpl implements FundService {
 
         code = fillCode(code);
 
+        //本身加入结果数组
+        NodeDataBean self = new NodeDataBean(code);
+        self.category = 0;
+        nodes.add(self);
+
         for(FundNetEdge fundNetEdge:getInterfacingCode(code, new ArrayList<>())){
             //记录两个点在node数组中的位置
             int indexA;
             int indexB;
 
             //先用id作为name，方便判断是否已经包含，最后一起转化为name
-            NodeDataBean node = new NodeDataBean(fundNetEdge.getCodeIdA());
-            int i = nodes.indexOf(node);
-            if(i<0){
-                nodes.add(node);
-                indexA = nodes.size()-1;
+            NodeDataBean nodeA = new NodeDataBean(fundNetEdge.getCodeIdA());
+            NodeDataBean nodeB = new NodeDataBean(fundNetEdge.getCodeIdB());
+            int a = nodes.indexOf(nodeA);
+            int b = nodes.indexOf(nodeB);
+            //判断nodeA是否已经在结果集中
+            if(a>=0){
+                indexA=a;
             }else {
-                indexA = i;
+                //若不在则另一点一定在结果集中
+                nodeA.category=nodes.get(b).category+1;
+                indexA = nodes.size();
+                nodes.add(nodeA);
+            }
+            if(b>=0){
+                indexB=b;
+            }else {
+                nodeB.category=nodes.get(a).category+1;
+                indexB = nodes.size();
+                nodes.add(nodeB);
             }
 
-            node = new NodeDataBean(fundNetEdge.getCodeIdB());
-            i = nodes.indexOf(node);
-            if(i<0){
-                nodes.add(node);
-                indexB = nodes.size()-1;
-            }else {
-                indexB = i;
-            }
             links.add(new FundLinkDataBean(indexA,indexB,fundNetEdge.getWeight()));
         }
 
         //把id转化成name
         for(NodeDataBean node:nodes){
             try {
-                node.name = fundRepository.findByCode(node.name).getName();
+                node.name = fundRepository.findByCode(node.code).getName();
             }catch (NullPointerException e){
-                System.out.println(node.name);
+                System.out.println(node.code);
             }
         }
 
