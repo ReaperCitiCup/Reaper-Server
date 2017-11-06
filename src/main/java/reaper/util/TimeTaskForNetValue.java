@@ -18,13 +18,13 @@ import java.util.regex.Pattern;
 /**
  * Created by max on 2017/9/10.
  */
-@Component
+
 public class TimeTaskForNetValue  {
 
     @Autowired
     FundNetValueRepository fundNetValueRepository;
 
-    @Scheduled(cron = "0 00 01 ? * *")//每天凌晨1点
+
     public void updateEveryday() {
 
 
