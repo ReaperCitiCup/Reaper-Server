@@ -142,9 +142,8 @@ public class ManagerServiceImpl implements ManagerService {
                         fundRankByType.getTotal()));
             }
             try {
-//                TODO 这里咋不直接用fundhistory的name呢？
-//                res.add(new RankBean(code, fundHistory.getFundName(), ranks));
-                res.add(new RankBean(code, fundRepository.findByCode(code).getName(), ranks));
+                res.add(new RankBean(code, fundHistory.getFundName(), ranks));
+//                res.add(new RankBean(code, fundRepository.findByCode(code).getName(), ranks));
             } catch (NullPointerException e) {
                 e.printStackTrace();
                 System.out.println(managerId + "的" + code + "基金找不到");
@@ -190,35 +189,34 @@ public class ManagerServiceImpl implements ManagerService {
         List<PerformanceDataBean> others = new ArrayList<>();
         //经理所持基金
         try {
-            //TODO 这里只用fundrepository查一次
-//            List<FundHistory> fundHistoryList=fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId);
-//            List<String> codeList=fundHistoryList.parallelStream().map(FundHistory::getFundCode).collect(Collectors.toList());
-//            List<Fund> fundList=fundRepository.findAllFundOfManagerService();
-//            for(Fund fund:fundList){
-//                PerformanceDataBean res = new PerformanceDataBean(fund);
-//                if(codeList.contains(fund.getCode())&& !funds.contains(res)){
-//                    funds.add(res);
-//                }
-//                else if(res.risk <= 50 && res.rate >= -100 && res.rate <= 100){
-//                    others.add(res);
-//                }
-//            }
-            for (FundHistory fundManager : fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId)) {
-                Fund fund = fundRepository.findByCode(fundManager.getFundCode());
+            List<FundHistory> fundHistoryList=fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId);
+            List<String> codeList=fundHistoryList.parallelStream().map(FundHistory::getFundCode).collect(Collectors.toList());
+            List<Fund> fundList=fundRepository.findAllFundOfManagerService();
+            for(Fund fund:fundList){
                 PerformanceDataBean res = new PerformanceDataBean(fund);
-                if (fund != null && fund.getAnnualProfit() != null && !funds.contains(res)) {
+                if(codeList.contains(fund.getCode())&& !funds.contains(res)){
                     funds.add(res);
                 }
-            }
-            funds = addFundPerformOfManager(funds, managerId);//
-
-            //其他基金
-            for (Fund fund : fundRepository.findAll()) {
-                PerformanceDataBean res = new PerformanceDataBean(fund);
-                if (!funds.contains(res) && res.risk <= 50 && res.rate >= -100 && res.rate <= 100) {
+                else if(res.risk <= 50 && res.rate >= -100 && res.rate <= 100){
                     others.add(res);
                 }
             }
+//            for (FundHistory fundManager : fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId)) {
+//                Fund fund = fundRepository.findByCode(fundManager.getFundCode());
+//                PerformanceDataBean res = new PerformanceDataBean(fund);
+//                if (fund != null && fund.getAnnualProfit() != null && !funds.contains(res)) {
+//                    funds.add(res);
+//                }
+//            }
+//            funds = addFundPerformOfManager(funds, managerId);
+//
+//            //其他基金
+//            for (Fund fund : fundRepository.findAll()) {
+//                PerformanceDataBean res = new PerformanceDataBean(fund);
+//                if (!funds.contains(res) && res.risk <= 50 && res.rate >= -100 && res.rate <= 100) {
+//                    others.add(res);
+//                }
+//            }
         } catch (NullPointerException e) {
             System.out.println(managerId);
         }

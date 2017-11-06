@@ -15,6 +15,7 @@ import reaper.util.ToFieldBean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Feng on 2017/9/2.
@@ -53,44 +54,41 @@ public class CompanyServiceImpl implements CompanyService {
         List<PerformanceDataBean> funds = new ArrayList<>();
         List<PerformanceDataBean> others = new ArrayList<>();
 
-        //TODO 这里是优化后的代码
-//        List<Fund> companyFund=fundRepository.findCompanyFund(companyId);
-//        for(Fund fund:companyFund){
-//            funds.add(new PerformanceDataBean(fund));
+        List<Fund> companyFund=fundRepository.findCompanyFund(companyId);
+        funds = companyFund.parallelStream().map(cf->new PerformanceDataBean(cf)).collect(Collectors.toList());
+
+        List<Fund> otherFund=fundRepository.findOtherFund(companyId);
+        others = otherFund.parallelStream().filter(of->(of.getVolatility()<=50&&of.getAnnualProfit()>=-100&&of.getAnnualProfit()<=100))
+                .map(of->new PerformanceDataBean(of)).collect(Collectors.toList());
+
+//        for (FundCompany fundCompany : fundCompanies) {
+//            try {
+//                //所有fund的信息
+//                Fund fund = fundRepository.findByCode(fundCompany.getFundId());
+//                if (fund.getAnnualProfit() != null && fund.getVolatility() != null) {
+//                    funds.add(new PerformanceDataBean(fund));
+//                }
+//            } catch (NullPointerException e) {
+//                System.out.println(fundCompany.getFundId());
+//                //若不存在，则动态爬取
+//                Fund fund = new Crawler().crawlFundDetail(fundCompany.getFundId(), fundRepository);
+//                if (fund.getAnnualProfit() != null && fund.getVolatility() != null) {
+//                    funds.add(new PerformanceDataBean(fund));
+//                }
+//            }
 //        }
-//        List<Fund> otherFund=fundRepository.findOtherFund(companyId);
-//        for(Fund fund:otherFund){
-//            others.add(new PerformanceDataBean(fund));
+//
+//        for (Fund fund : fundRepository.findAll()) {
+//            if (fund.getAnnualProfit() != null && fund.getVolatility() != null) {
+//                PerformanceDataBean data = new PerformanceDataBean(fund);
+//
+//                //判断是否是公司的
+//                //TODO 这个比较有点怪怪的，别忘了问钱
+//                if (!funds.contains(data) && data.risk <= 50 && data.rate >= -100 && data.rate <= 100) {
+//                    others.add(data);
+//                }
+//            }
 //        }
-
-        for (FundCompany fundCompany : fundCompanies) {
-            try {
-                //所有fund的信息
-                Fund fund = fundRepository.findByCode(fundCompany.getFundId());
-                if (fund.getAnnualProfit() != null && fund.getVolatility() != null) {
-                    funds.add(new PerformanceDataBean(fund));
-                }
-            } catch (NullPointerException e) {
-                System.out.println(fundCompany.getFundId());
-                //若不存在，则动态爬取
-                Fund fund = new Crawler().crawlFundDetail(fundCompany.getFundId(), fundRepository);
-                if (fund.getAnnualProfit() != null && fund.getVolatility() != null) {
-                    funds.add(new PerformanceDataBean(fund));
-                }
-            }
-        }
-
-        for (Fund fund : fundRepository.findAll()) {
-            if (fund.getAnnualProfit() != null && fund.getVolatility() != null) {
-                PerformanceDataBean data = new PerformanceDataBean(fund);
-
-                //判断是否是公司的
-                //TODO 这个比较有点怪怪的，别忘了问钱
-                if (!funds.contains(data) && data.risk <= 50 && data.rate >= -100 && data.rate <= 100) {
-                    others.add(data);
-                }
-            }
-        }
         return new FundPerformanceBean(funds, others);
     }
 
@@ -107,41 +105,36 @@ public class CompanyServiceImpl implements CompanyService {
         List<PerformanceDataBean> managers = new ArrayList<>();
         List<PerformanceDataBean> others = new ArrayList<>();
 
-        //TODO 改法同上
-//        List<Manager> companyManager=ManagerRepository.findCompanyManager(companyId);
-//        for (Manager manager:companyManager){
-//            managers.add(new PerformanceDataBean(manager.getManagerId(),manager.getName(),
-//                    manager.getReturnRate(),manager.getRisk()));
-//        }
-//        List<Manager> otherManager=managerRepository.findOtherMangerByCompanyId(companyId);
-//        for(Manager manager:otherManager){
-//            others.add(new PerformanceDataBean(manager));
-//        }
+        //TODO 想不起原来为什么returnRate要除以100了，先这样改完，有问题再改吧～
+        List<Manager> companyManager=managerRepository.findCompanyManager(companyId);
+        managers = companyManager.parallelStream().map(cm->new PerformanceDataBean(cm)).collect(Collectors.toList());
+        List<Manager> otherManager=managerRepository.findOtherMangerByCompanyId(companyId);
+        others = otherManager.parallelStream().map(om->new PerformanceDataBean(om)).collect(Collectors.toList());
 
-        //TODO 这里要问钱，本公司经理和其他经理写得怪怪的
-        for (ManagerCompany managerCompany : managerCompanies) {
-            try {
-                Manager manager = managerRepository.findByManagerId(managerCompany.getManagerId());
-                //
-                if (manager.getReturnRate() != null && manager.getRisk() != null) {
-                    managers.add(new PerformanceDataBean(manager.getManagerId(), manager.getName(),
-                            manager.getReturnRate() / 100, manager.getRisk()));
-                }
-            } catch (NullPointerException e) {
-                System.out.println(managerCompany.getManagerId());
-                //TODO 扒经理代码不知怎么不见了，假如有空指针再去找找
-            }
-        }
-
-        for (Manager manager : managerRepository.findAll()) {
-            if (manager.getRisk() != null && manager.getReturnRate() != null) {
-                PerformanceDataBean data = new PerformanceDataBean(manager);
-                data.rate /= 100;
-                if (!managers.contains(data) && data.rate <= 200 && data.risk <= 20) {
-                    others.add(data);
-                }
-            }
-        }
+//        //TODO 这里要问钱，本公司经理和其他经理写得怪怪的
+//        for (ManagerCompany managerCompany : managerCompanies) {
+//            try {
+//                Manager manager = managerRepository.findByManagerId(managerCompany.getManagerId());
+//                //
+//                if (manager.getReturnRate() != null && manager.getRisk() != null) {
+//                    managers.add(new PerformanceDataBean(manager.getManagerId(), manager.getName(),
+//                            manager.getReturnRate() / 100, manager.getRisk()));
+//                }
+//            } catch (NullPointerException e) {
+//                System.out.println(managerCompany.getManagerId());
+//                //TODO 扒经理代码不知怎么不见了，假如有空指针再去找找
+//            }
+//        }
+//
+//        for (Manager manager : managerRepository.findAll()) {
+//            if (manager.getRisk() != null && manager.getReturnRate() != null) {
+//                PerformanceDataBean data = new PerformanceDataBean(manager);
+//                data.rate /= 100;
+//                if (!managers.contains(data) && data.rate <= 200 && data.risk <= 20) {
+//                    others.add(data);
+//                }
+//            }
+//        }
 
         return new ManagerPerformanceBean(managers, others);
     }
@@ -162,23 +155,23 @@ public class CompanyServiceImpl implements CompanyService {
         double bank = 0;
 
         //TODO 改法同上，并改用lambda表达式进行计算（虽然优化不大）
-//        List<AssetAllocation> assetAllocations=assetAllocationRepository.findByCompany(companyId);
-//        stock=assetAllocations.parallelStream().mapToDouble((x)->x.stock).sum();
-//        bond=assetAllocations.parallelStream().mapToDouble((x)->x.bond).sum();
+        List<AssetAllocation> assetAllocations=assetAllocationRepository.findByCompany(companyId);
+        stock=assetAllocations.parallelStream().mapToDouble((x)->x.stock).sum();
+        bond=assetAllocations.parallelStream().mapToDouble((x)->x.bond).sum();
         //TODO 卧槽，bank那一列怎么全是零
-//        bank=assetAllocations.parallelStream().mapToDouble((x)->x.bank).sum();
-//        count=assetAllocations.size();
+        bank=assetAllocations.parallelStream().mapToDouble((x)->x.bank).sum();
+        count=assetAllocations.size();
 
-        for (FundCompany fundCompany : fundCompanies) {
-            AssetAllocation assetAllocation = assetAllocationRepository.findByCode(fundCompany.getFundId());
-            if (assetAllocation == null || assetAllocation.getBank() == null) {
-                continue;
-            }
-            stock += assetAllocation.stock;
-            bond += assetAllocation.bond;
-            bank += assetAllocation.bank;
-            count++;
-        }
+//        for (FundCompany fundCompany : fundCompanies) {
+//            AssetAllocation assetAllocation = assetAllocationRepository.findByCode(fundCompany.getFundId());
+//            if (assetAllocation == null || assetAllocation.getBank() == null) {
+//                continue;
+//            }
+//            stock += assetAllocation.stock;
+//            bond += assetAllocation.bond;
+//            bank += assetAllocation.bank;
+//            count++;
+//        }
         List<FieldValueBean> res = new ArrayList<>();
         res.add(new FieldValueBean("股票", FormatData.fixToTwo(stock / count)));
         res.add(new FieldValueBean("银行", FormatData.fixToTwo(bank / count)));
