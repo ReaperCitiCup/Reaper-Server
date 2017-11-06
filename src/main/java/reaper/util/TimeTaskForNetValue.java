@@ -1,6 +1,8 @@
 package reaper.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import reaper.model.FundNetValue;
 import reaper.repository.FundNetValueRepository;
 import reaper.repository.ManagerRelationRepository;
@@ -16,12 +18,14 @@ import java.util.regex.Pattern;
 /**
  * Created by max on 2017/9/10.
  */
-public class TimeTaskForNetValue extends TimerTask {
+@Component
+public class TimeTaskForNetValue  {
 
     @Autowired
     FundNetValueRepository fundNetValueRepository;
-    @Override
-    public void run() {
+
+    @Scheduled(cron = "0 00 01 ? * *")//每天凌晨1点
+    public void updateEveryday() {
 
 
 
