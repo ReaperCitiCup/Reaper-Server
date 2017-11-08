@@ -156,10 +156,10 @@ public class CompanyServiceImpl implements CompanyService {
 
         //TODO 改法同上，并改用lambda表达式进行计算（虽然优化不大）
         List<AssetAllocation> assetAllocations=assetAllocationRepository.findByCompany(companyId);
-        stock=assetAllocations.parallelStream().mapToDouble((x)->x.stock).sum();
-        bond=assetAllocations.parallelStream().mapToDouble((x)->x.bond).sum();
+        stock=assetAllocations.parallelStream().mapToDouble((x)->x.getStock()).sum();
+        bond=assetAllocations.parallelStream().mapToDouble((x)->x.getBond()).sum();
         //TODO 卧槽，bank那一列怎么全是零
-        bank=assetAllocations.parallelStream().mapToDouble((x)->x.bank).sum();
+        bank=assetAllocations.parallelStream().mapToDouble((x)->x.getBank()).sum();
         count=assetAllocations.size();
 
 //        for (FundCompany fundCompany : fundCompanies) {

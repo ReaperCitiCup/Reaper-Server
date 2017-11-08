@@ -5,9 +5,11 @@ package reaper.bean;
  */
 public class NodeDataBean {
     public String name;
+    public String code;
+    public Integer category;
 
-    public NodeDataBean(String name) {
-        this.name = name;
+    public NodeDataBean(String code) {
+        this.code = code;
     }
 
     @Override
@@ -17,11 +19,11 @@ public class NodeDataBean {
 
         NodeDataBean that = (NodeDataBean) o;
 
-        return name != null ? name.equals(that.name) : that.name == null;
+        return code != null ? code.equals(that.code) : that.code == null;
     }
 
     @Override
     public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+        return code != null ? code.hashCode() : 0;
     }
 }

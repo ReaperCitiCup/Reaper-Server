@@ -57,15 +57,11 @@ public class ManagerServiceImpl implements ManagerService {
      */
     @Override
     public ManagerBean findManagerById(String id) {
-        //TODO manager表此时应该已经有companyId了
         Manager manager = managerRepository.findByManagerId(id);
         if (manager != null) {
-            ManagerCompany managerCompany = managerCompanyRespository.findByManagerId(manager.getManagerId());
-//            String companyId=manager.getCompanyId();
-//            if(companyId!=null){
-            if (managerCompany != null) {
-//                Company company=companyRepository.findByCompanyId(companyId);
-                Company company = companyRepository.findByCompanyId(managerCompany.getCompanyId());
+            String companyId=manager.getCompanyId();
+            if(companyId!=null){
+                Company company=companyRepository.findByCompanyId(companyId);
                 if (company != null) {
                     return new ManagerBean(manager.getManagerId(), manager.getName(), sdf.format(manager.getAppointedDate()),
                             String.valueOf((int) ((new Date().getTime() - manager.getAppointedDate().getTime()) / (1000 * 3600 * 24))),

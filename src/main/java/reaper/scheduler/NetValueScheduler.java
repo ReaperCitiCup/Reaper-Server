@@ -1,11 +1,13 @@
-package reaper.util;
 
+package reaper.scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reaper.model.FundNetValue;
 import reaper.repository.FundNetValueRepository;
 import reaper.repository.ManagerRelationRepository;
+import reaper.util.Code;
+import reaper.util.MyBug;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,13 +20,13 @@ import java.util.regex.Pattern;
 /**
  * Created by max on 2017/9/10.
  */
-
-public class TimeTaskForNetValue  {
+@Component
+public class NetValueScheduler {
 
     @Autowired
     FundNetValueRepository fundNetValueRepository;
 
-
+    @Scheduled(cron = "0 00 01 ? * *")//每天凌晨1点
     public void updateEveryday() {
 
 

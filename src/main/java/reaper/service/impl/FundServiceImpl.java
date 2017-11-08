@@ -216,7 +216,7 @@ public class FundServiceImpl implements FundService {
     @Override
     public CurrentAssetBean findCurrentAssetByCode(String code) {
         AssetAllocation assetAllocation = assetAllocationRepository.findByCode(fillCode(code));
-        return assetAllocation==null?null:new CurrentAssetBean(Double.valueOf(fixToTwo(assetAllocation.bond)),Double.valueOf(fixToTwo(assetAllocation.stock)),Double.valueOf(fixToTwo(assetAllocation.bank)));
+        return assetAllocation==null?null:new CurrentAssetBean(Double.valueOf(fixToTwo(assetAllocation.getBond())),Double.valueOf(fixToTwo(assetAllocation.getStock())),Double.valueOf(fixToTwo(assetAllocation.getBank())));
     }
 
     @Override
@@ -557,38 +557,47 @@ public class FundServiceImpl implements FundService {
 
         code = fillCode(code);
 
+        //本身加入结果数组
+        NodeDataBean self = new NodeDataBean(code);
+        self.category = 0;
+        nodes.add(self);
+
         for(FundNetEdge fundNetEdge:getInterfacingCode(code, new ArrayList<>())){
             //记录两个点在node数组中的位置
             int indexA;
             int indexB;
 
             //先用id作为name，方便判断是否已经包含，最后一起转化为name
-            NodeDataBean node = new NodeDataBean(fundNetEdge.getCodeIdA());
-            int i = nodes.indexOf(node);
-            if(i<0){
-                nodes.add(node);
-                indexA = nodes.size()-1;
+            NodeDataBean nodeA = new NodeDataBean(fundNetEdge.getCodeIdA());
+            NodeDataBean nodeB = new NodeDataBean(fundNetEdge.getCodeIdB());
+            int a = nodes.indexOf(nodeA);
+            int b = nodes.indexOf(nodeB);
+            //判断nodeA是否已经在结果集中
+            if(a>=0){
+                indexA=a;
             }else {
-                indexA = i;
+                //若不在则另一点一定在结果集中
+                nodeA.category=nodes.get(b).category+1;
+                indexA = nodes.size();
+                nodes.add(nodeA);
+            }
+            if(b>=0){
+                indexB=b;
+            }else {
+                nodeB.category=nodes.get(a).category+1;
+                indexB = nodes.size();
+                nodes.add(nodeB);
             }
 
-            node = new NodeDataBean(fundNetEdge.getCodeIdB());
-            i = nodes.indexOf(node);
-            if(i<0){
-                nodes.add(node);
-                indexB = nodes.size()-1;
-            }else {
-                indexB = i;
-            }
             links.add(new FundLinkDataBean(indexA,indexB,fundNetEdge.getWeight()));
         }
 
         //把id转化成name
         for(NodeDataBean node:nodes){
             try {
-                node.name = fundRepository.findByCode(node.name).getName();
+                node.name = fundRepository.findByCode(node.code).getName();
             }catch (NullPointerException e){
-                System.out.println(node.name);
+                System.out.println(node.code);
             }
         }
 
