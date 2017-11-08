@@ -7,7 +7,6 @@ Created on Sun Sep 10 10:48:40 2017
 
 import numpy as np
 import pymysql
-import time
 
 
 def sqlByType(type_kind, lamda=5, count=8):
@@ -23,9 +22,7 @@ def sqlByType(type_kind, lamda=5, count=8):
         conn = pymysql.connect(host='101.132.182.30', user='reaper', passwd='reaper112233', db='reaper', port=3306,
                                charset='utf8')
         cur1 = conn.cursor()  # 获取一个游标
-        print "1", time.time()
         cur1.execute('SELECT  code FROM reaper.fund WHERE ' + fund_type)
-        print "1 - end", time.time()
         data = cur1.fetchall()
 
         data_code = []
@@ -35,9 +32,7 @@ def sqlByType(type_kind, lamda=5, count=8):
             # data_date.append(str(d[1]))
 
         cur2 = conn.cursor()
-        print "2", time.time()
         cur2.execute('SELECT code,rank' + str(int(lamda)) + ' FROM reaper.fund_rank WHERE 1')
-        print "2 - end", time.time()
         data = cur2.fetchall()
         data_score = []
         for d in data:
@@ -65,18 +60,14 @@ def sqlByFactor(factor_kind, lamda=5, count=8):
                                charset='utf8')
         cur1 = conn.cursor()  # 获取一个游标
 
-        print "1", time.time()
         cur1.execute('SELECT code FROM reaper.factor_result WHERE max2=' + str(int(factor_kind)))
-        print "1 - end", time.time()
         data = cur1.fetchall()
 
         for d in data:
             data_code.append(int(d[0]))
 
         cur2 = conn.cursor()  # 获取一个游标
-        print "2", time.time()
         cur2.execute('SELECT code,rank' + str(int(lamda)) + ' FROM reaper.fund_rank WHERE 1')
-        print "2 - end", time.time()
         data = cur2.fetchall()
         data_score = []
         for d in data:

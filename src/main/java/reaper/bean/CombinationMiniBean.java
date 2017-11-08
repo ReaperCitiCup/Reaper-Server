@@ -39,7 +39,7 @@ public class CombinationMiniBean {
     /**
      * 是否有风险产生
      */
-    public Boolean hasRisk;
+    public Boolean hasRisk = false;
 
     public CombinationMiniBean(Integer id, String name, Double newProfit, Double annualProfit, Double volatility, List<FundRatioNameBean> combination, Boolean hasRisk) {
         this.id = id;

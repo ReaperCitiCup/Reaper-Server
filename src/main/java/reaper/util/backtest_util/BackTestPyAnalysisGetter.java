@@ -5,6 +5,7 @@ import reaper.util.PythonUser;
 import reaper.util.ValueDateBeanComparator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -27,6 +28,7 @@ public class BackTestPyAnalysisGetter {
      */
     public static PyAnalysisResult getBasicFactors(List<String> codeList, List<Double> percentage, String startDate, String endDate) {
         PyAnalysisResult result = new PyAnalysisResult();
+        percentage.stream().forEach(System.out::print);
         String pyRes = PythonUser.usePy(FILE_BACK_ANALYSIS, startDate + " " + endDate + " " + combineAndFillBlank(codeList, percentage));
 
         String[] lines = pyRes.split("\n");
@@ -44,9 +46,9 @@ public class BackTestPyAnalysisGetter {
         for (String each : useful) {
             String[] values = each.split(" ");
             if (values[1].equals("年化收益率=")) {
-                result.setNhsyl(Double.valueOf(values[2]));
+                result.setNhsyl(Double.valueOf(values[2]) * 100);
             } else if (values[1].equals("年化波动率=")) {
-                result.setNhbdl(Double.valueOf(values[2]));
+                result.setNhbdl(Double.valueOf(values[2]) * 100);
             } else if (values[1].equals("在险价值=")) {
                 result.setZxjz(Double.valueOf(values[2]));
             } else if (values[1].equals("下行标准差=")) {
@@ -62,7 +64,7 @@ public class BackTestPyAnalysisGetter {
             } else if (values[1].equals("择时系数=")) {
                 result.setZsxs(Double.valueOf(values[2]));
             } else if (values[1].equals("最大跌幅=")) {
-                result.setZddf(Double.valueOf(values[2]));
+                result.setZddf(Double.valueOf(values[2]) * 100);
             } else if (values[1].equals("期初净值=")) {
                 result.setQcjz(Double.valueOf(values[2]));
             } else if (values[1].equals("期末净值=")) {
@@ -70,11 +72,10 @@ public class BackTestPyAnalysisGetter {
             } else if (values[1].equals("累计净值=")) {
                 cumNet.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
             } else if (values[1].equals("日收益率=")) {
-                dailyReturnRates.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
+                dailyReturnRates.add(new ValueDateBean(values[2], Double.valueOf(values[3]) * 100));
             } else if (values[1].equals("每日回撤=")) {
-                dailyRetrace.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
+                dailyRetrace.add(new ValueDateBean(values[2], Double.valueOf(values[3]) * 100));
             } else {
-                System.out.println(each);
                 PyAnalysisResult.CorrelationCoefficient correlationCoefficient = result.new CorrelationCoefficient(values[1], values[2], Double.valueOf(values[3]));
                 coefficients.add(correlationCoefficient);
             }
@@ -85,5 +86,12 @@ public class BackTestPyAnalysisGetter {
         result.setDailyRetrace(new ArrayList<>(dailyRetrace));
         result.setDailyReturnRate(new ArrayList<>(dailyReturnRates));
         return result;
+    }
+
+    public static void main(String[] args) {
+        List<String> codes = new ArrayList<>(Arrays.asList("000120", "000308"));
+        List<Double> percentage = new ArrayList<>(Arrays.asList(50.0, 50.0));
+
+        PyAnalysisResult result = getBasicFactors(codes, percentage, "1900-10-01", "2017-11-04");
     }
 }

@@ -215,9 +215,9 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public BacktestReportBean backtestCombination(Integer combinationId, String startDate, String endDate, String baseIndex) throws java.text.ParseException {
-        if (userService.getCurrentUser() == null) {
-            return null;
-        }
+//        if (userService.getCurrentUser() == null) {
+//            return null;
+//        }
 
         BacktestReportBean backtestReportBean = new BacktestReportBean();
         int days = DaysBetween.daysOfTwo(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
