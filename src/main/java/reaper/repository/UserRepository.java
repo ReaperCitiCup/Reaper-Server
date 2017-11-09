@@ -10,10 +10,6 @@ import org.springframework.data.repository.CrudRepository;
  */
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    //TODO 这里应该删掉，还没测
-    @Query(value = "SELECT MAX(id) from user;", nativeQuery = true)
-    Integer findNextId();
-
     User findUserById(Integer id);
 
     User findUserByUsername(String username);

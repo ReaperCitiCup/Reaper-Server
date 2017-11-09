@@ -31,6 +31,7 @@ public class UserRepositoryTest {
     public void save() throws Exception {
         User user = new User();
 //        user.setId(1);
+//        user.setId(null);
         user.setUsername("111");
         user.setPassword("123");
         userRepository.save(user);

@@ -22,7 +22,7 @@ public class UserServiceTest {
 
     @Test
     public void signUp() {
-        ResultMessage resultMessage = userService.signUp("123", "123");
+        ResultMessage resultMessage = userService.signUp("111", "123");
         assertEquals(ResultMessage.SUCCESS, resultMessage);
     }
 

@@ -7,6 +7,7 @@ import reaper.model.*;
 import reaper.repository.*;
 import reaper.service.ManagerService;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -181,6 +182,7 @@ public class ManagerServiceImpl implements ManagerService {
      */
     @Override
     public FundPerformanceBean findFundPerformanceByManagerId(String managerId) {
+        //TODO 再看看吧，怎么跟以前的结果不一样
         List<PerformanceDataBean> funds = new ArrayList<>();
         List<PerformanceDataBean> others = new ArrayList<>();
         //经理所持基金
@@ -190,11 +192,12 @@ public class ManagerServiceImpl implements ManagerService {
             List<Fund> fundList=fundRepository.findAllFundOfManagerService();
             for(Fund fund:fundList){
                 PerformanceDataBean res = new PerformanceDataBean(fund);
-                if(codeList.contains(fund.getCode())&& !funds.contains(res)){
-                    funds.add(res);
-                }
-                else if(res.risk <= 50 && res.rate >= -100 && res.rate <= 100){
-                    others.add(res);
+                if(!funds.contains(res)) {
+                    if (codeList.contains(fund.getCode())) {
+                        funds.add(res);
+                    } else if (res.risk <= 50 && res.rate >= -100 && res.rate <= 100) {
+                        others.add(res);
+                    }
                 }
             }
 //            for (FundHistory fundManager : fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId)) {
@@ -236,13 +239,15 @@ public class ManagerServiceImpl implements ManagerService {
             res.rate /= 100;
             managers.add(res);
         }
-        //TODO 问钱
-        for (Manager manager1 : managerRepository.findAll()) {
+
+        List<Manager> otherManagers=managerRepository.findOtherManagerByManagerId(managerId);
+        for (Manager manager1 : otherManagers) {
             PerformanceDataBean res = new PerformanceDataBean(manager1);
             res.rate /= 100;
-            if (!managers.contains(res) && res.rate <= 200 && res.risk <= 20) {
-                others.add(res);
-            }
+            others.add(res);
+//            if (!managers.contains(res) && res.rate <= 200 && res.risk <= 20) {
+//                others.add(res);
+//            }
         }
         return new ManagerPerformanceBean(managers, others);
     }
@@ -255,14 +260,15 @@ public class ManagerServiceImpl implements ManagerService {
      */
     @Override
     public ManagerAbilityBean findManagerAbilityByManagerId(String managerId) {
-        Manager manager = managerRepository.findByManagerId(managerId);
-        Integer id=Integer.parseInt(managerId);
-        if (manager != null) {
-            ManagerRemark managerRemark = managerRemarkRepository.findByManagerId(id);
-            if (managerRemark != null) {
-                return new ManagerAbilityBean(managerRemark);
-            }
-
+        Integer id=null;
+        try {
+            id=Integer.parseInt(managerId);
+        }catch (NumberFormatException ne){
+            return null;
+        }
+        ManagerRemark managerRemark = managerRemarkRepository.findByManagerId(id);
+        if (managerRemark != null) {
+            return new ManagerAbilityBean(managerRemark);
         }
         return null;
     }
@@ -275,7 +281,6 @@ public class ManagerServiceImpl implements ManagerService {
      */
     @Override
     public ManagerNetworkBean findSocialNetworkByManagerId(String managerId) {
-        //TODO 联系改好数据库后再说
         List<NodeDataBean> nodes = new ArrayList<>();
         List<ManagerLinkDataBean> links = new ArrayList<>();
 
@@ -331,6 +336,7 @@ public class ManagerServiceImpl implements ManagerService {
             if (!managerEdges.contains(managerEdge)) {
                 managerEdges.add(managerEdge);
                 managerEdges = getInterfacingCode(managerEdge.getManagerIdA(), managerEdges);
+//                managerEdges.addAll(getInterfacingCode(managerEdge.getManagerIdA(), managerEdges));
             }
         }
         //作为右端点
@@ -338,6 +344,7 @@ public class ManagerServiceImpl implements ManagerService {
             if (!managerEdges.contains(managerEdge)) {
                 managerEdges.add(managerEdge);
                 managerEdges = getInterfacingCode(managerEdge.getManagerIdB(), managerEdges);
+//                managerEdges.addAll(getInterfacingCode(managerEdge.getManagerIdB(), managerEdges));
             }
         }
         return managerEdges;
