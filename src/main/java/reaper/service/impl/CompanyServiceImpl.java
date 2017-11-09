@@ -50,16 +50,11 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public FundPerformanceBean findFundPerformanceByCompanyId(String companyId) {
         //该公司所有的fund
-        List<FundCompany> fundCompanies = fundCompanyRepository.findAllByCompanyId(companyId);
-        List<PerformanceDataBean> funds = new ArrayList<>();
-        List<PerformanceDataBean> others = new ArrayList<>();
-
         List<Fund> companyFund=fundRepository.findCompanyFund(companyId);
-        funds = companyFund.parallelStream().map(cf->new PerformanceDataBean(cf)).collect(Collectors.toList());
+        List<PerformanceDataBean> funds = companyFund.parallelStream().map(PerformanceDataBean::new).collect(Collectors.toList());
 
         List<Fund> otherFund=fundRepository.findOtherFund(companyId);
-        others = otherFund.parallelStream().filter(of->(of.getVolatility()<=50&&of.getAnnualProfit()>=-100&&of.getAnnualProfit()<=100))
-                .map(of->new PerformanceDataBean(of)).collect(Collectors.toList());
+        List<PerformanceDataBean> others = otherFund.parallelStream().map(PerformanceDataBean::new).collect(Collectors.toList());
 
 //        for (FundCompany fundCompany : fundCompanies) {
 //            try {
@@ -83,7 +78,7 @@ public class CompanyServiceImpl implements CompanyService {
 //                PerformanceDataBean data = new PerformanceDataBean(fund);
 //
 //                //判断是否是公司的
-//                //TODO 这个比较有点怪怪的，别忘了问钱
+//
 //                if (!funds.contains(data) && data.risk <= 50 && data.rate >= -100 && data.rate <= 100) {
 //                    others.add(data);
 //                }
@@ -100,18 +95,13 @@ public class CompanyServiceImpl implements CompanyService {
      */
     @Override
     public ManagerPerformanceBean findManagerPerformanceByCompanyId(String companyId) {
-        List<ManagerCompany> managerCompanies = managerCompanyRespository.findAllByCompanyId(companyId);
         //公司经理
-        List<PerformanceDataBean> managers = new ArrayList<>();
-        List<PerformanceDataBean> others = new ArrayList<>();
-
         //TODO 想不起原来为什么returnRate要除以100了，先这样改完，有问题再改吧～
         List<Manager> companyManager=managerRepository.findCompanyManager(companyId);
-        managers = companyManager.parallelStream().map(cm->new PerformanceDataBean(cm)).collect(Collectors.toList());
+        List<PerformanceDataBean> managers = companyManager.parallelStream().map(PerformanceDataBean::new).collect(Collectors.toList());
         List<Manager> otherManager=managerRepository.findOtherMangerByCompanyId(companyId);
-        others = otherManager.parallelStream().map(om->new PerformanceDataBean(om)).collect(Collectors.toList());
+        List<PerformanceDataBean> others = otherManager.parallelStream().map(PerformanceDataBean::new).collect(Collectors.toList());
 
-//        //TODO 这里要问钱，本公司经理和其他经理写得怪怪的
 //        for (ManagerCompany managerCompany : managerCompanies) {
 //            try {
 //                Manager manager = managerRepository.findByManagerId(managerCompany.getManagerId());
@@ -147,19 +137,17 @@ public class CompanyServiceImpl implements CompanyService {
      */
     @Override
     public List<FieldValueBean> findAssetAllocationByCompanyId(String companyId) {
-        List<FundCompany> fundCompanies = fundCompanyRepository.findAllByCompanyId(companyId);
         //计数，非null数值
         int count = 0;
         double stock = 0;
         double bond = 0;
         double bank = 0;
 
-        //TODO 改法同上，并改用lambda表达式进行计算（虽然优化不大）
         List<AssetAllocation> assetAllocations=assetAllocationRepository.findByCompany(companyId);
-        stock=assetAllocations.parallelStream().mapToDouble((x)->x.getStock()).sum();
-        bond=assetAllocations.parallelStream().mapToDouble((x)->x.getBond()).sum();
+        stock=assetAllocations.parallelStream().mapToDouble(AssetAllocation::getStock).sum();
+        bond=assetAllocations.parallelStream().mapToDouble(AssetAllocation::getBond).sum();
         //TODO 卧槽，bank那一列怎么全是零
-        bank=assetAllocations.parallelStream().mapToDouble((x)->x.getBank()).sum();
+        bank=assetAllocations.parallelStream().mapToDouble(AssetAllocation::getBank).sum();
         count=assetAllocations.size();
 
 //        for (FundCompany fundCompany : fundCompanies) {
@@ -173,10 +161,19 @@ public class CompanyServiceImpl implements CompanyService {
 //            count++;
 //        }
         List<FieldValueBean> res = new ArrayList<>();
-        res.add(new FieldValueBean("股票", FormatData.fixToTwo(stock / count)));
-        res.add(new FieldValueBean("银行", FormatData.fixToTwo(bank / count)));
-        res.add(new FieldValueBean("债券", FormatData.fixToTwo(bond / count)));
-        res.add(new FieldValueBean("其他", FormatData.fixToTwo(100 - stock / count - bank / count - bond / count)));
+        if(count!=0) {
+            res.add(new FieldValueBean("股票", FormatData.fixToTwo(stock / count)));
+            res.add(new FieldValueBean("银行", FormatData.fixToTwo(bank / count)));
+            res.add(new FieldValueBean("债券", FormatData.fixToTwo(bond / count)));
+            res.add(new FieldValueBean("其他", FormatData.fixToTwo(100 - stock / count - bank / count - bond / count)));
+        }
+        else{
+            res.add(new FieldValueBean("股票", FormatData.fixToTwo(0.0)));
+            res.add(new FieldValueBean("银行", FormatData.fixToTwo(0.0)));
+            res.add(new FieldValueBean("债券", FormatData.fixToTwo(0.0)));
+            res.add(new FieldValueBean("其他", FormatData.fixToTwo(0.0)));
+        }
+
         return res;
     }
 

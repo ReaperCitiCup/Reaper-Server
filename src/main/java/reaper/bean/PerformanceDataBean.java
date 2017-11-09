@@ -45,7 +45,7 @@ public class PerformanceDataBean {
     public PerformanceDataBean(Manager manager) {
         id = manager.getManagerId();
         name = manager.getName();
-        rate = FormatData.fixToTwoAndPercent(manager.getBestReturns());
+        rate = FormatData.fixToTwoAndPercent(manager.getBestReturns()/100.0);
         risk = FormatData.fixToTwoAndPercent(manager.getRisk());
     }
 

@@ -182,7 +182,6 @@ public class ManagerServiceImpl implements ManagerService {
      */
     @Override
     public FundPerformanceBean findFundPerformanceByManagerId(String managerId) {
-        //TODO 再看看吧，怎么跟以前的结果不一样
         List<PerformanceDataBean> funds = new ArrayList<>();
         List<PerformanceDataBean> others = new ArrayList<>();
         //经理所持基金
@@ -192,12 +191,10 @@ public class ManagerServiceImpl implements ManagerService {
             List<Fund> fundList=fundRepository.findAllFundOfManagerService();
             for(Fund fund:fundList){
                 PerformanceDataBean res = new PerformanceDataBean(fund);
-                if(!funds.contains(res)) {
-                    if (codeList.contains(fund.getCode())) {
-                        funds.add(res);
-                    } else if (res.risk <= 50 && res.rate >= -100 && res.rate <= 100) {
-                        others.add(res);
-                    }
+                if (codeList.contains(fund.getCode())) {
+                    funds.add(res);
+                } else if (res.risk <= 50 && res.rate >= -100 && res.rate <= 100) {
+                    others.add(res);
                 }
             }
 //            for (FundHistory fundManager : fundHistoryRepository.findAllByManagerIdAndAndEndDateIsNull(managerId)) {
@@ -234,6 +231,7 @@ public class ManagerServiceImpl implements ManagerService {
         List<PerformanceDataBean> managers = new ArrayList<>();
         List<PerformanceDataBean> others = new ArrayList<>();
         Manager manager = managerRepository.findByManagerId(managerId);
+        //TODO 这里除了一百
         if (manager != null) {
             PerformanceDataBean res = new PerformanceDataBean(manager);
             res.rate /= 100;

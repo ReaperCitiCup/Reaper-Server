@@ -199,7 +199,7 @@ public class ManagerServiceTest {
         List<PerformanceDataBean> funds=fundPerformanceBean.funds;
         Assert.assertEquals(15, funds.size());
         List<PerformanceDataBean> others=fundPerformanceBean.others;
-//        Assert.assertEquals(5283, others.size());
+        Assert.assertEquals(5090, others.size());
         assertArrayEquals(
                 new String[]{
                         "000005"
@@ -283,14 +283,14 @@ public class ManagerServiceTest {
         Assert.assertEquals(3, managerNetworkBean.nodes.size());
         Assert.assertEquals(2, managerNetworkBean.links.size());
         for(NodeDataBean nodeDataBean:managerNetworkBean.nodes){
-            System.out.println(nodeDataBean.name);
+            System.out.println(nodeDataBean.code);
         }
         assertArrayEquals(
                 new String []{
                         "陈正宪", "何如", "刘珈吟"
                 },
                 new String[]{
-                        managerNetworkBean.nodes.get(0).name, managerNetworkBean.nodes.get(1).name, managerNetworkBean.nodes.get(2).name
+                        managerNetworkBean.nodes.get(0).code, managerNetworkBean.nodes.get(1).code, managerNetworkBean.nodes.get(2).code
                 }
         );
         ManagerLinkDataBean managerLinkDataBean=managerNetworkBean.links.get(0);
