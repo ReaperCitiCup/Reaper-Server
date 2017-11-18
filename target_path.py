@@ -7,6 +7,7 @@ Created on Sun Sep 10 10:48:40 2017
 
 import numpy as np
 import pymysql
+import sys
 
 
 def sqlByType(type_kind, lamda=5, count=8):
@@ -105,10 +106,12 @@ def sqlCode(lamda=5, count=8, sqlkind=1, type_kind=1, factor_kind=1):
     return code
 
 
-# lamda = int(sys.argv[1])
-# count = int(sys.argv[2])
-# sqlkind = int(sys.argv[3])
-# type_kind = int(sys.argv[4])
-# factor_kind = int(sys.argv[5])
-# print sqlCode(lamda, count, sqlkind, type_kind, factor_kind)
-print sqlCode(5, 8, 1, 1, 1)
+lamda = int(sys.argv[1])
+count = int(sys.argv[2])
+sqlkind = int(sys.argv[3])
+type_kind = int(sys.argv[4])
+factor_kind = int(sys.argv[5])
+print sqlCode(lamda, count, sqlkind, type_kind, factor_kind)
+# print sqlCode(5, 10, 1, 1, 0)
+# print sqlCode(5, 10, 1, 2, 0)
+# print sqlCode(5, 10, 1, 3, 0)

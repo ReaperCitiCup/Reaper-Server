@@ -406,6 +406,8 @@ def fundGroup(codeList, pencentage):
     maxStartDate = '1000-01-01'
     for code in codeList:
         fundDict[code] = getFund(code)  # 获取组合中各个基金的信息
+        # print code,fundDict[code].date[-1],fundDict[code].date[0]
+        # print '!!!!!!!!\n'
         if (fundDict[code].date[-1] > maxStartDate):
             maxStartDate = fundDict[code].date[-1]  # 时间序列是按逆序存放的
         if (fundDict[code].date[0] < minEndDate):
@@ -413,7 +415,9 @@ def fundGroup(codeList, pencentage):
     myFundGroup = Fund("myFundGroup")  # 创建一个空的基金组合对象，加权平均后的数据可放到这个对象中
     maxStartTime = datetime.strptime(maxStartDate, '%Y-%m-%d')
     minEndTime = datetime.strptime(minEndDate, '%Y-%m-%d')
+    # print maxStartTime, minEndTime
     days = (minEndTime - maxStartTime).days
+    # print days
     index = []  # 各个基金的下标列表
     for i in range(len(codeList)):
         index.append(0)

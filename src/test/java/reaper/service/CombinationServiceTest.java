@@ -53,31 +53,57 @@ public class CombinationServiceTest {
 
     @Test
     public void backtestCombination() throws Exception {
-        Integer combinationId = 28;
+        Integer combinationId = 29;
         String startDate = "2016-06-30";
         String endDate = "2016-08-31";
         String baseIndex = "上证指数";
 
 
         BacktestReportBean reportBean = combinationService.backtestCombination(combinationId, startDate, endDate, baseIndex);
-        if (reportBean == null) {
-            System.out.println("null");
-        } else {
-//            System.out.println(reportBean.toString());
+        // 收益率
+        BacktestComparisonBean profitRateTrend = reportBean.profitRateTrend;
+        for (ValueDateBean valueDateBean : profitRateTrend.base) {
+            System.out.println("profitRateTrend base: " + valueDateBean.date + " " + valueDateBean.value);
         }
+        System.out.println("=============================================================");
+        for (ValueDateBean valueDateBean : profitRateTrend.fund) {
+            System.out.println("profitRateTrend fund: " + valueDateBean.date + " " + valueDateBean.value);
+        }
+        System.out.println("=============================================================");
+
+        // 每日回撤
+        BacktestComparisonBean dailyRetracementTrend = reportBean.dailyRetracementTrend;
+        for (ValueDateBean valueDateBean : dailyRetracementTrend.base) {
+            System.out.println("dailyRetracementTrend base: " + valueDateBean.date + " " + valueDateBean.value);
+        }
+        System.out.println("=============================================================");
+        for (ValueDateBean valueDateBean : dailyRetracementTrend.fund) {
+            System.out.println("dailyRetracementTrend fund: " + valueDateBean.date + " " + valueDateBean.value);
+        }
+        System.out.println("=============================================================");
+        // 累计净值
+        BacktestComparisonBean cumulativeNetValueTrend = reportBean.cumulativeNetValueTrend;
+        for (ValueDateBean valueDateBean : cumulativeNetValueTrend.base) {
+            System.out.println("cumulative base: " + valueDateBean.date + " " + valueDateBean.value);
+        }
+        System.out.println("=============================================================");
+        for (ValueDateBean valueDateBean : cumulativeNetValueTrend.base) {
+            System.out.println("cumulative base: " + valueDateBean.date + " " + valueDateBean.value);
+        }
+
     }
 
     @Test
     public void findFundsByTargetAndPath() throws Exception {
         AssetTargetPathBean assetTargetPathBean = new AssetTargetPathBean();
         assetTargetPathBean.profitRiskTarget = 5;
-        assetTargetPathBean.path = 2;
+        assetTargetPathBean.path = 1;
         List<String> factors = new ArrayList<>();
 //        factors.add("beta");
 //        factors.add("btop");
 
-        factors.add("momentum");
-        factors.add("liquidity");
+//        factors.add("momentum");
+//        factors.add("liquidity");
         assetTargetPathBean.factor = factors;
 
         List<CategoryFundBean> result = combinationService.findFundsByTargetAndPath(assetTargetPathBean);
