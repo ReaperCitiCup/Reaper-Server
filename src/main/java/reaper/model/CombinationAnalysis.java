@@ -81,7 +81,7 @@ public class CombinationAnalysis {
         stock = bean.weight.stock;
         bond = bean.weight.bond;
         hybrid = bean.weight.hybrid;
-        factor = StringUtils.join(bean.factor,'|');
+        factor = bean.factor==null?null:StringUtils.join(bean.factor,'|');
         for(FundCategoryBean fundCategoryBean:bean.funds) {
             if(fundCategoryBean.category.equals("股票型基金")) {
                 stockCodes = StringUtils.join(fundCategoryBean.codes,'|');

@@ -58,11 +58,17 @@ public class CombinationServiceImpl implements CombinationService {
      * @return
      */
     @Override
-    public ResultMessage createCombinationByUser(String name, List<FundRatioBean> funds, Integer profitRisk) {
+    public ResultMessage createCombinationByUser(String name, List<FundRatioBean> funds, Integer profitRisk, CombinationAnalysis combinationAnalysis) {
         User user = userService.getCurrentUser();
         if (user == null) return ResultMessage.WRONG;
         StringBuilder fundsBuilder = new StringBuilder();
         StringBuilder weightsBuilder = new StringBuilder();
+
+        for (Combination existCombination : combinationRepository.findCombinationsByUserid(user.getId())) {
+            if (existCombination.getName().equals(name)) {
+                return ResultMessage.EXIST;
+            }
+        }
 
         for (int i = 0; i < funds.size(); i++) {
             FundRatioBean fundRatioBean = funds.get(i);
@@ -118,27 +124,18 @@ public class CombinationServiceImpl implements CombinationService {
         }
 
         try {
-            boolean isNameExist = false;
-            for (Combination existCombination : combinationRepository.findCombinationsByUserid(user.getId())) {
-                if (existCombination.getName().equals(name)) {
-                    isNameExist = true;
-                    break;
-                }
+            int combinationID = combinationRepository.save(combination).getId();
+            if (combinationAnalysis != null) {
+                combinationAnalysis.setId(combinationID);
+                combinationAnalysisRepository.save(combinationAnalysis);
             }
-
-            if (isNameExist) {
-                return ResultMessage.EXIST;
-            } else {
-                combinationRepository.save(combination);
-                return ResultMessage.SUCCESS;
-            }
+            return ResultMessage.SUCCESS;
 
         } catch (Exception e) {
             e.printStackTrace();
             return ResultMessage.FAILED;
         }
 
-        // TODO 数据库增加是否有风险
     }
 
     /**
@@ -675,7 +672,7 @@ public class CombinationServiceImpl implements CombinationService {
             return ResultMessage.WRONG;
         }
 
-        combinationAnalysisRepository.save(new CombinationAnalysis(fundCombination));
+        CombinationAnalysis combinationAnalysis = new CombinationAnalysis(fundCombination);
 
         /**
          * 静态比例配置要特别处理
@@ -694,7 +691,7 @@ public class CombinationServiceImpl implements CombinationService {
                 fundRatioBeans.add(new FundRatioBean(s, ration));
             }
 
-            return createCombinationByUser(fundCombination.name, fundRatioBeans, fundCombination.profitRiskTarget);
+            return createCombinationByUser(fundCombination.name, fundRatioBeans, fundCombination.profitRiskTarget, combinationAnalysis);
         }
 
         Map<String, Double> result = new HashMap<>();
@@ -746,11 +743,11 @@ public class CombinationServiceImpl implements CombinationService {
             beans.add(new FundRatioBean(entry.getKey(), FormatData.fixToTwoAndPercent(entry.getValue())));
         }
 
-        for (FundRatioBean bean : beans) {
-            System.out.println("&&&\t" + bean.id + " " + bean.ratio);
-        }
+//        for (FundRatioBean bean : beans) {
+//            System.out.println("&&&\t" + bean.id + " " + bean.ratio);
+//        }
 
-        return createCombinationByUser(fundCombination.name, beans, fundCombination.profitRiskTarget);
+        return createCombinationByUser(fundCombination.name, beans, fundCombination.profitRiskTarget, combinationAnalysis);
     }
 
     /**
