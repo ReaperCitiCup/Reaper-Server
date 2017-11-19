@@ -163,7 +163,7 @@ def getFund(code):
     fund = Fund(code)
     try:
         cur.execute(
-            'SELECT  date,unitNetValue,dailyRate,cumulativeNetValue FROM reaper.fund_netValue WHERE code=' + code)
+            'SELECT  date,unitNetValue,dailyRate,cumulativeNetValue FROM reaper.fund_netValue WHERE code=' + code + ' ORDER BY date DESC')
         data = cur.fetchall()
         for d in data:
             fund.date.append((str(d[0]))[:10])  # 去掉时分秒

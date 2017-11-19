@@ -32,32 +32,27 @@ def hierarchicalClustering(fund_data):
           factorOrder.append(curFactorOrder)
           j+=1
 
-
-           
-                    
-     print "基金顺序为：",fundOrder
+     print ' '.join(fundOrder)
 
      for i in range(len(factorOrder)):
-           print "第",i+1,"个因子的顺序为：",factorOrder[i]
-
-
+          print ' '.join(str(f) for f in factorOrder[i])
 
 fund_data=[]
-# #读取个数
-# n=int(sys.argv[1])
-# #读取每个代码以及后面的10个参数
-# for i in range(n):
-#      data=[]
-#      data.append(str(sys.argv[2+i*11]))
-#      for j in range(10):
-#           data.append(int(sys.argv[2+i*11+j]))
-#      fund_data.append(data)
+#读取个数
+n=int(sys.argv[1])
+#读取每个代码以及后面的10个参数
+for i in range(n):
+     data=[]
+     data.append(str(sys.argv[2+i*11]))
+     for j in range(10):
+          data.append(int(sys.argv[2+i*11+j]))
+     fund_data.append(data)
 
-fund_data.append(['000003',-0.0719,0.069663935,0.022509314])#基金数据，第一个为基金代码，后面为要聚类的数据（传来的10个风格因子，现在设的只是样例数据）
-fund_data.append(['000004',0.0177,0.019897408,0.006429108])
-fund_data.append(['000007',0.0102,0.10581899,0.034191477])
-fund_data.append(['000017',-0.0063,0.012374808,0.00399846])
-fund_data.append(['000024',0.0538,0.070886282,0.02290427])
-fund_data.append(['000025',0.163,0.084955376,0.027450175])
+# fund_data.append(['000003',-0.0719,0.069663935,0.022509314])#基金数据，第一个为基金代码，后面为要聚类的数据（传来的10个风格因子，现在设的只是样例数据）
+# fund_data.append(['000004',0.0177,0.019897408,0.006429108])
+# fund_data.append(['000007',0.0102,0.10581899,0.034191477])
+# fund_data.append(['000017',-0.0063,0.012374808,0.00399846])
+# fund_data.append(['000024',0.0538,0.070886282,0.02290427])
+# fund_data.append(['000025',0.163,0.084955376,0.027450175])
 
 hierarchicalClustering(fund_data) #层次聚类

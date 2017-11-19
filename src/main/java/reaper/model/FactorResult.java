@@ -13,6 +13,11 @@ public class FactorResult {
     private String code;
 
     /**
+     * 年化收益率
+     */
+    private Double annualProfit;
+
+    /**
      * 因子类型，N为普通因子，R为风险因子
      */
     private Character factorType;
@@ -190,6 +195,14 @@ public class FactorResult {
     private Double max1;
 
     private Double max2;
+
+    public Double getAnnualProfit() {
+        return annualProfit;
+    }
+
+    public void setAnnualProfit(Double annualProfit) {
+        this.annualProfit = annualProfit;
+    }
 
     public String getCode() {
         return code;

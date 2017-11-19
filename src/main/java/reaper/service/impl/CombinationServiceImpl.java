@@ -44,6 +44,8 @@ public class CombinationServiceImpl implements CombinationService {
     private FundService fundService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private FactorsHeatRepository factorsHeatRepository;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -843,5 +845,60 @@ public class CombinationServiceImpl implements CombinationService {
         }
 
         return res;
+    }
+
+
+    /**
+     * 获取聚类分析后的热图数据
+     *
+     * @param codes 基金代码
+     * @return
+     */
+    public FundFactorsHeatBean getFundFactorsHeat(List<String> codes) {
+        List<String> resFunds = new ArrayList<>();
+        List<String> resFactors = new ArrayList<>();
+        List<FundFactorsHeatDataBean> resDatas = new ArrayList<>();
+
+        String instruction = "";
+        //计算有效数目
+        int count = 0;
+        for (String code : codes) {
+            FactorsHeat fh = factorsHeatRepository.findOne(code);
+            if (fh != null) {
+                count++;
+                instruction += String.valueOf(code) + " " +
+                        fh.getBeta() + " " +
+                        fh.getBtop() + " " +
+                        fh.getEarningsYield() + " " +
+                        fh.getGrowth() + " " +
+                        fh.getLeverage() + " " +
+                        fh.getLiquidity() + " " +
+                        fh.getMomentum() + " " +
+                        fh.getNlsize() + " " +
+                        fh.getResidualvolatility() + " " +
+                        fh.getSize() + " ";
+            }
+        }
+        instruction = String.valueOf(count)+instruction;
+        //python排序结果
+        String orderRes = PythonUser.usePy("cluster.py",instruction);
+        //结果第一行为代码，下面10行为各个因子
+        String orderedCodesAndAttr[] = orderRes.split("\n");
+        for(String code:orderedCodesAndAttr[0].split(" ")){
+            resFunds.add(code);
+        }
+
+        //10种因子
+        String attrs[] = {"beta","价值","盈利能力","成长性","杠杆率","流动性","动量","非线性市值","波动率","市值"};
+
+        for(int i=0;i<10;i++){
+            resFactors.add(attrs[i]);
+            String[] values = orderedCodesAndAttr[i].split(" ");
+            for(int j=0;j<values.length;j++){
+                resDatas.add(new FundFactorsHeatDataBean(i,j,(int)Double.parseDouble(values[j])));
+            }
+        }
+
+        return new FundFactorsHeatBean(resFunds,resFactors,resDatas);
     }
 }

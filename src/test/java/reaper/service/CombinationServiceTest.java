@@ -151,5 +151,19 @@ public class CombinationServiceTest {
 
     }
 
+    @Test
+    public void testFactorHeat()throws Exception{
+        List<String> funds = new ArrayList<String>(){{
+            add("000001");
+            add("000003");
+            add("000004");
+            add("000017");
+            add("000044");
+
+        }};
+        System.out.println(combinationService.getFundFactorsHeat(funds));
+
+    }
+
 
 }

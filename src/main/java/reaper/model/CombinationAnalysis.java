@@ -78,10 +78,10 @@ public class CombinationAnalysis {
         profitRiskTarget = bean.profitRiskTarget;
         profitRate = bean.profitRate;
         path = bean.path;
-        stock = bean.weight.stock;
-        bond = bean.weight.bond;
-        hybrid = bean.weight.hybrid;
-        factor = StringUtils.join(bean.factor,'|');
+        stock = bean.weight==null?null:bean.weight.stock;
+        bond = bean.weight==null?null:bean.weight.bond;
+        hybrid = bean.weight==null?null:bean.weight.hybrid;
+        factor = factor==null?null:StringUtils.join(bean.factor,'|');
         for(FundCategoryBean fundCategoryBean:bean.funds) {
             if(fundCategoryBean.category.equals("股票型基金")) {
                 stockCodes = StringUtils.join(fundCategoryBean.codes,'|');
