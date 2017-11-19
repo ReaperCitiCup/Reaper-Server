@@ -1,6 +1,7 @@
 package reaper.service;
 
 import reaper.bean.*;
+import reaper.model.CombinationAnalysis;
 import reaper.util.ResultMessage;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public interface CombinationService {
      * @param funds 组合列表
      * @return
      */
-    public ResultMessage createCombinationByUser(String name, List<FundRatioBean> funds, Integer profitRisk);
+    public ResultMessage createCombinationByUser(String name, List<FundRatioBean> funds, Integer profitRisk, CombinationAnalysis combinationAnalysis);
 
     /**
      * 我的组合列表

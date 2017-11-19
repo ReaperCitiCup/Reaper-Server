@@ -63,5 +63,17 @@ public class FundCombinationBean {
         this.profitRate = profitRate;
     }
 
-
+    @Override
+    public String toString() {
+        return "FundCombinationBean{" +
+                "profitRiskTarget=" + profitRiskTarget +
+                ", path=" + path +
+                ", weight=" + weight +
+                ", factor=" + factor +
+                ", name='" + name + '\'' +
+                ", funds=" + funds +
+                ", method=" + method +
+                ", profitRate=" + profitRate +
+                '}';
+    }
 }

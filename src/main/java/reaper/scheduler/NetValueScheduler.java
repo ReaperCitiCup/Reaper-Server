@@ -45,7 +45,7 @@ public class NetValueScheduler {
 
 
         MyBug myBug = new MyBug();
-        String allmessage = myBug.sendPost("http://fund.eastmoney.com/f10/F10DataApi.aspx" , "type=lsjz&id="+code+"&page=1&per=1");
+        String allmessage = myBug.sendPost("http://fund.eastmoney.com/f10/F10DataApi.aspx" , "type=lsjz&code="+code+"&page=1&per=1");
 
 
         //System.out.println(allmessage);
@@ -89,8 +89,8 @@ public class NetValueScheduler {
                     fundNetValue.setCumulativeNetValue(Double.parseDouble(biaozhuncha3));
                 }
 
-                System.out.println(code+" "+datestr+" "+biaozhuncha2+" "+biaozhuncha3+" "+
-                        xiapubilv1);
+//                System.out.println(code+" "+datestr+" "+biaozhuncha2+" "+biaozhuncha3+" "+
+//                        xiapubilv1);
                 fundNetValueRepository.save(fundNetValue);
 
             } catch (ParseException e) {
