@@ -6,8 +6,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "factor_heat")
-public class FactorsHeat {
+@Table(name = "rank_data_rf")
+public class RankDataRf {
     @Id
     @Column(length = 6)
     public String code;
@@ -32,7 +32,7 @@ public class FactorsHeat {
 
     private Double size;
 
-    public FactorsHeat() {
+    public RankDataRf() {
     }
 
     public String getCode() {
@@ -125,7 +125,7 @@ public class FactorsHeat {
 
     @Override
     public String toString() {
-        return "FactorsHeat{" +
+        return "RankDataRf{" +
                 "code='" + code + '\'' +
                 ", beta=" + beta +
                 ", btop=" + btop +

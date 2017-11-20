@@ -161,7 +161,7 @@ public class CombinationServiceTest {
             add("000044");
 
         }};
-        System.out.println(combinationService.getFundFactorsHeat(funds));
+//        System.out.println(combinationService.getFundFactorsHeat(funds));
 
     }
 

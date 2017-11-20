@@ -45,7 +45,7 @@ public class CombinationServiceImpl implements CombinationService {
     @Autowired
     private UserService userService;
     @Autowired
-    private FactorsHeatRepository factorsHeatRepository;
+    private RankDataRfRepository rankDataRfRepository;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -866,7 +866,7 @@ public class CombinationServiceImpl implements CombinationService {
         //计算有效数目
         int count = 0;
         for (String code : codeNameMap.keySet()) {
-            FactorsHeat fh = factorsHeatRepository.findOne(code);
+            FactorResult fh = factorResultRepository.findByCodeAndFactorType(code,'N');
             if (fh != null) {
                 count++;
                 instruction += String.valueOf(code) + " " +
@@ -898,7 +898,7 @@ public class CombinationServiceImpl implements CombinationService {
             resFactors.add(attrs[i]);
             String[] values = orderedCodesAndAttr[i].split(" ");
             for (int j = 0; j < values.length; j++) {
-                resDatas.add(new FundFactorsHeatDataBean(i, j, (int) Double.parseDouble(values[j])));
+                resDatas.add(new FundFactorsHeatDataBean(i, j, Double.parseDouble(values[j])));
             }
         }
 

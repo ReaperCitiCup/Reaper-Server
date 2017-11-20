@@ -10,7 +10,7 @@ public class Code {
 
     public ArrayList<String> getStockCode() {
 
-        File file = new File("src/main/id.txt");
+        File file = new File("code.txt");
         ArrayList<String> codes = new ArrayList<String>();
 
         try {

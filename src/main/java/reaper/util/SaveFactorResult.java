@@ -16,7 +16,7 @@ public class SaveFactorResult {
      * 读取
      */
     public List<BrisonResult> saveBrinsonResult() {
-        File file = new File("src/main/brinson_result.csv");
+        File file = new File("brinson_result_S3.csv");
         List<BrisonResult> results = new ArrayList<>();
         try {
             BufferedReader bf = new BufferedReader(new FileReader(file));
@@ -64,7 +64,7 @@ public class SaveFactorResult {
      * 归因读取csv
      */
     public List<FactorResult> saveFactorResult(String type) {
-        File file = new File("src/main/" + type + "factor_result.csv");
+        File file = new File(type + "factor_result_S3.csv");
         List<FactorResult> results = new ArrayList<>();
         try {
             BufferedReader bf = new BufferedReader(new FileReader(file));

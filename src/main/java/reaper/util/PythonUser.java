@@ -13,6 +13,7 @@ public class PythonUser {
      * @return 所有命令行输出
      */
     public static String usePy(String pyName, String argvs) {
+        System.out.println("python " + pyName + " " + argvs);
         String res = "";
         try {
             Process process = Runtime.getRuntime().exec("python " + pyName + " " + argvs);
