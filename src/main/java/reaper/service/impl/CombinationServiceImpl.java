@@ -9,6 +9,7 @@ import reaper.service.CombinationService;
 import reaper.service.FundService;
 import reaper.service.UserService;
 import reaper.util.*;
+import reaper.util.backtest_util.PortfolioMatlabResultGetter;
 import reaper.util.backtest_util.PyAnalysisResult;
 
 import java.text.SimpleDateFormat;
@@ -659,6 +660,23 @@ public class CombinationServiceImpl implements CombinationService {
             }
             return result;
         }
+        /**
+         * barra
+         */
+        else if (path == 3) {
+            Map<String, Double> fundRatio = PortfolioMatlabResultGetter.getBarra(targetPath.barraFactor);
+            BarraCache cache = BarraCache.getBarraCache();
+            boolean res = cache.saveToCache(userService.getCurrentUser().getId(), fundRatio);
+            if (!res) {
+                return new ArrayList<>();
+            }
+            List<MiniBean> miniBeans = new ArrayList<>();
+            for (String code : fundRatio.keySet()) {
+                miniBeans.add(fundService.findFundNameByCode(code));
+            }
+            result.add(new CategoryFundBean("barra", miniBeans));
+            return result;
+        }
         return Collections.EMPTY_LIST;
     }
 
@@ -697,7 +715,24 @@ public class CombinationServiceImpl implements CombinationService {
             return createCombinationByUser(fundCombination.name, fundRatioBeans, fundCombination.profitRiskTarget, combinationAnalysis);
         }
 
-        Map<String, Double> result = new HashMap<>();
+        /**
+         * barra
+         */
+        if (fundCombination.path == 3) {
+            Map<String, Double> fundRatio = BarraCache.getBarraCache().findFromCache(userService.getCurrentUser().getId());
+            if (fundRatio == null || fundRatio.isEmpty()) {
+                return ResultMessage.FAILED;
+            }
+
+            List<FundRatioBean> beans = new ArrayList<>();
+            for (Map.Entry<String, Double> entry : fundRatio.entrySet()) {
+                beans.add(new FundRatioBean(entry.getKey(), entry.getValue()));
+            }
+
+            return createCombinationByUser(fundCombination.name, beans, fundCombination.profitRiskTarget, null);
+        }
+
+        Map<String, Double> result;
         int uncentralize_type = fundCombination.path;
         int portfolioType = fundCombination.method;
         List<String> codes = new ArrayList<>();
@@ -745,10 +780,6 @@ public class CombinationServiceImpl implements CombinationService {
         for (Map.Entry<String, Double> entry : result.entrySet()) {
             beans.add(new FundRatioBean(entry.getKey(), FormatData.fixToTwoAndPercent(entry.getValue())));
         }
-
-//        for (FundRatioBean bean : beans) {
-//            System.out.println("&&&\t" + bean.id + " " + bean.ratio);
-//        }
 
         return createCombinationByUser(fundCombination.name, beans, fundCombination.profitRiskTarget, combinationAnalysis);
     }

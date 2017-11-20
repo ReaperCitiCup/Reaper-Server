@@ -14,7 +14,7 @@ public class AssetTargetPathBean {
     public Integer profitRiskTarget;
 
     /**
-     * 1=资产间分散, 2=因子间分散
+     * 1=资产间分散, 2=因子间分散，3=barra，4=社会网络
      */
     public Integer path;
 
@@ -24,15 +24,21 @@ public class AssetTargetPathBean {
     public AssetWeightBean weight;
 
     /**
-     * 如果选择因子间分散，则factor有效
+     * 如果选择因子间分散，则styleFactor有效
      */
     public List<String> factor;
 
-    public AssetTargetPathBean(Integer profitRiskTarget, Integer path, AssetWeightBean weight, List<String> factor) {
+    /**
+     * 如果选择barra，则barraFactor有效
+     */
+    public List<BarraFactorBean> barraFactor;
+
+    public AssetTargetPathBean(Integer profitRiskTarget, Integer path, AssetWeightBean weight, List<String> factor, List<BarraFactorBean> barraFactor) {
         this.profitRiskTarget = profitRiskTarget;
         this.path = path;
         this.weight = weight;
         this.factor = factor;
+        this.barraFactor = barraFactor;
     }
 
     public AssetTargetPathBean() {
