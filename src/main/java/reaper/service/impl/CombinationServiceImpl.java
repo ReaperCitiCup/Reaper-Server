@@ -604,7 +604,7 @@ public class CombinationServiceImpl implements CombinationService {
         backtestReportBean.brisonAttributionStock = brisonAttributionStock;
         System.out.println("归因: " + LocalDateTime.now());
 
-        backtestReportBean.fundFactorsHeat = getFundFactorsHeat(codes);
+        backtestReportBean.fundFactorsHeat = getFundFactorsHeat(backtestReportBean.combination);
 
         return backtestReportBean;
     }
@@ -852,18 +852,20 @@ public class CombinationServiceImpl implements CombinationService {
     /**
      * 获取聚类分析后的热图数据
      *
-     * @param codes 基金代码
      * @return
      */
-    private FundFactorsHeatBean getFundFactorsHeat(List<String> codes) {
+    private FundFactorsHeatBean getFundFactorsHeat(List<FundRatioNameBean> fundRatioNameBeans) {
         List<String> resFunds = new ArrayList<>();
         List<String> resFactors = new ArrayList<>();
         List<FundFactorsHeatDataBean> resDatas = new ArrayList<>();
 
         String instruction = "";
+        Map<String, String> codeNameMap = new HashMap<>();
+        fundRatioNameBeans.forEach(fundRatioNameBean -> codeNameMap.put(fundRatioNameBean.code, fundRatioNameBean.name));
+
         //计算有效数目
         int count = 0;
-        for (String code : codes) {
+        for (String code : codeNameMap.keySet()) {
             FactorsHeat fh = factorsHeatRepository.findOne(code);
             if (fh != null) {
                 count++;
@@ -882,24 +884,24 @@ public class CombinationServiceImpl implements CombinationService {
         }
         instruction = String.valueOf(count) + " " + instruction;
         //python排序结果
-        String orderRes = PythonUser.usePy("cluster.py",instruction);
+        String orderRes = PythonUser.usePy("cluster.py", instruction);
         //结果第一行为代码，下面10行为各个因子
         String orderedCodesAndAttr[] = orderRes.split("\n");
-        for(String code:orderedCodesAndAttr[0].split(" ")){
-            resFunds.add(code);
+        for (String code : orderedCodesAndAttr[0].split(" ")) {
+            resFunds.add(codeNameMap.get(code));
         }
 
         //10种因子
-        String attrs[] = {"beta","价值","盈利能力","成长性","杠杆率","流动性","动量","非线性市值","波动率","市值"};
+        String attrs[] = {"beta", "价值", "盈利能力", "成长性", "杠杆率", "流动性", "动量", "非线性市值", "波动率", "市值"};
 
-        for(int i=0;i<10;i++){
+        for (int i = 0; i < 10; i++) {
             resFactors.add(attrs[i]);
             String[] values = orderedCodesAndAttr[i].split(" ");
-            for(int j=0;j<values.length;j++){
-                resDatas.add(new FundFactorsHeatDataBean(i,j,(int)Double.parseDouble(values[j])));
+            for (int j = 0; j < values.length; j++) {
+                resDatas.add(new FundFactorsHeatDataBean(i, j, (int) Double.parseDouble(values[j])));
             }
         }
 
-        return new FundFactorsHeatBean(resFunds,resFactors,resDatas);
+        return new FundFactorsHeatBean(resFunds, resFactors, resDatas);
     }
 }
