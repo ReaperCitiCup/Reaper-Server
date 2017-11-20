@@ -45,7 +45,7 @@ for i in range(n):
      data=[]
      data.append(str(sys.argv[2+i*11]))
      for j in range(10):
-          data.append(int(sys.argv[2+i*11+j]))
+          data.append(float(sys.argv[2+i*11+j]))
      fund_data.append(data)
 
 # fund_data.append(['000003',-0.0719,0.069663935,0.022509314])#基金数据，第一个为基金代码，后面为要聚类的数据（传来的10个风格因子，现在设的只是样例数据）
