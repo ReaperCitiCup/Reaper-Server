@@ -166,18 +166,12 @@ public class BacktestReportBean {
      */
     public List<FieldValueBean> brisonAttributionBond;
 
-    public BacktestReportBean(String startDate, String endDate, String baseIndex, List<FundRatioNameBean> combination, String investmentGoal, Double intervalAnnualProfit,
-                              Double cumulativeProfit, Double finalNetValue, Double maxRetracement, Double sharpeRatio,
-                              Double volatility, List<String> mainFactors, BacktestComparisonBean cumulativeNetValueTrend,
-                              BacktestComparisonBean profitRateTrend, BacktestValueComparisonBean totalProfitRate,
-                              BacktestValueComparisonBean overProfitRate, BacktestValueComparisonBean annualProfit,
-                              BacktestValueComparisonBean profitDaysRatio,
-                              BacktestComparisonBean dailyRetracementTrend, List<BacktestCorrelationTable> correlationCoefficientTable,
-                              Double maxDayDown, Integer maxDownDays, Double annualVolatility, Double var,
-                              Double averageCorrelationCoefficient, List<FieldValueBean> styleAttributionProfit,
-                              List<FieldValueBean> styleAttributionRisk, List<FieldValueBean> industryAttributionProfit,
-                              List<FieldValueBean> industryAttributionRisk, List<FieldValueBean> varietyAttribution,
-                              List<FieldValueBean> brisonAttributionStock, List<FieldValueBean> brisonAttributionBond) {
+    /**
+     * 热图
+     */
+    public FundFactorsHeatBean fundFactorsHeat;
+
+    public BacktestReportBean(String startDate, String endDate, String baseIndex, List<FundRatioNameBean> combination, String investmentGoal, Double intervalAnnualProfit, Double cumulativeProfit, Double finalNetValue, Double maxRetracement, Double sharpeRatio, Double volatility, List<String> mainFactors, BacktestComparisonBean cumulativeNetValueTrend, BacktestComparisonBean profitRateTrend, BacktestValueComparisonBean totalProfitRate, BacktestValueComparisonBean overProfitRate, BacktestValueComparisonBean annualProfit, BacktestValueComparisonBean profitDaysRatio, BacktestComparisonBean dailyRetracementTrend, List<BacktestCorrelationTable> correlationCoefficientTable, Double maxDayDown, Integer maxDownDays, Double annualVolatility, Double var, Double averageCorrelationCoefficient, List<FieldValueBean> styleAttributionProfit, List<FieldValueBean> styleAttributionRisk, List<FieldValueBean> industryAttributionProfit, List<FieldValueBean> industryAttributionRisk, List<FieldValueBean> varietyAttribution, List<FieldValueBean> brisonAttributionStock, List<FieldValueBean> brisonAttributionBond, FundFactorsHeatBean fundFactorsHeat) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.baseIndex = baseIndex;
@@ -201,7 +195,6 @@ public class BacktestReportBean {
         this.maxDayDown = maxDayDown;
         this.maxDownDays = maxDownDays;
         this.annualVolatility = annualVolatility;
-//        this.beta = beta;
         this.var = var;
         this.averageCorrelationCoefficient = averageCorrelationCoefficient;
         this.styleAttributionProfit = styleAttributionProfit;
@@ -211,6 +204,7 @@ public class BacktestReportBean {
         this.varietyAttribution = varietyAttribution;
         this.brisonAttributionStock = brisonAttributionStock;
         this.brisonAttributionBond = brisonAttributionBond;
+        this.fundFactorsHeat = fundFactorsHeat;
     }
 
     public BacktestReportBean() {
@@ -224,24 +218,24 @@ public class BacktestReportBean {
             System.out.println(fundRatioNameBean.code + "," + fundRatioNameBean.name + "," + fundRatioNameBean.weight);
         }
 
-        for (ValueDateBean valueDateBean: cumulativeNetValueTrend.base) {
+        for (ValueDateBean valueDateBean : cumulativeNetValueTrend.base) {
             System.out.print("cumulativeNetValueTrend.base=");
-            System.out.println(valueDateBean.date + "," +  valueDateBean.value);
+            System.out.println(valueDateBean.date + "," + valueDateBean.value);
         }
 
-        for (ValueDateBean valueDateBean: cumulativeNetValueTrend.fund) {
+        for (ValueDateBean valueDateBean : cumulativeNetValueTrend.fund) {
             System.out.print("cumulativeNetValueTrend.fund=");
-            System.out.println(valueDateBean.date + "," +  valueDateBean.value);
+            System.out.println(valueDateBean.date + "," + valueDateBean.value);
         }
 
-        for (ValueDateBean valueDateBean: profitRateTrend.base) {
+        for (ValueDateBean valueDateBean : profitRateTrend.base) {
             System.out.print("profitRateTrend.base=");
-            System.out.println(valueDateBean.date + "," +  valueDateBean.value);
+            System.out.println(valueDateBean.date + "," + valueDateBean.value);
         }
 
-        for (ValueDateBean valueDateBean: profitRateTrend.fund) {
+        for (ValueDateBean valueDateBean : profitRateTrend.fund) {
             System.out.print("profitRateTrend.fund=");
-            System.out.println(valueDateBean.date + "," +  valueDateBean.value);
+            System.out.println(valueDateBean.date + "," + valueDateBean.value);
         }
 
         System.out.println("totalProfitRate.base=" + totalProfitRate.baseIndex);
@@ -256,21 +250,20 @@ public class BacktestReportBean {
         System.out.println("profitDaysRatio.base=" + profitDaysRatio.baseIndex);
         System.out.println("profitDaysRatio.fund=" + profitDaysRatio.combination);
 
-        for (ValueDateBean valueDateBean: dailyRetracementTrend.base) {
+        for (ValueDateBean valueDateBean : dailyRetracementTrend.base) {
             System.out.print("dailyRetracementTrend.base=");
-            System.out.println(valueDateBean.date + "," +  valueDateBean.value);
+            System.out.println(valueDateBean.date + "," + valueDateBean.value);
         }
 
-        for (ValueDateBean valueDateBean: dailyRetracementTrend.fund) {
+        for (ValueDateBean valueDateBean : dailyRetracementTrend.fund) {
             System.out.print("dailyRetracementTrend.fund=");
-            System.out.println(valueDateBean.date + "," +  valueDateBean.value);
+            System.out.println(valueDateBean.date + "," + valueDateBean.value);
         }
 
-        for (BacktestCorrelationTable backtestCorrelationTable: correlationCoefficientTable) {
+        for (BacktestCorrelationTable backtestCorrelationTable : correlationCoefficientTable) {
             System.out.print("correlationCoefficientTrend=");
             System.out.println(backtestCorrelationTable.fund1 + "," + backtestCorrelationTable.fund2 + "," + backtestCorrelationTable.value);
         }
-
 
 
         return "BacktestReportBean{" +

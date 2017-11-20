@@ -1,11 +1,11 @@
 package reaper.util.backtest_util;
 
-//import Asset_Allocation.Asset_Allocation;
-//import Asset_Allocation_Factor.Asset_Allocation_Factor;
-//import com.mathworks.toolbox.javabuilder.MWArray;
-//import com.mathworks.toolbox.javabuilder.MWCharArray;
-//import com.mathworks.toolbox.javabuilder.MWException;
-//import com.mathworks.toolbox.javabuilder.MWNumericArray;
+import Asset_Allocation.Asset_Allocation;
+import Asset_Allocation_Factor.Asset_Allocation_Factor;
+import com.mathworks.toolbox.javabuilder.MWArray;
+import com.mathworks.toolbox.javabuilder.MWCharArray;
+import com.mathworks.toolbox.javabuilder.MWException;
+import com.mathworks.toolbox.javabuilder.MWNumericArray;
 
 import java.util.*;
 
@@ -46,121 +46,117 @@ public class PortfolioMatlabResultGetter {
          */
         if (uncentralize_type == 1) {
             Object[] result = null;
-//            Asset_Allocation assetAllocation = null;
-//            MWCharArray funds = null;
-//            MWNumericArray pType = null;
-//            MWNumericArray inputKind = null;
-//            MWNumericArray inputWeight = null;
-//
-//            try {
-//                funds = new MWCharArray(strings);
-//                pType = new MWNumericArray(portfolioType);
-//                inputKind = new MWNumericArray(input_kind_array);
-//                inputWeight = new MWNumericArray(input_weight_array);
-//                assetAllocation = new Asset_Allocation();
-//                if (portfolioType == 2) {
-//                    result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight, new MWNumericArray(profitRate));
-//                } else {
-//                    result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight);
-//                }
-//                String[] res = null;
-//                if (result != null && result.length != 0) {
-//                    System.out.println(result[0].toString());
-//                    res = result[0].toString().split("\n");
-//                } else {
-//                    return Collections.EMPTY_MAP;
-//                }
-//
-//                if (res == null || res.length != codes.size()) {
-//                    return Collections.EMPTY_MAP;
-//                }
-//
-//                for (int i = 0; i < sorted.size(); i++) {
-//                    resultMap.put(sorted.get(i), Double.valueOf(res[i]));
-//                    System.out.println(sorted.get(i) + "\t\t" + Double.valueOf(res[i]));
-//                }
-//
-//                return resultMap;
-//            } catch (MWException e) {
-//                return Collections.EMPTY_MAP;
-//            } finally {
-//                MWArray.disposeArray(result);
-//                MWArray.disposeArray(funds);
-//                MWArray.disposeArray(pType);
-//                MWArray.disposeArray(inputKind);
-//                MWArray.disposeArray(inputWeight);
-//
-//                if (assetAllocation != null) {
-//                    assetAllocation.dispose();
-//                    assetAllocation = null;
-//                }
-//            }
-//            /**
-//             * 因子间分散需要的参数
-//             *
-//             *  String[] codes = {"000007","000004","000017","000024","000025","000026","000052","000027","000065","000050","000003","000039","000042"};
-//             *  double[] input_kind={1,1,1,2,2,8,8,5,5,6,4,4,4};//输入因子的种类
-//             *  输入input_kind的长度必须和codes对应，input_facotr_num是指因子个数，input_kind指因子种类，其他
-//             *  变化不大，对参数格式有疑问可以问李振安
-//             */
-//        } else if (uncentralize_type == 2) {
-//            Object[] result = null;
-//            Asset_Allocation_Factor asset_allocation_factor = null;
-//            MWCharArray funds = null;
-//            MWNumericArray pType = null;
-//            MWNumericArray inputKind = null;
-//            MWNumericArray inputFactorNum = null;
-//            int input_factor_num = new HashSet<>(input_kind).size();
-//
-//            try {
-//                asset_allocation_factor = new Asset_Allocation_Factor();
-//                funds = new MWCharArray(strings);
-//                pType = new MWNumericArray(portfolioType);
-//                inputKind = new MWNumericArray(input_kind_array);
-//                inputFactorNum = new MWNumericArray(input_factor_num);
-//
-//                if (portfolioType == 2) {
-//                    result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum, new MWNumericArray(profitRate));
-//                } else {
-//                    result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum);
-//                }
-//                String[] res = null;
-//                if (result != null && result.length != 0) {
-////                    res = result[0].toString().replaceAll("[ ]+", " ").split(" ");
-//                    res = result[0].toString().split("\n");
-//                } else {
-//                    return Collections.EMPTY_MAP;
-//                }
-//
-//                if (res == null || res.length != codes.size()) {
-//                    return Collections.EMPTY_MAP;
-//                }
-//
-//                for (int i = 0; i < sorted.size(); i++) {
-//                    resultMap.put(sorted.get(i), Double.valueOf(res[i]));
-//                    System.out.println(sorted.get(i) + "\t\t" + Double.valueOf(res[i]));
-//                }
-//
-//                return resultMap;
-//            } catch (MWException e) {
-//                return Collections.EMPTY_MAP;
-//            } finally {
-//                MWArray.disposeArray(result);
-//                MWArray.disposeArray(funds);
-//                MWArray.disposeArray(pType);
-//                MWArray.disposeArray(inputKind);
-//                MWArray.disposeArray(inputFactorNum);
-//
-//                if (asset_allocation_factor != null) {
-//                    asset_allocation_factor.dispose();
-//                    asset_allocation_factor = null;
-//                }
-//            }
-//        } else {
-//            return Collections.EMPTY_MAP;
-//        }
+            Asset_Allocation assetAllocation = null;
+            MWCharArray funds = null;
+            MWNumericArray pType = null;
+            MWNumericArray inputKind = null;
+            MWNumericArray inputWeight = null;
 
-    }
-        return null;
+            try {
+                funds = new MWCharArray(strings);
+                pType = new MWNumericArray(portfolioType);
+                inputKind = new MWNumericArray(input_kind_array);
+                inputWeight = new MWNumericArray(input_weight_array);
+                assetAllocation = new Asset_Allocation();
+                if (portfolioType == 2) {
+                    result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight, new MWNumericArray(profitRate));
+                } else {
+                    result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight);
+                }
+                String[] res = null;
+                if (result != null && result.length != 0) {
+                    System.out.println(result[0].toString());
+                    res = result[0].toString().split("\n");
+                } else {
+                    return Collections.EMPTY_MAP;
+                }
+
+                if (res == null || res.length != codes.size()) {
+                    return Collections.EMPTY_MAP;
+                }
+
+                for (int i = 0; i < sorted.size(); i++) {
+                    resultMap.put(sorted.get(i), Double.valueOf(res[i]));
+                    System.out.println(sorted.get(i) + "\t\t" + Double.valueOf(res[i]));
+                }
+
+                return resultMap;
+            } catch (MWException e) {
+                return Collections.EMPTY_MAP;
+            } finally {
+                MWArray.disposeArray(result);
+                MWArray.disposeArray(funds);
+                MWArray.disposeArray(pType);
+                MWArray.disposeArray(inputKind);
+                MWArray.disposeArray(inputWeight);
+
+                if (assetAllocation != null) {
+                    assetAllocation.dispose();
+                    assetAllocation = null;
+                }
+            }
+            /**
+             * 因子间分散需要的参数
+             *
+             *  String[] codes = {"000007","000004","000017","000024","000025","000026","000052","000027","000065","000050","000003","000039","000042"};
+             *  double[] input_kind={1,1,1,2,2,8,8,5,5,6,4,4,4};//输入因子的种类
+             *  输入input_kind的长度必须和codes对应，input_facotr_num是指因子个数，input_kind指因子种类，其他
+             *  变化不大，对参数格式有疑问可以问李振安
+             */
+        } else if (uncentralize_type == 2) {
+            Object[] result = null;
+            Asset_Allocation_Factor asset_allocation_factor = null;
+            MWCharArray funds = null;
+            MWNumericArray pType = null;
+            MWNumericArray inputKind = null;
+            MWNumericArray inputFactorNum = null;
+            int input_factor_num = new HashSet<>(input_kind).size();
+
+            try {
+                asset_allocation_factor = new Asset_Allocation_Factor();
+                funds = new MWCharArray(strings);
+                pType = new MWNumericArray(portfolioType);
+                inputKind = new MWNumericArray(input_kind_array);
+                inputFactorNum = new MWNumericArray(input_factor_num);
+
+                if (portfolioType == 2) {
+                    result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum, new MWNumericArray(profitRate));
+                } else {
+                    result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum);
+                }
+                String[] res = null;
+                if (result != null && result.length != 0) {
+                    res = result[0].toString().split("\n");
+                } else {
+                    return Collections.EMPTY_MAP;
+                }
+
+                if (res == null || res.length != codes.size()) {
+                    return Collections.EMPTY_MAP;
+                }
+
+                for (int i = 0; i < sorted.size(); i++) {
+                    resultMap.put(sorted.get(i), Double.valueOf(res[i]));
+//                    System.out.println(sorted.get(i) + "\t\t" + Double.valueOf(res[i]));
+                }
+
+                return resultMap;
+            } catch (MWException e) {
+                return Collections.EMPTY_MAP;
+            } finally {
+                MWArray.disposeArray(result);
+                MWArray.disposeArray(funds);
+                MWArray.disposeArray(pType);
+                MWArray.disposeArray(inputKind);
+                MWArray.disposeArray(inputFactorNum);
+
+                if (asset_allocation_factor != null) {
+                    asset_allocation_factor.dispose();
+                    asset_allocation_factor = null;
+                }
+            }
+        } else {
+            return Collections.EMPTY_MAP;
+        }
 }
 }

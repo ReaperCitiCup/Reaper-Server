@@ -64,6 +64,4 @@ public interface CombinationService {
      */
     public ResultMessage createCombinationByAssetAllocation(FundCombinationBean fundCombination);
 
-    //TODO
-    public FundFactorsHeatBean getFundFactorsHeat(List<String> codes);
 }

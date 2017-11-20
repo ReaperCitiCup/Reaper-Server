@@ -214,9 +214,9 @@ public class CombinationServiceImpl implements CombinationService {
      */
     @Override
     public BacktestReportBean backtestCombination(Integer combinationId, String startDate, String endDate, String baseIndex) throws java.text.ParseException {
-//        if (userService.getCurrentUser() == null) {
-//            return null;
-//        }
+        if (userService.getCurrentUser() == null) {
+            return null;
+        }
 
         BacktestReportBean backtestReportBean = new BacktestReportBean();
         int days = DaysBetween.daysOfTwo(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
@@ -604,6 +604,7 @@ public class CombinationServiceImpl implements CombinationService {
         backtestReportBean.brisonAttributionStock = brisonAttributionStock;
         System.out.println("归因: " + LocalDateTime.now());
 
+        backtestReportBean.fundFactorsHeat = getFundFactorsHeat(codes);
 
         return backtestReportBean;
     }
@@ -854,7 +855,7 @@ public class CombinationServiceImpl implements CombinationService {
      * @param codes 基金代码
      * @return
      */
-    public FundFactorsHeatBean getFundFactorsHeat(List<String> codes) {
+    private FundFactorsHeatBean getFundFactorsHeat(List<String> codes) {
         List<String> resFunds = new ArrayList<>();
         List<String> resFactors = new ArrayList<>();
         List<FundFactorsHeatDataBean> resDatas = new ArrayList<>();
@@ -879,7 +880,7 @@ public class CombinationServiceImpl implements CombinationService {
                         fh.getSize() + " ";
             }
         }
-        instruction = String.valueOf(count)+instruction;
+        instruction = String.valueOf(count) + " " + instruction;
         //python排序结果
         String orderRes = PythonUser.usePy("cluster.py",instruction);
         //结果第一行为代码，下面10行为各个因子
