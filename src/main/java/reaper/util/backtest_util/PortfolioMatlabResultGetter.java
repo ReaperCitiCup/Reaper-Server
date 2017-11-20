@@ -2,10 +2,12 @@ package reaper.util.backtest_util;
 
 import Asset_Allocation.Asset_Allocation;
 import Asset_Allocation_Factor.Asset_Allocation_Factor;
+import Barra.Barra;
 import com.mathworks.toolbox.javabuilder.MWArray;
 import com.mathworks.toolbox.javabuilder.MWCharArray;
 import com.mathworks.toolbox.javabuilder.MWException;
 import com.mathworks.toolbox.javabuilder.MWNumericArray;
+import reaper.bean.BarraFactorBean;
 
 import java.util.*;
 
@@ -158,5 +160,52 @@ public class PortfolioMatlabResultGetter {
         } else {
             return Collections.EMPTY_MAP;
         }
-}
+    }
+
+    public static Map<String, Double> getBarra(List<BarraFactorBean> barraFactorBeans) {
+        Map<String, Double> resultMap = new HashMap<>();
+        Object[] result = null;
+        MWCharArray n = null;
+        MWNumericArray m = null;
+        Barra barra;
+
+        try {
+            double[] inputFactor = new double[barraFactorBeans.size()];
+            String[] sql = new String[barraFactorBeans.size() + 2];
+            sql[0] = "code";
+            sql[sql.length - 1] = "annualProfit";
+
+            for (int i = 0; i < barraFactorBeans.size(); i++) {
+                inputFactor[i] = barraFactorBeans.get(i).value;
+                sql[i + 1] = barraFactorBeans.get(i).name;
+            }
+
+            n = new MWCharArray(sql);
+            m = new MWNumericArray(inputFactor);
+            barra = new Barra();
+            result = barra.barra(2, n, m);
+
+            String[] codes;
+            String[] percent;
+
+            if (result != null && result.length == 2) {
+                codes = result[0].toString().split("\n");
+                percent = result[1].toString().split("\n");
+
+                for (int i = 0; i < codes.length; i++) {
+                    resultMap.put(codes[i], Double.valueOf(percent[i]) * 100);
+                }
+            }
+
+            return resultMap;
+        } catch (MWException e) {
+            e.printStackTrace();
+            return new HashMap<>();
+        } finally {
+            MWArray.disposeArray(n);
+            MWArray.disposeArray(m);
+            MWArray.disposeArray(result);
+        }
+
+    }
 }
