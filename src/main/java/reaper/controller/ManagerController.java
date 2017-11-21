@@ -144,7 +144,7 @@ public class ManagerController {
             value = "/{managerId}/social-network",
             method = RequestMethod.GET,
             produces = {"application/json; charset=UTF-8"})
-     public ManagerNetworkBean findSocialNetworkByManagerId(@PathVariable String managerId){
+    public ManagerNetworkBean findSocialNetworkByManagerId(@PathVariable String managerId){
         return managerService.findSocialNetworkByManagerId(managerId);
     }
 }

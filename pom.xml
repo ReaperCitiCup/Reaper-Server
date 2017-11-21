@@ -151,6 +151,12 @@
             <version>1.1</version>
         </dependency>
 
+      <dependency>
+          <groupId>Barra</groupId>
+          <artifactId>Barra</artifactId>
+          <version>1.1</version>
+      </dependency>
+
     </dependencies>
 
     <build>

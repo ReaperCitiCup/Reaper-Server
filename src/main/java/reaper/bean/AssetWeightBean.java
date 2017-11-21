@@ -29,4 +29,13 @@ public class AssetWeightBean {
 
     public AssetWeightBean() {
     }
+
+    @Override
+    public String toString() {
+        return "AssetWeightBean{" +
+                "stock=" + stock +
+                ", bond=" + bond +
+                ", hybrid=" + hybrid +
+                '}';
+    }
 }

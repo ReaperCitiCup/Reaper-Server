@@ -43,4 +43,15 @@ public class AssetTargetPathBean {
 
     public AssetTargetPathBean() {
     }
+
+    @Override
+    public String toString() {
+        return "AssetTargetPathBean{" +
+                "profitRiskTarget=" + profitRiskTarget +
+                ", path=" + path +
+                ", weight=" + weight +
+                ", factor=" + factor +
+                ", barraFactor=" + barraFactor +
+                '}';
+    }
 }

@@ -7,6 +7,7 @@ import com.mathworks.toolbox.javabuilder.MWArray;
 import com.mathworks.toolbox.javabuilder.MWCharArray;
 import com.mathworks.toolbox.javabuilder.MWException;
 import com.mathworks.toolbox.javabuilder.MWNumericArray;
+import org.apache.tomcat.util.buf.StringUtils;
 import reaper.bean.BarraFactorBean;
 
 import java.util.*;
@@ -180,7 +181,9 @@ public class PortfolioMatlabResultGetter {
                 sql[i + 1] = barraFactorBeans.get(i).name;
             }
 
-            n = new MWCharArray(sql);
+            String s = StringUtils.join(Arrays.asList(sql), ',');
+
+            n = new MWCharArray(s);
             m = new MWNumericArray(inputFactor);
             barra = new Barra();
             result = barra.barra(2, n, m);
