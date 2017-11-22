@@ -17,6 +17,10 @@ import java.util.*;
  */
 @SuppressWarnings("Duplicates")
 public class PortfolioMatlabResultGetter {
+
+    private PortfolioMatlabResultGetter() {
+    }
+
     /**
      * 创建组合时获得各基金的权重 matlab调用
      *

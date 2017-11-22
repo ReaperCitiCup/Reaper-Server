@@ -743,7 +743,7 @@ public class CombinationServiceImpl implements CombinationService {
                 }
             }
 
-            result = calComponentWeight(codes, portfolioType, input_kind, null, uncentralize_type, fundCombination.profitRate / 100.00);
+            result = calComponentWeight(codes, portfolioType, input_kind, new ArrayList<>(), uncentralize_type, fundCombination.profitRate / 100.00);
         } else return ResultMessage.INVALID;
 
         if (result == null || result.isEmpty()) {
@@ -870,7 +870,7 @@ public class CombinationServiceImpl implements CombinationService {
         //计算有效数目
         int count = 0;
         for (String code : codeNameMap.keySet()) {
-            FactorResult fh = factorResultRepository.findByCodeAndFactorType(code,'N');
+            FactorResult fh = factorResultRepository.findByCodeAndFactorType(code, 'N');
             if (fh != null) {
                 count++;
                 instruction += String.valueOf(code) + " " +
