@@ -13,8 +13,6 @@ import reaper.util.backtest_util.PortfolioMatlabResultGetter;
 import reaper.util.backtest_util.PyAnalysisResult;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static reaper.util.backtest_util.BackTestPyAnalysisGetter.getBasicFactors;
@@ -96,6 +94,7 @@ public class CombinationServiceImpl implements CombinationService {
          */
         try {
             double annualProfit = result.getNhsyl();
+            System.out.println("annualProfit " + annualProfit);
             combination.setAnnualProfit(FormatData.fixToTwoAndPercent(annualProfit));
         } catch (Exception e) {
             e.printStackTrace();
@@ -108,6 +107,7 @@ public class CombinationServiceImpl implements CombinationService {
          */
         try {
             double volatility = result.getNhbdl();
+            System.out.println("volatility: " + volatility);
             combination.setVolatility(FormatData.fixToTwoAndPercent(volatility));
         } catch (Exception e) {
             e.printStackTrace();
@@ -223,7 +223,6 @@ public class CombinationServiceImpl implements CombinationService {
         int days = DaysBetween.daysOfTwo(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
         List<Date> dateList = DaysBetween.getDatesBetweenTwoDate(simpleDateFormat.parse(startDate), simpleDateFormat.parse(endDate));
 
-        System.out.println(LocalDate.now());
 
         /**
          * 基本信息
@@ -232,7 +231,6 @@ public class CombinationServiceImpl implements CombinationService {
         backtestReportBean.endDate = endDate;
         backtestReportBean.baseIndex = baseIndex;
 
-        System.out.println("基本信息: " + LocalDateTime.now());
 
         /**
          * 基金组成
@@ -254,7 +252,6 @@ public class CombinationServiceImpl implements CombinationService {
         }
 
         PyAnalysisResult pyAnalysisResult = getBasicFactors(codes, weights, startDate, endDate);
-        System.out.println("基金组成: " + LocalDateTime.now());
 
         /**
          * 投资目标
@@ -270,8 +267,6 @@ public class CombinationServiceImpl implements CombinationService {
             backtestReportBean.investmentGoal = "无";
         }
 
-        System.out.println("投资目标: " + LocalDateTime.now());
-
 
         /**
          * 组合期末净值、期初净值、夏普比率
@@ -284,8 +279,6 @@ public class CombinationServiceImpl implements CombinationService {
         double finalNetValue = pyAnalysisResult.getQmjz();
         double startNetValue = pyAnalysisResult.getQcjz();
 
-        System.out.println("组合期末净值、期初净值、夏普比率: " + LocalDateTime.now());
-
         /**
          * 区间年化收益、累积收益、最终净值
          */
@@ -295,19 +288,15 @@ public class CombinationServiceImpl implements CombinationService {
         backtestReportBean.cumulativeProfit = FormatData.fixToTwoAndPercent((finalNetValue - startNetValue) / startNetValue);
         backtestReportBean.finalNetValue = FormatData.fixToTwo(finalNetValue);
 
-        System.out.println("区间年化收益、累积收益、最终净值: " + LocalDateTime.now());
-
         /**
          * 波动率：收益率的标准差
          */
         backtestReportBean.volatility = FormatData.fixToTwo(Calculator.calStandardDeviation(dailyRates));
-        System.out.println("波动率: " + LocalDateTime.now());
 
         /**
          * 主要的三个因子
          */
         backtestReportBean.mainFactors = findMainFactors(codes, weights);
-        System.out.println("最主要的三个因子: " + LocalDateTime.now());
 
         /**
          * 【图】累计净值
@@ -322,7 +311,6 @@ public class CombinationServiceImpl implements CombinationService {
 
 
         backtestReportBean.cumulativeNetValueTrend = new BacktestComparisonBean(netValues, baseNetValueList);
-        System.out.println("【图】累计净值: " + LocalDateTime.now());
 
         /**
          * 【图】收益率
@@ -338,7 +326,6 @@ public class CombinationServiceImpl implements CombinationService {
         }
 
         backtestReportBean.profitRateTrend = new BacktestComparisonBean(dailyRates, baseProfitList);
-        System.out.println("【图】收益率: " + LocalDateTime.now());
 
         /**
          * 总收益率 比较
@@ -348,14 +335,12 @@ public class CombinationServiceImpl implements CombinationService {
         double baseProfit = FormatData.fixToTwoAndPercent((finalBaseValue - startBaseValue) / startBaseValue);
         double fundProfit = FormatData.fixToTwoAndPercent((finalNetValue - startNetValue) / startNetValue);
         backtestReportBean.totalProfitRate = new BacktestValueComparisonBean(fundProfit, baseProfit);
-        System.out.println("总收益率: " + LocalDateTime.now());
 
 
         /**
          * 超额收益率 比较
          */
         backtestReportBean.overProfitRate = new BacktestValueComparisonBean(fundProfit - baseProfit, FormatData.fixToTwoAndPercent(0.0));
-        System.out.println("超额收益率: " + LocalDateTime.now());
 
 
         /**
@@ -369,7 +354,6 @@ public class CombinationServiceImpl implements CombinationService {
             baseAnnualProfit = Math.pow(finalBaseValue / startBaseValue, 1.0 / years) - 1;
         }
         backtestReportBean.annualProfit = new BacktestValueComparisonBean(FormatData.fixToTwoAndPercent(fundAnnualProfit), FormatData.fixToTwoAndPercent(baseAnnualProfit));
-        System.out.println("年化收益率: " + LocalDateTime.now());
 
         /**
          * 盈利天占比
@@ -390,8 +374,6 @@ public class CombinationServiceImpl implements CombinationService {
         }
 
         backtestReportBean.profitDaysRatio = new BacktestValueComparisonBean(FormatData.fixToTwoAndPercent(fundProfitDays / days), FormatData.fixToTwoAndPercent(baseProfitDays / days));
-        System.out.println("盈利天占比: " + LocalDateTime.now());
-
 
         /**
          * 【图】每日回撤、最大回撤
@@ -426,7 +408,6 @@ public class CombinationServiceImpl implements CombinationService {
 
         backtestReportBean.dailyRetracementTrend = new BacktestComparisonBean(fundRetracementList, baseRetracementList);
         backtestReportBean.maxRetracement = FormatData.fixToTwoAndPercent(maxRetracement);
-        System.out.println("每日回撤、最大回撤: " + LocalDateTime.now());
 
         /**
          * 【表】相关系数
@@ -448,7 +429,6 @@ public class CombinationServiceImpl implements CombinationService {
         }
 
         backtestReportBean.correlationCoefficientTable = backtestCorrelationTables;
-        System.out.println("相关系数: " + LocalDateTime.now());
 
         /**
          * 最大单日跌幅、最大连跌天数
@@ -463,22 +443,16 @@ public class CombinationServiceImpl implements CombinationService {
         }
         backtestReportBean.maxDayDown = FormatData.fixToTwo(0.0 - maxDayDown);
         backtestReportBean.maxDownDays = downDays;
-        System.out.println("最大单日跌幅、最大连跌天数: " + LocalDateTime.now());
-
 
         /**
          * 年化波动率
          */
         backtestReportBean.annualVolatility = FormatData.fixToTwo(pyAnalysisResult.getNhbdl());
-        System.out.println("年华波动率: " + LocalDateTime.now());
-
 
         /**
          * VaR 在险价值
          */
         backtestReportBean.var = FormatData.fixToTwo(pyAnalysisResult.getZxjz());
-        System.out.println("在险价值: " + LocalDateTime.now());
-
 
         /**
          * 风格归因-收益, 风格归因-风险, 行业归因-收益, 行业归因-风险, 品种归因, Brison归因-股票, Brison归因-债券
@@ -603,7 +577,6 @@ public class CombinationServiceImpl implements CombinationService {
         backtestReportBean.varietyAttribution = varietyAttribution;
         backtestReportBean.brisonAttributionBond = brisonAttributionBond;
         backtestReportBean.brisonAttributionStock = brisonAttributionStock;
-        System.out.println("归因: " + LocalDateTime.now());
 
         backtestReportBean.fundFactorsHeat = getFundFactorsHeat(backtestReportBean.combination);
 

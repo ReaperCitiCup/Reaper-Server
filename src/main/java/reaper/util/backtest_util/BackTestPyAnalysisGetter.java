@@ -44,9 +44,9 @@ public class BackTestPyAnalysisGetter {
         for (String each : useful) {
             String[] values = each.split(" ");
             if (values[1].equals("年化收益率=")) {
-                result.setNhsyl(Double.valueOf(values[2]) * 100);
+                result.setNhsyl(Double.valueOf(values[2]));
             } else if (values[1].equals("年化波动率=")) {
-                result.setNhbdl(Double.valueOf(values[2]) * 100);
+                result.setNhbdl(Double.valueOf(values[2]));
             } else if (values[1].equals("在险价值=")) {
                 result.setZxjz(Double.valueOf(values[2]));
             } else if (values[1].equals("下行标准差=")) {
@@ -62,7 +62,7 @@ public class BackTestPyAnalysisGetter {
             } else if (values[1].equals("择时系数=")) {
                 result.setZsxs(Double.valueOf(values[2]));
             } else if (values[1].equals("最大跌幅=")) {
-                result.setZddf(Double.valueOf(values[2]) * 100);
+                result.setZddf(Double.valueOf(values[2]));
             } else if (values[1].equals("期初净值=")) {
                 result.setQcjz(Double.valueOf(values[2]));
             } else if (values[1].equals("期末净值=")) {
@@ -70,9 +70,9 @@ public class BackTestPyAnalysisGetter {
             } else if (values[1].equals("累计净值=")) {
                 cumNet.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
             } else if (values[1].equals("日收益率=")) {
-                dailyReturnRates.add(new ValueDateBean(values[2], Double.valueOf(values[3]) * 100));
+                dailyReturnRates.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
             } else if (values[1].equals("每日回撤=")) {
-                dailyRetrace.add(new ValueDateBean(values[2], Double.valueOf(values[3]) * 100));
+                dailyRetrace.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
             } else {
                 PyAnalysisResult.CorrelationCoefficient correlationCoefficient = result.new CorrelationCoefficient(values[1], values[2], Double.valueOf(values[3]));
                 coefficients.add(correlationCoefficient);
