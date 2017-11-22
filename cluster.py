@@ -34,7 +34,7 @@ def hierarchicalClustering(fund_data):
 
      print ' '.join(fundOrder)
 
-     for i in range(len(factorOrder)):
+     for i in range(1,len(factorOrder)):
           print ' '.join(str(f) for f in factorOrder[i])
 
 fund_data=[]
@@ -44,7 +44,7 @@ n=int(sys.argv[1])
 for i in range(n):
      data=[]
      data.append(str(sys.argv[2+i*11]))
-     for j in range(10):
+     for j in range(11):
           data.append(float(sys.argv[2+i*11+j]))
      fund_data.append(data)
 

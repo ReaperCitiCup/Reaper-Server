@@ -900,7 +900,7 @@ public class CombinationServiceImpl implements CombinationService {
 
         for (int i = 0; i < 10; i++) {
             resFactors.add(attrs[i]);
-            String[] values = orderedCodesAndAttr[i].split(" ");
+            String[] values = orderedCodesAndAttr[i+1].split(" ");
             for (int j = 0; j < values.length; j++) {
                 resDatas.add(new FundFactorsHeatDataBean(i, j, Double.parseDouble(values[j])));
             }

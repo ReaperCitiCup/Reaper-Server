@@ -74,6 +74,9 @@ public class CombinationAnalysis {
      */
     private Double profitRate;
 
+    public CombinationAnalysis() {
+    }
+
     public CombinationAnalysis(FundCombinationBean bean) {
         profitRiskTarget = bean.profitRiskTarget;
         profitRate = bean.profitRate;

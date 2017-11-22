@@ -136,7 +136,7 @@
         <dependency>
             <groupId>Asset_Allocation</groupId>
             <artifactId>Asset_Allocation</artifactId>
-            <version>1.1</version>
+            <version>2.0</version>
         </dependency>
 
         <dependency>
@@ -148,13 +148,19 @@
         <dependency>
             <groupId>Asset_Allocation_Factor</groupId>
             <artifactId>Asset_Allocation_Factor</artifactId>
-            <version>1.1</version>
+            <version>2.0</version>
         </dependency>
 
       <dependency>
           <groupId>Barra</groupId>
           <artifactId>Barra</artifactId>
           <version>1.1</version>
+      </dependency>
+
+      <dependency>
+          <groupId>Asset_Allocation_Factor39</groupId>
+          <artifactId>Asset_Allocation_Factor39</artifactId>
+          <version>1.0</version>
       </dependency>
 
     </dependencies>

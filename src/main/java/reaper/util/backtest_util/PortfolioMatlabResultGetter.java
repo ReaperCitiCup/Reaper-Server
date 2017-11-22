@@ -33,9 +33,20 @@ public class PortfolioMatlabResultGetter {
         List<String> sorted = new ArrayList<>(codes);
         Collections.sort(sorted);
         String[] strings = codes.toArray(new String[codes.size()]);
-        Double[] input_kind_array = input_kind.toArray(new Double[input_kind.size()]);
+        double[] input_kind_array = input_kind.stream().mapToDouble(d->d).toArray();
 
-        Double[] input_weight_array = input_weight.toArray(new Double[input_weight.size()]);
+        double[] input_weight_array = input_weight.stream().mapToDouble(d->d).toArray();
+
+        System.out.println("code:");
+        codes.forEach(System.out::println);
+        System.out.println("kind:");
+        input_kind.forEach(System.out::println);
+        System.out.println("weight:");
+        input_weight.forEach(System.out::println);
+        System.out.println("ptype:"+portfolioType);
+        System.out.println("profitRate:"+profitRate);
+
+
 
         /**
          * 资产间分散需要的参数
@@ -65,7 +76,7 @@ public class PortfolioMatlabResultGetter {
                 inputKind = new MWNumericArray(input_kind_array);
                 inputWeight = new MWNumericArray(input_weight_array);
                 assetAllocation = new Asset_Allocation();
-                if (portfolioType == 2) {
+                if (portfolioType == 5) {
                     result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight, new MWNumericArray(profitRate));
                 } else {
                     result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight);
@@ -117,7 +128,7 @@ public class PortfolioMatlabResultGetter {
             MWNumericArray pType = null;
             MWNumericArray inputKind = null;
             MWNumericArray inputFactorNum = null;
-            int input_factor_num = new HashSet<>(input_kind).size();
+            double input_factor_num = new HashSet<>(input_kind).size();
 
             try {
                 asset_allocation_factor = new Asset_Allocation_Factor();
@@ -126,7 +137,7 @@ public class PortfolioMatlabResultGetter {
                 inputKind = new MWNumericArray(input_kind_array);
                 inputFactorNum = new MWNumericArray(input_factor_num);
 
-                if (portfolioType == 2) {
+                if (portfolioType == 5) {
                     result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum, new MWNumericArray(profitRate));
                 } else {
                     result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum);
