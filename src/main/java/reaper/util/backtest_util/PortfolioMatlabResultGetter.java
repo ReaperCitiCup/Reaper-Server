@@ -2,6 +2,7 @@ package reaper.util.backtest_util;
 
 import Asset_Allocation.Asset_Allocation;
 import Asset_Allocation_Factor.Asset_Allocation_Factor;
+import Asset_Allocation_Factor39.Asset_Allocation_Factor39;
 import Barra.Barra;
 import com.mathworks.toolbox.javabuilder.MWArray;
 import com.mathworks.toolbox.javabuilder.MWCharArray;
@@ -33,19 +34,19 @@ public class PortfolioMatlabResultGetter {
         List<String> sorted = new ArrayList<>(codes);
         Collections.sort(sorted);
         String[] strings = codes.toArray(new String[codes.size()]);
-        double[] input_kind_array = input_kind.stream().mapToDouble(d->d).toArray();
+        double[] input_kind_array = input_kind.stream().mapToDouble(d -> d).toArray();
 
-        double[] input_weight_array = input_weight.stream().mapToDouble(d->d).toArray();
+        double[] input_weight_array = input_weight.stream().mapToDouble(d -> d).toArray();
 
-        System.out.println("code:");
-        codes.forEach(System.out::println);
-        System.out.println("kind:");
-        input_kind.forEach(System.out::println);
-        System.out.println("weight:");
-        input_weight.forEach(System.out::println);
-        System.out.println("ptype:"+portfolioType);
-        System.out.println("profitRate:"+profitRate);
-
+//        System.out.println("code:");
+//        codes.forEach(System.out::println);
+//        System.out.println("kind:");
+//        input_kind.forEach(System.out::println);
+//        System.out.println("weight:");
+//        input_weight.forEach(System.out::println);
+//        System.out.println("ptype:"+portfolioType);
+//        System.out.println("profitRate:"+profitRate);
+//
 
 
         /**
@@ -155,7 +156,6 @@ public class PortfolioMatlabResultGetter {
 
                 for (int i = 0; i < sorted.size(); i++) {
                     resultMap.put(sorted.get(i), Double.valueOf(res[i]));
-//                    System.out.println(sorted.get(i) + "\t\t" + Double.valueOf(res[i]));
                 }
 
                 return resultMap;
@@ -171,6 +171,57 @@ public class PortfolioMatlabResultGetter {
                 if (asset_allocation_factor != null) {
                     asset_allocation_factor.dispose();
                     asset_allocation_factor = null;
+                }
+            }
+        } else if (uncentralize_type == 4) {
+            Object[] result = null;
+            Asset_Allocation_Factor39 asset_allocation_factor39 = null;
+            MWCharArray funds = null;
+            MWNumericArray pType = null;
+            MWNumericArray inputKind = null;
+            MWNumericArray inputFactorNum = null;
+            double input_factor_num = new HashSet<>(input_kind).size();
+
+            try {
+                asset_allocation_factor39 = new Asset_Allocation_Factor39();
+                funds = new MWCharArray(strings);
+                pType = new MWNumericArray(portfolioType);
+                inputKind = new MWNumericArray(input_kind_array);
+                inputFactorNum = new MWNumericArray(input_factor_num);
+
+                if (portfolioType == 5) {
+                    result = asset_allocation_factor39.factor_arrangement(1, funds, pType, inputKind, inputFactorNum, new MWNumericArray(profitRate));
+                } else {
+                    result = asset_allocation_factor39.factor_arrangement(1, funds, pType, inputKind, inputFactorNum);
+                }
+                String[] res = null;
+                if (result != null && result.length != 0) {
+                    res = result[0].toString().split("\n");
+                } else {
+                    return Collections.EMPTY_MAP;
+                }
+
+                if (res == null || res.length != codes.size()) {
+                    return Collections.EMPTY_MAP;
+                }
+
+                for (int i = 0; i < sorted.size(); i++) {
+                    resultMap.put(sorted.get(i), Double.valueOf(res[i]));
+                }
+
+                return resultMap;
+            } catch (MWException e) {
+                return Collections.EMPTY_MAP;
+            } finally {
+                MWArray.disposeArray(result);
+                MWArray.disposeArray(funds);
+                MWArray.disposeArray(pType);
+                MWArray.disposeArray(inputKind);
+                MWArray.disposeArray(inputFactorNum);
+
+                if (asset_allocation_factor39 != null) {
+                    asset_allocation_factor39.dispose();
+                    asset_allocation_factor39 = null;
                 }
             }
         } else {

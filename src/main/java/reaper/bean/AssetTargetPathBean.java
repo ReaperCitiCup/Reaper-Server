@@ -24,7 +24,7 @@ public class AssetTargetPathBean {
     public AssetWeightBean weight;
 
     /**
-     * 如果选择因子间分散，则styleFactor有效
+     * 如果选择因子间分散，则factor有效
      */
     public List<String> factor;
 

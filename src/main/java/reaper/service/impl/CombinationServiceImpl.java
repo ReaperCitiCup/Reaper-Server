@@ -45,6 +45,8 @@ public class CombinationServiceImpl implements CombinationService {
     private UserService userService;
     @Autowired
     private RankDataRfRepository rankDataRfRepository;
+    @Autowired
+    private NetworkRankRepository networkRankRepository;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -638,16 +640,39 @@ public class CombinationServiceImpl implements CombinationService {
          */
         else if (path == 3) {
             Map<String, Double> fundRatio = PortfolioMatlabResultGetter.getBarra(targetPath.barraFactor);
+
+            if (fundRatio.isEmpty()) {
+                return Collections.EMPTY_LIST;
+            }
+            System.out.println("Barra Matlab finish ");
+            fundRatio.entrySet().stream().forEach(stringDoubleEntry -> System.out.println(stringDoubleEntry.getKey() + " " + stringDoubleEntry.getValue()));
             BarraCache cache = BarraCache.getBarraCache();
             boolean res = cache.saveToCache(userService.getCurrentUser().getId(), fundRatio);
             if (!res) {
-                return new ArrayList<>();
+                return Collections.EMPTY_LIST;
             }
             List<MiniBean> miniBeans = new ArrayList<>();
             for (String code : fundRatio.keySet()) {
                 miniBeans.add(fundService.findFundNameByCode(code));
             }
             result.add(new CategoryFundBean("barra", miniBeans));
+            System.out.println("Barra Returns");
+            return result;
+        }
+        /**
+         * 社会网络中心配置
+         */
+        else if (path == 4) {
+            for (String s : targetPath.factor) {
+                NetworkRank networkRank = networkRankRepository.findOne(s);
+                List<String> tmp = Arrays.asList(networkRank.getCodes().split("\\|"));
+                String fname = s;
+                List<MiniBean> miniBeans = new ArrayList<>();
+                for (String code : tmp) {
+                    miniBeans.add(fundService.findFundNameByCode(code));
+                }
+                result.add(new CategoryFundBean(fname, miniBeans));
+            }
             return result;
         }
         return Collections.EMPTY_LIST;
@@ -744,7 +769,23 @@ public class CombinationServiceImpl implements CombinationService {
             }
 
             result = calComponentWeight(codes, portfolioType, input_kind, new ArrayList<>(), uncentralize_type, fundCombination.profitRate / 100.00);
-        } else return ResultMessage.INVALID;
+        }
+        /**
+         * 社会网络中心配置
+         */
+        else if (uncentralize_type == 4) {
+            for (FundCategoryBean categoryBean : fundCombination.funds) {
+                Double category = FactorNumberMapping.factorThirtyNineName2No(categoryBean.category);
+                for (String code : categoryBean.codes) {
+                    codes.add(code);
+                    input_kind.add(category);
+                }
+            }
+
+            result = calComponentWeight(codes, portfolioType, input_kind, new ArrayList<>(), uncentralize_type, fundCombination.profitRate / 100.00);
+        } else {
+            return ResultMessage.INVALID;
+        }
 
         if (result == null || result.isEmpty()) {
             return ResultMessage.FAILED;
@@ -900,7 +941,7 @@ public class CombinationServiceImpl implements CombinationService {
 
         for (int i = 0; i < 10; i++) {
             resFactors.add(attrs[i]);
-            String[] values = orderedCodesAndAttr[i+1].split(" ");
+            String[] values = orderedCodesAndAttr[i + 1].split(" ");
             for (int j = 0; j < values.length; j++) {
                 resDatas.add(new FundFactorsHeatDataBean(i, j, Double.parseDouble(values[j])));
             }

@@ -44,61 +44,61 @@ public class FactorNumberMapping {
             return 10.0;
         } else if (name.equals("jx")) {
             return 11.0;
-        } else if (name.equals("gfjg")) {
-            return 12.0;
-        } else if (name.equals("growth")) {
-            return 13.0;
         } else if (name.equals("yh")) {
-            return 14.0;
+            return 12.0;
         } else if (name.equals("fdc")) {
-            return 15.0;
+            return 13.0;
         } else if (name.equals("yy")) {
-            return 16.0;
+            return 14.0;
         } else if (name.equals("cyly")) {
-            return 17.0;
+            return 15.0;
         } else if (name.equals("smls")) {
-            return 18.0;
+            return 16.0;
         } else if (name.equals("jc")) {
-            return 19.0;
+            return 17.0;
         } else if (name.equals("jd")) {
-            return 20.0;
+            return 18.0;
         } else if (name.equals("fzfz")) {
-            return 21.0;
+            return 19.0;
         } else if (name.equals("spyl")) {
-            return 22.0;
+            return 20.0;
         } else if (name.equals("dzyqj")) {
-            return 23.0;
+            return 21.0;
         } else if (name.equals("jtys")) {
-            return 24.0;
+            return 22.0;
         } else if (name.equals("qc")) {
-            return 25.0;
+            return 23.0;
         } else if (name.equals("qgzz")) {
-            return 26.0;
+            return 24.0;
         } else if (name.equals("dljgysy")) {
-            return 27.0;
+            return 25.0;
         } else if (name.equals("zh")) {
-            return 28.0;
+            return 26.0;
         } else if (name.equals("tx")) {
-            return 29.0;
+            return 27.0;
         } else if (name.equals("sysh")) {
-            return 30.0;
+            return 28.0;
         } else if (name.equals("ysjs")) {
-            return 31.0;
+            return 29.0;
         } else if (name.equals("nlmy")) {
-            return 32.0;
+            return 30.0;
         } else if (name.equals("jz")) {
-            return 33.0;
+            return 31.0;
         } else if (name.equals("jsj")) {
-            return 34.0;
+            return 32.0;
         } else if (name.equals("jchg")) {
-            return 35.0;
+            return 33.0;
         } else if (name.equals("mt")) {
-            return 36.0;
+            return 34.0;
         } else if (name.equals("dlsb")) {
-            return 37.0;
+            return 35.0;
         } else if (name.equals("gt")) {
+            return 36.0;
+        } else if (name.equals("gfjg")) {
+            return 37.0;
+        } else if (name.equals("fyhjr")) {
             return 38.0;
-        } else if (name.equals("")) {
+        } else if (name.equals("cm")) {
             return 39.0;
         } else {
             return 0.0;
