@@ -338,7 +338,8 @@ class Rm:
         self.dayRate = []
         self.monthRate = []
 
-        cur.execute('SELECT  date,beforeClosePrice,closePrice FROM basic_stock_index where stockId="000001"')
+        cur.execute(
+            'SELECT  date,beforeClosePrice,closePrice FROM basic_stock_index where stockId="000001" order by date DESC ')
         data = cur.fetchall()
         dataLen = len(data)
         i = 0
@@ -368,7 +369,8 @@ class Rf:
         self.rfMonthly = []
         self.rfYearly = []
 
-        cur.execute('SELECT date,closePrice,priceFluctuation from basic_stock_index where stockId="000012"')
+        cur.execute(
+            'SELECT date,closePrice,priceFluctuation from basic_stock_index where stockId="000012" order by date DESC ')
         data = cur.fetchall()
         dataLen = len(data)
         i = 0
@@ -383,7 +385,7 @@ class Rf:
             i += 1
             date = data[i][0].strftime('%Y-%m-%d')
 
-        cur.execute('SELECT date,rfYearly,rfDaily,rfWeekly,rfMonthly from rf')
+        cur.execute('SELECT date,rfYearly,rfDaily,rfWeekly,rfMonthly from rf order by date DESC ')
         data = cur.fetchall()
         dataLen = len(data)
         for d in data:
@@ -455,8 +457,8 @@ def fundGroup(codeList, pencentage):
         #     curAccNetValue += fundDict[codeList[i]].accNetValue[index[i]] * pencentage[i]
         for i in range(len(pencentage)):
             curRate += fundDict[codeList[i]].dailyRate[index[i]] * pencentage[i]
-            curNAV += 1 * pencentage[i] / (fundDict[codeList[i]].nav[index[i]])  # 假设对组合投资1块钱，则curNAV即为买到的净值
-            curAccNetValue += 1 * pencentage[i] / (fundDict[codeList[i]].accNetValue[index[i]])
+            curNAV += pencentage[i] / (fundDict[codeList[i]].nav[index[i]])  # 假设对组合投资1块钱，则curNAV即为买到的净值
+            curAccNetValue += pencentage[i] / (fundDict[codeList[i]].accNetValue[index[i]])
 
         myFundGroup.dailyRate.append(curRate)
         myFundGroup.nav.append(curNAV)
@@ -475,8 +477,10 @@ def fundGroupTest(codeList, pencentage, startTime, endTime):
 
     temp = corrDate(fundDict[code].date, fundDict[code].dailyRate, rm.date, rm.dayRate, rf.date, rf.rfMonthly,
                     fundDict[code].nav, fundDict[code].accNetValue)
+
+    # print len(temp.date), len(temp.nav), len(temp.accNetValue)
     temp.countByDate(startTime, endTime)
-    # print len(temp.date),len(temp.nav),len(temp.accNetValue)
+    # print len(temp.date), len(temp.nav), len(temp.accNetValue)
 
     for i in range(len(temp.date)):
         print "#", "日收益率=", temp.date[i], temp.fundRate[i]
