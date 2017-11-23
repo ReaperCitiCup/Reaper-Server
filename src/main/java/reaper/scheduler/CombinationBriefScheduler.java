@@ -29,7 +29,7 @@ public class CombinationBriefScheduler {
     private CombinationRepository combinationRepository;
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 0 14 * * ?")
     public void updateCombinationBrief() throws Exception {
         List<Combination> combinations = combinationRepository.findAll();
 
@@ -38,7 +38,7 @@ public class CombinationBriefScheduler {
             String[] weights = combination.getWeights().split("\\|");
             List<Double> percentage = new ArrayList<>();
             for (String weight : weights) {
-                percentage.add(Double.valueOf(weight));
+                percentage.add(Double.valueOf(weight) / 100.00);
             }
             PyAnalysisResult result = getBasicFactors(Arrays.asList(codes), percentage, "1900-05-05", simpleDateFormat.format(new Date()));
 
