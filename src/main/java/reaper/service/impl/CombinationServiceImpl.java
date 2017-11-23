@@ -293,7 +293,7 @@ public class CombinationServiceImpl implements CombinationService {
         /**
          * 波动率：收益率的标准差
          */
-        backtestReportBean.volatility = FormatData.fixToTwo(Calculator.calStandardDeviation(dailyRates));
+        backtestReportBean.volatility = FormatData.fixToTwo(pyAnalysisResult.getNhbdl());
 
         /**
          * 主要的三个因子
@@ -349,12 +349,7 @@ public class CombinationServiceImpl implements CombinationService {
          * 年化收益率 比较
          */
         double baseAnnualProfit = 0.0;
-        if (days < 365) {
-            baseAnnualProfit = (finalBaseValue - startBaseValue) / days / 100 * 365.0;
-        } else {
-            int years = days / 365;
-            baseAnnualProfit = Math.pow(finalBaseValue / startBaseValue, 1.0 / years) - 1;
-        }
+        baseAnnualProfit = ((((finalBaseValue - startBaseValue) / startBaseValue) / days) * 365.0) / 100.00;
         backtestReportBean.annualProfit = new BacktestValueComparisonBean(FormatData.fixToTwoAndPercent(fundAnnualProfit), FormatData.fixToTwoAndPercent(baseAnnualProfit));
 
         /**
@@ -375,7 +370,7 @@ public class CombinationServiceImpl implements CombinationService {
             }
         }
 
-        backtestReportBean.profitDaysRatio = new BacktestValueComparisonBean(FormatData.fixToTwoAndPercent(fundProfitDays / days), FormatData.fixToTwoAndPercent(baseProfitDays / days));
+        backtestReportBean.profitDaysRatio = new BacktestValueComparisonBean(FormatData.fixToTwoAndPercent(fundProfitDays / dailyRates.size()), FormatData.fixToTwoAndPercent(baseProfitDays / baseProfitList.size()));
 
         /**
          * 【图】每日回撤、最大回撤
