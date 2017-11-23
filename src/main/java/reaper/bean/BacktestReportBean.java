@@ -171,7 +171,12 @@ public class BacktestReportBean {
      */
     public FundFactorsHeatBean fundFactorsHeat;
 
-    public BacktestReportBean(String startDate, String endDate, String baseIndex, List<FundRatioNameBean> combination, String investmentGoal, Double intervalAnnualProfit, Double cumulativeProfit, Double finalNetValue, Double maxRetracement, Double sharpeRatio, Double volatility, List<String> mainFactors, BacktestComparisonBean cumulativeNetValueTrend, BacktestComparisonBean profitRateTrend, BacktestValueComparisonBean totalProfitRate, BacktestValueComparisonBean overProfitRate, BacktestValueComparisonBean annualProfit, BacktestValueComparisonBean profitDaysRatio, BacktestComparisonBean dailyRetracementTrend, List<BacktestCorrelationTable> correlationCoefficientTable, Double maxDayDown, Integer maxDownDays, Double annualVolatility, Double var, Double averageCorrelationCoefficient, List<FieldValueBean> styleAttributionProfit, List<FieldValueBean> styleAttributionRisk, List<FieldValueBean> industryAttributionProfit, List<FieldValueBean> industryAttributionRisk, List<FieldValueBean> varietyAttribution, List<FieldValueBean> brisonAttributionStock, List<FieldValueBean> brisonAttributionBond, FundFactorsHeatBean fundFactorsHeat) {
+    /**
+     * 是否成功
+     */
+    public Boolean isSuccess;
+
+    public BacktestReportBean(String startDate, String endDate, String baseIndex, List<FundRatioNameBean> combination, String investmentGoal, Double intervalAnnualProfit, Double cumulativeProfit, Double finalNetValue, Double maxRetracement, Double sharpeRatio, Double volatility, List<String> mainFactors, BacktestComparisonBean cumulativeNetValueTrend, BacktestComparisonBean profitRateTrend, BacktestValueComparisonBean totalProfitRate, BacktestValueComparisonBean overProfitRate, BacktestValueComparisonBean annualProfit, BacktestValueComparisonBean profitDaysRatio, BacktestComparisonBean dailyRetracementTrend, List<BacktestCorrelationTable> correlationCoefficientTable, Double maxDayDown, Integer maxDownDays, Double annualVolatility, Double var, Double averageCorrelationCoefficient, List<FieldValueBean> styleAttributionProfit, List<FieldValueBean> styleAttributionRisk, List<FieldValueBean> industryAttributionProfit, List<FieldValueBean> industryAttributionRisk, List<FieldValueBean> varietyAttribution, List<FieldValueBean> brisonAttributionStock, List<FieldValueBean> brisonAttributionBond, FundFactorsHeatBean fundFactorsHeat, Boolean isSuccess) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.baseIndex = baseIndex;
@@ -205,6 +210,7 @@ public class BacktestReportBean {
         this.brisonAttributionStock = brisonAttributionStock;
         this.brisonAttributionBond = brisonAttributionBond;
         this.fundFactorsHeat = fundFactorsHeat;
+        this.isSuccess = isSuccess;
     }
 
     public BacktestReportBean() {

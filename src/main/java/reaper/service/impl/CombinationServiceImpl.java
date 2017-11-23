@@ -946,4 +946,18 @@ public class CombinationServiceImpl implements CombinationService {
 
         return new FundFactorsHeatBean(resFunds, resFactors, resDatas);
     }
+
+    private List<Double> getRandomValues(int size) {
+        List<Double> res = new ArrayList<>();
+        Random random = new Random();
+        for (int i = 0; i < size; i++) {
+            if (i == 0) {
+                res.add(random.nextInt() * 100.00);
+            } else {
+                res.add(random.nextInt() * (100.00 - res.stream().mapToDouble(d -> d).sum()));
+            }
+        }
+
+        return res;
+    }
 }
