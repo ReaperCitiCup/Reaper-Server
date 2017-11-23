@@ -87,7 +87,7 @@ public class CombinationServiceImpl implements CombinationService {
         String[] weights = combination.getWeights().split("\\|");
         List<Double> percentage = new ArrayList<>();
         for (String weight : weights) {
-            percentage.add(Double.valueOf(weight));
+            percentage.add(Double.valueOf(weight) / 100.00);
         }
         PyAnalysisResult result = getBasicFactors(Arrays.asList(fundsArray), percentage, "1900-05-05", simpleDateFormat.format(new Date()));
 
@@ -646,11 +646,6 @@ public class CombinationServiceImpl implements CombinationService {
             }
             System.out.println("Barra Matlab finish ");
             fundRatio.entrySet().stream().forEach(stringDoubleEntry -> System.out.println(stringDoubleEntry.getKey() + " " + stringDoubleEntry.getValue()));
-//            BarraCache cache = BarraCache.getBarraCache();
-//            boolean res = cache.saveToCache(userService.getCurrentUser().getId(), fundRatio);
-//            if (!res) {
-//                return Collections.EMPTY_LIST;
-//            }
             List<MiniBean> miniBeans = new ArrayList<>();
             for (String code : fundRatio.keySet()) {
                 miniBeans.add(fundService.findFundNameByCode(code));
@@ -720,7 +715,6 @@ public class CombinationServiceImpl implements CombinationService {
          */
         if (fundCombination.path == 3) {
             Map<String, Double> fundRatio = PortfolioMatlabResultGetter.getBarra(fundCombination.barraFactor);
-// Map<String, Double> fundRatio = BarraCache.getBarraCache().findFromCache(userService.getCurrentUser().getId());
             if (fundRatio == null || fundRatio.isEmpty()) {
                 return ResultMessage.FAILED;
             }
