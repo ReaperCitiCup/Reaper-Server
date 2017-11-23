@@ -184,7 +184,7 @@ public class PortfolioMatlabResultGetter {
             try {
                 asset_allocation_factor39 = new Asset_Allocation_Factor39();
                 funds = new MWCharArray(strings);
-                pType = new MWNumericArray(portfolioType);
+                pType = new MWNumericArray(portfolioType - 1);
                 inputKind = new MWNumericArray(input_kind_array);
                 inputFactorNum = new MWNumericArray(input_factor_num);
 
