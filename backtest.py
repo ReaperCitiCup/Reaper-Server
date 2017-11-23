@@ -100,13 +100,13 @@ def annualizedVolatility(r):
 
 
 # 计算年化收益率，参数类型：列表
-def annualizedRate(dailyRate):
+def annualizedRate(dailyRate, days):
     result = 0
     countLen = 0
     while (countLen < len(dailyRate) and countLen < Number_Of_Trading_Days):
         result += dailyRate[countLen]
         countLen += 1
-    return result / countLen * Number_Of_Trading_Days
+    return result / days * 365
 
 
 # 计算特雷诺比率，参数类型：前两个为列表，beta为数值
@@ -514,7 +514,10 @@ def fundGroupTest(codeList, pencentage, startTime, endTime):
     beta = countBeta(temp.fundRate, temp.rm)
     print "# beta=", beta
 
-    print "# 年化收益率=", annualizedRate(temp.fundRate)
+    startTime = datetime.strptime(startTime, '%Y-%m-%d')
+    endTime = datetime.strptime(endTime, '%Y-%m-%d')
+    days = (endTime - startTime).days
+    print "# 年化收益率=", annualizedRate(temp.fundRate, days)
 
     print "# 年化波动率=", annualizedVolatility(temp.fundRate)
 
