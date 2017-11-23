@@ -21,36 +21,39 @@ public class ToFieldBean {
             return null;
         }
         List<FieldValueBean> res = new ArrayList<>();
-        res.add(new FieldValueBean("综合", fixToTwoAndPercent(factorResult.getZh())));
-        res.add(new FieldValueBean("机械", fixToTwoAndPercent(factorResult.getJx())));
-        res.add(new FieldValueBean("银行", fixToTwoAndPercent(factorResult.getYh())));
-        res.add(new FieldValueBean("房地产", fixToTwoAndPercent(factorResult.getFdc())));
-        res.add(new FieldValueBean("医药", fixToTwoAndPercent(factorResult.getYy())));
-        res.add(new FieldValueBean("餐饮旅游", fixToTwoAndPercent(factorResult.getHyyzhj())));
-        res.add(new FieldValueBean("商贸零售", fixToTwoAndPercent(factorResult.getSmls())));
-        res.add(new FieldValueBean("建材", fixToTwoAndPercent(factorResult.getJc())));
-        res.add(new FieldValueBean("家电", fixToTwoAndPercent(factorResult.getJd())));
-        res.add(new FieldValueBean("纺织服装", fixToTwoAndPercent(factorResult.getFzfz())));
-        res.add(new FieldValueBean("食品饮料", fixToTwoAndPercent(factorResult.getSpyl())));
-        res.add(new FieldValueBean("电子元器件", fixToTwoAndPercent(factorResult.getDzyqj())));
-        res.add(new FieldValueBean("交通运输", fixToTwoAndPercent(factorResult.getJtys())));
-        res.add(new FieldValueBean("汽车", fixToTwoAndPercent(factorResult.getQc())));
-        res.add(new FieldValueBean("轻工制造", fixToTwoAndPercent(factorResult.getQgzz())));
-        res.add(new FieldValueBean("电力及公用事业", fixToTwoAndPercent(factorResult.getDljgysy())));
-        res.add(new FieldValueBean("通信", fixToTwoAndPercent(factorResult.getTx())));
-        res.add(new FieldValueBean("石油石化", fixToTwoAndPercent(factorResult.getSysh())));
-        res.add(new FieldValueBean("有色金属", fixToTwoAndPercent(factorResult.getYsjs())));
-        res.add(new FieldValueBean("农林牧渔", fixToTwoAndPercent(factorResult.getNlmy())));
-        res.add(new FieldValueBean("建筑", fixToTwoAndPercent(factorResult.getJz())));
-        res.add(new FieldValueBean("计算机", fixToTwoAndPercent(factorResult.getJsj())));
-        res.add(new FieldValueBean("基础化工", fixToTwoAndPercent(factorResult.getJchg())));
-        res.add(new FieldValueBean("煤炭", fixToTwoAndPercent(factorResult.getMt())));
-        res.add(new FieldValueBean("电力设备", fixToTwoAndPercent(factorResult.getDlsb())));
-        res.add(new FieldValueBean("钢铁", fixToTwoAndPercent(factorResult.getGt())));
-        res.add(new FieldValueBean("国防军工", fixToTwoAndPercent(factorResult.getGfjg())));
-        res.add(new FieldValueBean("非银行金融", fixToTwoAndPercent(factorResult.getFyhjr())));
-        res.add(new FieldValueBean("传媒", fixToTwoAndPercent(factorResult.getCm())));
-        res.add(new FieldValueBean("行业因子合计", fixToTwoAndPercent(factorResult.getHyyzhj())));
+        //若合计大于100，总的除以100
+        double base = factorResult.getHyyzhj()>1?100:1;
+
+        res.add(new FieldValueBean("综合", fixToTwoAndPercent(factorResult.getZh())/base));
+        res.add(new FieldValueBean("机械", fixToTwoAndPercent(factorResult.getJx())/base));
+        res.add(new FieldValueBean("银行", fixToTwoAndPercent(factorResult.getYh())/base));
+        res.add(new FieldValueBean("房地产", fixToTwoAndPercent(factorResult.getFdc())/base));
+        res.add(new FieldValueBean("医药", fixToTwoAndPercent(factorResult.getYy())/base));
+        res.add(new FieldValueBean("餐饮旅游", fixToTwoAndPercent(factorResult.getHyyzhj())/base));
+        res.add(new FieldValueBean("商贸零售", fixToTwoAndPercent(factorResult.getSmls())/base));
+        res.add(new FieldValueBean("建材", fixToTwoAndPercent(factorResult.getJc())/base));
+        res.add(new FieldValueBean("家电", fixToTwoAndPercent(factorResult.getJd())/base));
+        res.add(new FieldValueBean("纺织服装", fixToTwoAndPercent(factorResult.getFzfz())/base));
+        res.add(new FieldValueBean("食品饮料", fixToTwoAndPercent(factorResult.getSpyl())/base));
+        res.add(new FieldValueBean("电子元器件", fixToTwoAndPercent(factorResult.getDzyqj())/base));
+        res.add(new FieldValueBean("交通运输", fixToTwoAndPercent(factorResult.getJtys())/base));
+        res.add(new FieldValueBean("汽车", fixToTwoAndPercent(factorResult.getQc())/base));
+        res.add(new FieldValueBean("轻工制造", fixToTwoAndPercent(factorResult.getQgzz())/base));
+        res.add(new FieldValueBean("电力及公用事业", fixToTwoAndPercent(factorResult.getDljgysy())/base));
+        res.add(new FieldValueBean("通信", fixToTwoAndPercent(factorResult.getTx())/base));
+        res.add(new FieldValueBean("石油石化", fixToTwoAndPercent(factorResult.getSysh())/base));
+        res.add(new FieldValueBean("有色金属", fixToTwoAndPercent(factorResult.getYsjs())/base));
+        res.add(new FieldValueBean("农林牧渔", fixToTwoAndPercent(factorResult.getNlmy())/base));
+        res.add(new FieldValueBean("建筑", fixToTwoAndPercent(factorResult.getJz())/base));
+        res.add(new FieldValueBean("计算机", fixToTwoAndPercent(factorResult.getJsj())/base));
+        res.add(new FieldValueBean("基础化工", fixToTwoAndPercent(factorResult.getJchg())/base));
+        res.add(new FieldValueBean("煤炭", fixToTwoAndPercent(factorResult.getMt())/base));
+        res.add(new FieldValueBean("电力设备", fixToTwoAndPercent(factorResult.getDlsb())/base));
+        res.add(new FieldValueBean("钢铁", fixToTwoAndPercent(factorResult.getGt())/base));
+        res.add(new FieldValueBean("国防军工", fixToTwoAndPercent(factorResult.getGfjg())/base));
+        res.add(new FieldValueBean("非银行金融", fixToTwoAndPercent(factorResult.getFyhjr())/base));
+        res.add(new FieldValueBean("传媒", fixToTwoAndPercent(factorResult.getCm())/base));
+        res.add(new FieldValueBean("行业因子合计", fixToTwoAndPercent(factorResult.getHyyzhj())/base));
         return res;
     }
 
@@ -103,16 +106,40 @@ public class ToFieldBean {
             return null;
         }
         List<FieldValueBean> res = new ArrayList<>();
-        res.add(new FieldValueBean("beta", fixToTwoAndPercent(factorResult.getBeta())));
-        res.add(new FieldValueBean("价值", fixToTwoAndPercent(factorResult.getBtop())));
-        res.add(new FieldValueBean("盈利能力", fixToTwoAndPercent(factorResult.getEarningsYield())));
-        res.add(new FieldValueBean("成长性", fixToTwoAndPercent(factorResult.getGrowth())));
-        res.add(new FieldValueBean("杠杆率", fixToTwoAndPercent(factorResult.getLeverage())));
-        res.add(new FieldValueBean("流动性", fixToTwoAndPercent(factorResult.getLiquidity())));
-        res.add(new FieldValueBean("动量", fixToTwoAndPercent(factorResult.getMomentum())));
-        res.add(new FieldValueBean("非线性市值", fixToTwoAndPercent(factorResult.getNlsize())));
-        res.add(new FieldValueBean("波动率", fixToTwoAndPercent(factorResult.getResidualvolatility())));
-        res.add(new FieldValueBean("市值", fixToTwoAndPercent(factorResult.getSize())));
+        //若大于100，总的除以100
+        double base = 1;
+        if(factorResult.getBeta()>1){
+            base = 100;
+        }else if(factorResult.getBtop()>1){
+            base = 100;
+        }else if(factorResult.getEarningsYield()>1){
+            base = 100;
+        }else if(factorResult.getGrowth()>1){
+            base = 100;
+        }else if(factorResult.getLeverage()>1){
+            base = 100;
+        }else if(factorResult.getLiquidity()>1){
+            base = 100;
+        }else if(factorResult.getMomentum()>1){
+            base = 100;
+        }else if(factorResult.getNlsize()>1){
+            base = 100;
+        }else if(factorResult.getResidualvolatility()>1){
+            base = 100;
+        }else if(factorResult.getSize()>1){
+            base = 100;
+        }
+
+        res.add(new FieldValueBean("beta", fixToTwoAndPercent(factorResult.getBeta())/base));
+        res.add(new FieldValueBean("价值", fixToTwoAndPercent(factorResult.getBtop())/base));
+        res.add(new FieldValueBean("盈利能力", fixToTwoAndPercent(factorResult.getEarningsYield())/base));
+        res.add(new FieldValueBean("成长性", fixToTwoAndPercent(factorResult.getGrowth())/base));
+        res.add(new FieldValueBean("杠杆率", fixToTwoAndPercent(factorResult.getLeverage())/base));
+        res.add(new FieldValueBean("流动性", fixToTwoAndPercent(factorResult.getLiquidity())/base));
+        res.add(new FieldValueBean("动量", fixToTwoAndPercent(factorResult.getMomentum())/base));
+        res.add(new FieldValueBean("非线性市值", fixToTwoAndPercent(factorResult.getNlsize())/base));
+        res.add(new FieldValueBean("波动率", fixToTwoAndPercent(factorResult.getResidualvolatility())/base));
+        res.add(new FieldValueBean("市值", fixToTwoAndPercent(factorResult.getSize())/base));
         return res;
     }
 
@@ -145,10 +172,21 @@ public class ToFieldBean {
             return null;
         }
         List<FieldValueBean> res = new ArrayList<>();
-        res.add(new FieldValueBean("资产配置效益", fixToTwoAndPercent(brisonResult.getAllocationEffect())));
-        res.add(new FieldValueBean("债券选择效益", fixToTwoAndPercent(brisonResult.getSelectionEffect())));
-        res.add(new FieldValueBean("交叉效益", fixToTwoAndPercent(brisonResult.getInteractionEffect())));
-        res.add(new FieldValueBean("总超额效益", fixToTwoAndPercent(brisonResult.getActiveReturn())));
+        double base = 1;
+        if(brisonResult.getAllocationEffect()>1){
+            base = 100;
+        }else if(brisonResult.getSelectionEffect()>1){
+            base = 100;
+        }else if(brisonResult.getInteractionEffect()>1){
+            base = 100;
+        }else if(brisonResult.getActiveReturn()>1){
+            base = 100;
+        }
+
+        res.add(new FieldValueBean("资产配置效益", fixToTwoAndPercent(brisonResult.getAllocationEffect())/base));
+        res.add(new FieldValueBean("债券选择效益", fixToTwoAndPercent(brisonResult.getSelectionEffect())/base));
+        res.add(new FieldValueBean("交叉效益", fixToTwoAndPercent(brisonResult.getInteractionEffect())/base));
+        res.add(new FieldValueBean("总超额效益", fixToTwoAndPercent(brisonResult.getActiveReturn())/base));
         return res;
     }
 
@@ -174,11 +212,23 @@ public class ToFieldBean {
         if (stockBrinsonResult == null) {
             return null;
         }
+
+        double base = 1;
+        if(stockBrinsonResult.getAllocationEffect()>1){
+            base = 100;
+        }else if(stockBrinsonResult.getSelectionEffect()>1){
+            base = 100;
+        }else if(stockBrinsonResult.getInteractionEffect()>1){
+            base = 100;
+        }else if(stockBrinsonResult.getActiveReturn()>1){
+            base = 100;
+        }
+
         List<FieldValueBean> res = new ArrayList<>();
-        res.add(new FieldValueBean("资产配置效益", fixToTwoAndPercent(stockBrinsonResult.getAllocationEffect())));
-        res.add(new FieldValueBean("股票选择效益", fixToTwoAndPercent(stockBrinsonResult.getSelectionEffect())));
-        res.add(new FieldValueBean("交叉效益", fixToTwoAndPercent(stockBrinsonResult.getInteractionEffect())));
-        res.add(new FieldValueBean("总超额效益", fixToTwoAndPercent(stockBrinsonResult.getActiveReturn())));
+        res.add(new FieldValueBean("资产配置效益", fixToTwoAndPercent(stockBrinsonResult.getAllocationEffect())/base));
+        res.add(new FieldValueBean("股票选择效益", fixToTwoAndPercent(stockBrinsonResult.getSelectionEffect())/base));
+        res.add(new FieldValueBean("交叉效益", fixToTwoAndPercent(stockBrinsonResult.getInteractionEffect())/base));
+        res.add(new FieldValueBean("总超额效益", fixToTwoAndPercent(stockBrinsonResult.getActiveReturn())/base));
         return res;
     }
 
@@ -205,15 +255,34 @@ public class ToFieldBean {
             return null;
         }
         List<FieldValueBean> res = new ArrayList<>();
-        res.add(new FieldValueBean("国债", fixToTwoAndPercent(brisonResult.getGzExposure())));
-        res.add(new FieldValueBean("地方政府债", fixToTwoAndPercent(brisonResult.getDfzfzExposure())));
-        res.add(new FieldValueBean("金融债", fixToTwoAndPercent(brisonResult.getJrzExposure())));
-        res.add(new FieldValueBean("企业债", fixToTwoAndPercent(brisonResult.getQyzExposure())));
-        res.add(new FieldValueBean("公司债", fixToTwoAndPercent(brisonResult.getGszExposure())));
-        res.add(new FieldValueBean("中期票据", fixToTwoAndPercent(brisonResult.getZqpjExposure())));
-        res.add(new FieldValueBean("短期融资券", fixToTwoAndPercent(brisonResult.getDqrzqExposure())));
-        res.add(new FieldValueBean("定向工具", fixToTwoAndPercent(brisonResult.getDxgjExposure())));
-        res.add(new FieldValueBean("其他", fixToTwoAndPercent(brisonResult.getOtherExposure())));
+        double base = 1;
+        if(brisonResult.getGzExposure()>1){
+            base = 100;
+        }else if(brisonResult.getDfzfzExposure()>1){
+            base = 100;
+        }else if(brisonResult.getJrzExposure()>1){
+            base = 100;
+        }else if(brisonResult.getQyzExposure()>1){
+            base = 100;
+        }else if(brisonResult.getGszExposure()>1){
+            base = 100;
+        }else if(brisonResult.getZqpjExposure()>1){
+            base = 100;
+        }else if(brisonResult.getDqrzqExposure()>1){
+            base = 100;
+        }else if(brisonResult.getDxgjExposure()>1){
+            base = 100;
+        }
+
+        res.add(new FieldValueBean("国债", fixToTwoAndPercent(brisonResult.getGzExposure())/base));
+        res.add(new FieldValueBean("地方政府债", fixToTwoAndPercent(brisonResult.getDfzfzExposure())/base));
+        res.add(new FieldValueBean("金融债", fixToTwoAndPercent(brisonResult.getJrzExposure())/base));
+        res.add(new FieldValueBean("企业债", fixToTwoAndPercent(brisonResult.getQyzExposure())/base));
+        res.add(new FieldValueBean("公司债", fixToTwoAndPercent(brisonResult.getGszExposure())/base));
+        res.add(new FieldValueBean("中期票据", fixToTwoAndPercent(brisonResult.getZqpjExposure())/base));
+        res.add(new FieldValueBean("短期融资券", fixToTwoAndPercent(brisonResult.getDqrzqExposure())/base));
+        res.add(new FieldValueBean("定向工具", fixToTwoAndPercent(brisonResult.getDxgjExposure())/base));
+        res.add(new FieldValueBean("其他", fixToTwoAndPercent(brisonResult.getOtherExposure())/base));
         return res;
     }
 
