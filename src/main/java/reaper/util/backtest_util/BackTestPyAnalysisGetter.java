@@ -29,6 +29,9 @@ public class BackTestPyAnalysisGetter {
     public static PyAnalysisResult getBasicFactors(List<String> codeList, List<Double> percentage, String startDate, String endDate) {
         PyAnalysisResult result = new PyAnalysisResult();
         String pyRes = PythonUser.usePy(FILE_BACK_ANALYSIS, startDate + " " + endDate + " " + combineAndFillBlank(codeList, percentage));
+
+        System.out.println(pyRes);
+
         String[] lines = pyRes.split("\n");
         List<String> useful = new ArrayList<>();
         for (String line : lines) {

@@ -38,15 +38,14 @@ public class PortfolioMatlabResultGetter {
 
         double[] input_weight_array = input_weight.stream().mapToDouble(d -> d).toArray();
 
-//        System.out.println("code:");
-//        codes.forEach(System.out::println);
-//        System.out.println("kind:");
-//        input_kind.forEach(System.out::println);
-//        System.out.println("weight:");
-//        input_weight.forEach(System.out::println);
-//        System.out.println("ptype:"+portfolioType);
-//        System.out.println("profitRate:"+profitRate);
-//
+        System.out.println("code:");
+        codes.forEach(System.out::println);
+        System.out.println("kind:");
+        input_kind.forEach(System.out::println);
+        System.out.println("weight:");
+        input_weight.forEach(System.out::println);
+        System.out.println("ptype:"+portfolioType);
+        System.out.println("profitRate:"+profitRate);
 
 
         /**
@@ -73,7 +72,7 @@ public class PortfolioMatlabResultGetter {
 
             try {
                 funds = new MWCharArray(strings);
-                pType = new MWNumericArray(portfolioType);
+                pType = new MWNumericArray(portfolioType-1);
                 inputKind = new MWNumericArray(input_kind_array);
                 inputWeight = new MWNumericArray(input_weight_array);
                 assetAllocation = new Asset_Allocation();
@@ -134,7 +133,7 @@ public class PortfolioMatlabResultGetter {
             try {
                 asset_allocation_factor = new Asset_Allocation_Factor();
                 funds = new MWCharArray(strings);
-                pType = new MWNumericArray(portfolioType);
+                pType = new MWNumericArray(portfolioType-1);
                 inputKind = new MWNumericArray(input_kind_array);
                 inputFactorNum = new MWNumericArray(input_factor_num);
 

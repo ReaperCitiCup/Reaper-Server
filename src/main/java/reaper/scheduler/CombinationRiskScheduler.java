@@ -37,7 +37,7 @@ public class CombinationRiskScheduler {
     @Autowired
     private FundRepository fundRepository;
 
-    @Scheduled(cron = "0 0 3 * * ?")
+    @Scheduled(cron = "0 0 4 * * ?")
     public void updateRisk() throws Exception {
         List<CombinationAnalysis> combinationAnalyses = combinationAnalysisRepository.findAll();
         for (CombinationAnalysis combinationAnalysis : combinationAnalyses) {
