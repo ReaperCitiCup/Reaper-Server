@@ -293,7 +293,7 @@ public class CombinationServiceImpl implements CombinationService {
         /**
          * 波动率：收益率的标准差
          */
-        backtestReportBean.volatility = FormatData.fixToTwo(Calculator.calStandardDeviation(dailyRates));
+        backtestReportBean.volatility = pyAnalysisResult.getNhbdl();
 
         /**
          * 主要的三个因子
