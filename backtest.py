@@ -449,10 +449,14 @@ def fundGroup(codeList, pencentage):
         curRate = 0
         curNAV = 0
         curAccNetValue = 0
+        # for i in range(len(pencentage)):
+        #     curRate += fundDict[codeList[i]].dailyRate[index[i]] * pencentage[i]
+        #     curNAV += fundDict[codeList[i]].nav[index[i]] * pencentage[i]
+        #     curAccNetValue += fundDict[codeList[i]].accNetValue[index[i]] * pencentage[i]
         for i in range(len(pencentage)):
             curRate += fundDict[codeList[i]].dailyRate[index[i]] * pencentage[i]
-            curNAV += fundDict[codeList[i]].nav[index[i]] * pencentage[i]
-            curAccNetValue += fundDict[codeList[i]].accNetValue[index[i]] * pencentage[i]
+            curNAV += 1 * pencentage[i] / (fundDict[codeList[i]].nav[index[i]])  # 假设对组合投资1块钱，则curNAV即为买到的净值
+            curAccNetValue += 1 * pencentage[i] / (fundDict[codeList[i]].accNetValue[index[i]])
 
         myFundGroup.dailyRate.append(curRate)
         myFundGroup.nav.append(curNAV)
@@ -514,10 +518,14 @@ def fundGroupTest(codeList, pencentage, startTime, endTime):
     beta = countBeta(temp.fundRate, temp.rm)
     print "# beta=", beta
 
+    # startTime = datetime.strptime(startTime, '%Y-%m-%d')
+    # endTime = datetime.strptime(endTime, '%Y-%m-%d')
+    # days = (endTime - startTime).days
+    totalReturn = (temp.nav[0] - temp.nav[-1]) / temp.nav[-1]
     startTime = datetime.strptime(startTime, '%Y-%m-%d')
     endTime = datetime.strptime(endTime, '%Y-%m-%d')
     days = (endTime - startTime).days
-    print "# 年化收益率=", annualizedRate(temp.fundRate, days)
+    print "# 年化收益率=", totalReturn / days * 365
 
     print "# 年化波动率=", annualizedVolatility(temp.fundRate)
 
