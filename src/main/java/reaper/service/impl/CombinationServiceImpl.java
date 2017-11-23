@@ -696,21 +696,23 @@ public class CombinationServiceImpl implements CombinationService {
         /**
          * 静态比例配置要特别处理
          */
-        if (fundCombination.method == 1) {
-            List<String> funds = new ArrayList<>();
-            for (FundCategoryBean categoryBean : fundCombination.funds) {
-                funds.addAll(categoryBean.codes);
+        if (fundCombination.method != null) {
+            if (fundCombination.method == 1) {
+                List<String> funds = new ArrayList<>();
+                for (FundCategoryBean categoryBean : fundCombination.funds) {
+                    funds.addAll(categoryBean.codes);
+                }
+
+                int size = funds.size();
+                double ration = 100.0 / size;
+
+                List<FundRatioBean> fundRatioBeans = new ArrayList<>();
+                for (String s : funds) {
+                    fundRatioBeans.add(new FundRatioBean(s, ration));
+                }
+
+                return createCombinationByUser(fundCombination.name, fundRatioBeans, fundCombination.profitRiskTarget, combinationAnalysis);
             }
-
-            int size = funds.size();
-            double ration = 100.0 / size;
-
-            List<FundRatioBean> fundRatioBeans = new ArrayList<>();
-            for (String s : funds) {
-                fundRatioBeans.add(new FundRatioBean(s, ration));
-            }
-
-            return createCombinationByUser(fundCombination.name, fundRatioBeans, fundCombination.profitRiskTarget, combinationAnalysis);
         }
 
         /**
