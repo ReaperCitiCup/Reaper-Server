@@ -39,12 +39,17 @@ public class FundCombinationBean {
     public List<FundCategoryBean> funds;
 
     /**
+     * 如果选择barra，则barraFactor有效
+     */
+    public List<BarraFactorBean> barraFactor;
+
+    /**
      * 分散化方法 1 2 3
      */
     public Integer method;
 
     /**
-     * 如果分散化方法为均值方差 2，则 profitRate 有效
+     * 如果分散化方法为均值方差 6，则 profitRate 有效
      */
     public Double profitRate;
 

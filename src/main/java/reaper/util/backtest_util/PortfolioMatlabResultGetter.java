@@ -77,7 +77,7 @@ public class PortfolioMatlabResultGetter {
                 inputKind = new MWNumericArray(input_kind_array);
                 inputWeight = new MWNumericArray(input_weight_array);
                 assetAllocation = new Asset_Allocation();
-                if (portfolioType == 5) {
+                if (portfolioType == 6) {
                     result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight, new MWNumericArray(profitRate));
                 } else {
                     result = assetAllocation.asset_arrangement(1, funds, pType, inputKind, inputWeight);
@@ -138,7 +138,7 @@ public class PortfolioMatlabResultGetter {
                 inputKind = new MWNumericArray(input_kind_array);
                 inputFactorNum = new MWNumericArray(input_factor_num);
 
-                if (portfolioType == 5) {
+                if (portfolioType == 6) {
                     result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum, new MWNumericArray(profitRate));
                 } else {
                     result = asset_allocation_factor.factor_arrangement(1, funds, pType, inputKind, inputFactorNum);
@@ -189,7 +189,7 @@ public class PortfolioMatlabResultGetter {
                 inputKind = new MWNumericArray(input_kind_array);
                 inputFactorNum = new MWNumericArray(input_factor_num);
 
-                if (portfolioType == 5) {
+                if (portfolioType == 6) {
                     result = asset_allocation_factor39.factor_arrangement(1, funds, pType, inputKind, inputFactorNum, new MWNumericArray(profitRate));
                 } else {
                     result = asset_allocation_factor39.factor_arrangement(1, funds, pType, inputKind, inputFactorNum);
