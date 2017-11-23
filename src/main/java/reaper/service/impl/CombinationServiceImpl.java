@@ -349,7 +349,7 @@ public class CombinationServiceImpl implements CombinationService {
          * 年化收益率 比较
          */
         double baseAnnualProfit = 0.0;
-        baseAnnualProfit = ((((finalBaseValue - startBaseValue) / startBaseValue) / days) * 365.0) / 100.00;
+        baseAnnualProfit = ((((finalBaseValue - startBaseValue) / startBaseValue) / days) * 365.0);
         backtestReportBean.annualProfit = new BacktestValueComparisonBean(FormatData.fixToTwoAndPercent(fundAnnualProfit), FormatData.fixToTwoAndPercent(baseAnnualProfit));
 
         /**
