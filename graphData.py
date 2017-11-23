@@ -101,14 +101,13 @@ def annualizedVolatility(r):
 
 
 # 计算年化收益率，参数类型：列表
-def annualizedRate(dailyRate):
-    result = 0
-    countLen = 0
-    while (countLen < len(dailyRate) and countLen < Number_Of_Trading_Days):
-        result += dailyRate[countLen]
-        countLen += 1
-    return result / countLen * Number_Of_Trading_Days
-
+def annualizedRate(dailyRate,days):#days为投资天数
+    result=0
+    countLen=0
+    while(countLen<len(dailyRate) and countLen<Number_Of_Trading_Days):
+        result+=dailyRate[countLen]
+        countLen+=1
+    return result/days*365
 
 # 计算特雷诺比率，参数类型：前两个为列表，beta为数值
 def TreynorRatio(resultRate, rf, beta):
@@ -163,7 +162,7 @@ class Fund:
 def getFund(code):
     fund = Fund(code)
     try:
-        cur.execute('SELECT  date,unitNetValue,dailyRate FROM reaper.fund_netValue WHERE code=' + code)
+        cur.execute('SELECT  date,unitNetValue,dailyRate FROM reaper.fund_netValue WHERE code=' + code + ' ORDER BY date DESC')
         data = cur.fetchall()
         for d in data:
             fund.date.append((str(d[0]))[:10])  # 去掉时分秒
@@ -287,7 +286,7 @@ class Rm:
         self.dayRate = []
         self.monthRate = []
 
-        cur.execute('SELECT  date,beforeClosePrice,closePrice FROM basic_stock_index where stockId="000001"')
+        cur.execute('SELECT  date,beforeClosePrice,closePrice FROM basic_stock_index where stockId="000001" ORDER BY date DESC ')
         data = cur.fetchall()
         dataLen = len(data)
         i = 0
@@ -519,7 +518,7 @@ def test2(code, startTime, endTime, option):  # 参数：基金的代码，查�
             print curEndTime.strftime('%Y-%m-%d'), beta[-1]
 
         elif ('annualizedRate' == option):
-            AnnualizedRate.append(annualizedRate(temp.fundRate))
+            AnnualizedRate.append(annualizedRate(temp.fundRate,days))
             print curEndTime.strftime('%Y-%m-%d'), AnnualizedRate[-1]
 
         elif ('annualizedVolatility' == option):
