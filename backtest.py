@@ -525,11 +525,14 @@ def fundGroupTest(codeList, pencentage, startTime, endTime):
     # startTime = datetime.strptime(startTime, '%Y-%m-%d')
     # endTime = datetime.strptime(endTime, '%Y-%m-%d')
     # days = (endTime - startTime).days
-    totalReturn = (temp.nav[0] - temp.nav[-1]) / temp.nav[-1]
+    # totalReturn = (temp.nav[0] - temp.nav[-1]) / temp.nav[-1]
+    # startTime = datetime.strptime(temp.date[-1], '%Y-%m-%d')
+    # endTime = datetime.strptime(temp.date[0], '%Y-%m-%d')
+    # days = (endTime - startTime).days
     startTime = datetime.strptime(temp.date[-1], '%Y-%m-%d')
     endTime = datetime.strptime(temp.date[0], '%Y-%m-%d')
     days = (endTime - startTime).days
-    print "# 年化收益率=", totalReturn / days * 365
+    print "# 年化收益率=", annualizedRate(temp.fundRate, days)
 
     print "# 年化波动率=", annualizedVolatility(temp.fundRate)
 
