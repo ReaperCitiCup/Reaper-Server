@@ -1,6 +1,7 @@
 package reaper.util.backtest_util;
 
 import reaper.bean.ValueDateBean;
+import reaper.util.FormatData;
 import reaper.util.PythonUser;
 import reaper.util.ValueDateBeanComparator;
 
@@ -73,7 +74,7 @@ public class BackTestPyAnalysisGetter {
             } else if (values[1].equals("累计净值=")) {
                 cumNet.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
             } else if (values[1].equals("日收益率=")) {
-                dailyReturnRates.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
+                dailyReturnRates.add(new ValueDateBean(values[2], FormatData.fixToTwoAndPercent(Double.valueOf(values[3]))));
             } else if (values[1].equals("每日回撤=")) {
                 dailyRetrace.add(new ValueDateBean(values[2], Double.valueOf(values[3])));
             } else {
