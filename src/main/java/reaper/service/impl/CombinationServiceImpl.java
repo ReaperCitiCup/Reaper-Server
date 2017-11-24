@@ -404,7 +404,7 @@ public class CombinationServiceImpl implements CombinationService {
         Collections.reverse(baseRetracementList);
 
         backtestReportBean.dailyRetracementTrend = new BacktestComparisonBean(fundRetracementList, baseRetracementList);
-        backtestReportBean.maxRetracement = FormatData.fixToTwoAndPercent(maxRetracement);
+        backtestReportBean.maxRetracement = FormatData.fixToTwo(maxRetracement);
 
         /**
          * 【表】相关系数
