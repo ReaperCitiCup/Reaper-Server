@@ -457,8 +457,8 @@ def fundGroup(codeList, pencentage):
         #     curAccNetValue += fundDict[codeList[i]].accNetValue[index[i]] * pencentage[i]
         for i in range(len(pencentage)):
             curRate += fundDict[codeList[i]].dailyRate[index[i]] * pencentage[i]
-            curNAV += pencentage[i] / (fundDict[codeList[i]].nav[index[i]])  # 假设对组合投资1块钱，则curNAV即为买到的净值
-            curAccNetValue += pencentage[i] / (fundDict[codeList[i]].accNetValue[index[i]])
+            curNAV += pencentage[i] * (fundDict[codeList[i]].nav[index[i]])  # 假设对组合投资1块钱，则curNAV即为买到的净值
+            curAccNetValue += pencentage[i] * (fundDict[codeList[i]].accNetValue[index[i]])
 
         myFundGroup.dailyRate.append(curRate)
         myFundGroup.nav.append(curNAV)
@@ -501,6 +501,7 @@ def fundGroupTest(codeList, pencentage, startTime, endTime):
     print "# 最大跌幅=", min(temp.fundRate)
     print "# 期初净值=", temp.nav[-1]
     print "# 期末净值=", temp.nav[0]
+    print "# 累计收益=", sum(temp.fundRate)
 
     y = ListSub(temp.fundRate, temp.rf)
     x1 = ListSub(temp.rm, temp.rf)

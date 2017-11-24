@@ -65,6 +65,8 @@ public class BackTestPyAnalysisGetter {
                 result.setZgxs(Double.valueOf(values[2]));
             } else if (values[1].equals("择时系数=")) {
                 result.setZsxs(Double.valueOf(values[2]));
+            } else if (values[1].equals("累计收益=")) {
+                result.setLjsy(Double.valueOf(values[2]));
             } else if (values[1].equals("最大跌幅=")) {
                 result.setZddf(Double.valueOf(values[2]));
             } else if (values[1].equals("期初净值=")) {

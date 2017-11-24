@@ -287,7 +287,7 @@ public class CombinationServiceImpl implements CombinationService {
         double fundAnnualProfit = pyAnalysisResult.getNhsyl();
 
         backtestReportBean.intervalAnnualProfit = FormatData.fixToTwoAndPercent(fundAnnualProfit);
-        backtestReportBean.cumulativeProfit = FormatData.fixToTwoAndPercent((finalNetValue - startNetValue) / startNetValue);
+        backtestReportBean.cumulativeProfit = FormatData.fixToTwoAndPercent(pyAnalysisResult.getLjsy());
         backtestReportBean.finalNetValue = FormatData.fixToTwo(finalNetValue);
 
         /**
@@ -335,7 +335,7 @@ public class CombinationServiceImpl implements CombinationService {
         double finalBaseValue = basicStockIndexList.get(basicStockIndexList.size() - 1).getClosePrice();
         double startBaseValue = basicStockIndexList.get(0).getClosePrice();
         double baseProfit = FormatData.fixToTwoAndPercent((finalBaseValue - startBaseValue) / startBaseValue);
-        double fundProfit = FormatData.fixToTwoAndPercent((finalNetValue - startNetValue) / startNetValue);
+        double fundProfit = FormatData.fixToTwoAndPercent(pyAnalysisResult.getLjsy());
         backtestReportBean.totalProfitRate = new BacktestValueComparisonBean(fundProfit, baseProfit);
 
 

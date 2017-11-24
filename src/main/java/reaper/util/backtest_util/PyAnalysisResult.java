@@ -69,6 +69,11 @@ public class PyAnalysisResult {
     private Double qmjz;
 
     /**
+     * 累计收益
+     */
+    private Double ljsy;
+
+    /**
      * 平均相关系数
      */
     private List<CorrelationCoefficient> pjxgxs;
@@ -261,5 +266,13 @@ public class PyAnalysisResult {
 
     public void setDailyRetrace(List<ValueDateBean> dailyRetrace) {
         this.dailyRetrace = dailyRetrace;
+    }
+
+    public Double getLjsy() {
+        return ljsy;
+    }
+
+    public void setLjsy(Double ljsy) {
+        this.ljsy = ljsy;
     }
 }
