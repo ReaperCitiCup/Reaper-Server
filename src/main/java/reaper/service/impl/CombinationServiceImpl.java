@@ -122,7 +122,7 @@ public class CombinationServiceImpl implements CombinationService {
         try {
             List<ValueDateBean> returnRates = result.getDailyReturnRate();
             double newProfit = returnRates.get(returnRates.size() - 1).value;
-            combination.setNewProfit(FormatData.fixToTwoAndPercent(newProfit));
+            combination.setNewProfit(newProfit);
         } catch (Exception e) {
             e.printStackTrace();
             combination.setNewProfit(0.0);
