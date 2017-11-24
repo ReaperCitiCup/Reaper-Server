@@ -29,7 +29,7 @@ public class CombinationBriefScheduler {
     private CombinationRepository combinationRepository;
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    @Scheduled(cron = "0 0 3 * * ?")
+    @Scheduled(cron = "0 0 11 * * ?")
     public void updateCombinationBrief() throws Exception {
         List<Combination> combinations = combinationRepository.findAll();
 
